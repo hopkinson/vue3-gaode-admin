@@ -1,0 +1,56 @@
+/**
+ * CSS工具库
+ */
+/*-------------------------------------
+ ├   图片相关                          ┆
+ └------------------------------------*/
+//  图片缩略图
+.img-thumb(@width,@height) {
+  width: @width;
+  height: @height;
+  text-align: center;
+  line-height: @height;
+  background-color: #fff;
+  i {
+    font-size: 20px;
+  }
+}
+
+/*-------------------------------------
+├   文字省略                            ┆
+└------------------------------------*/
+// 多行省略
+.text-ellipsis-multi-line(@line) when (@line <= 1) {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.text-ellipsis-multi-line(@line) when (@line > 1) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: @line;
+  -webkit-box-orient: vertical;
+}
+
+/*-------------------------------------
+├   背景                              ┆
+└------------------------------------*/
+// 改变页面背景色
+.change-full-page-backgound(@bg) {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  background: @bg;
+}
+/*-------------------------------------
+├   字体                              ┆
+└------------------------------------*/
+// 少于12px的清空
+.font-smaller(@w){
+  font-size: 12px;
+  transform: scale(@w/12);
+  transform-origin: left
+}

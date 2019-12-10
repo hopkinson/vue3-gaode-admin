@@ -1,0 +1,30 @@
+/**
+  全局样式  
+*/
+// 2. 全局样式
+.global {
+  /* 图片 相关 */
+  &__img {
+    &--default {
+      .img-thumb(350px, 350px);
+    }
+    // 缩略图
+    &--thumb {
+      .img-thumb(50px, 50px);
+    }
+  }
+  /* 块级元素 相关 */
+  &__block {
+    // 1. 水平居中
+    &--horizontal-center {
+      display: table;
+      margin: 10px auto;
+    }
+  }
+  &__inline {
+    // 1. 水平居中
+    &--horizontal-center {
+      text-align: center;
+    }
+  }
+}
