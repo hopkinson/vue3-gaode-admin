@@ -12,6 +12,10 @@
     htmlWebpackPlugin.options.cdn.css) { %>
     <link rel="stylesheet" href="<%= htmlWebpackPlugin.options.cdn.css[i] %>" />
     <% } %>
+    <script
+      type="text/javascript"
+      src="https://webapi.amap.com/maps?v=1.4.11&key=d8629d0fd7aacdae4a39f068968b96c0"
+    ></script>
     <!-- 使用CDN的JS文件 -->
     <% for (var i in htmlWebpackPlugin.options.cdn &&
     htmlWebpackPlugin.options.cdn.js) { %>
@@ -19,15 +23,14 @@
       type="text/javascript"
       src="<%= htmlWebpackPlugin.options.cdn.js[i] %>"
     ></script>
-    <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.11&key=d8629d0fd7aacdae4a39f068968b96c0"></script>
-    <!--引入UI组件库（1.0版本） -->      
+    <!--引入UI组件库（1.0版本） -->
     <script src="http://webapi.amap.com/ui/1.0/main.js"></script>
-    <script type="text/javascript" src="http://webapi.amap.com/demos/js/liteToolbar.js"></script>
+    <script
+      type="text/javascript"
+      src="http://webapi.amap.com/demos/js/liteToolbar.js"
+    ></script>
     <% } %>
   </head>
-  
-
-
 
   <body>
     <noscript>
@@ -40,7 +43,7 @@
     <!-- built files will be auto injected -->
     <script>
       // 为了防止报map未定义这个错误
-      window.onload=function(){
+      window.onload = function() {
         var map
       }
     </script>

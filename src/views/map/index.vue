@@ -2,7 +2,6 @@
   <div class="map">
     <!-- 图表 && 查询 -->
     <div class="map__chart">
-      <!-- 左边 -->
       <div class="map__chart--left">
         <panel-chart title="告警统计" unit="单位（次）">
           <chart-warning :data="warning"></chart-warning>
@@ -10,7 +9,6 @@
         <panel-chart title="当天最高时速" unit="速度km/h">
           <chart-speed :data="speed"></chart-speed>
         </panel-chart>
-        <!-- 左边 - 底部图例 -->
         <div class="map__legends map__legends--position">
           <div
             v-for="(item, index) in legends"

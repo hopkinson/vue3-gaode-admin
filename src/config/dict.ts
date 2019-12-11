@@ -3,6 +3,7 @@ export const MAP = {
   zoom: 19, //初始化地图层级
   center: [113.453468, 23.154044], //初始化地图中心点
   zooms: [3, 22], // 缩放
+  mapStyle: 'amap://styles/darkblue',
   tileUrl: 'http://zwcf5200.cn:10698/SubHD/tile/raster/[z]/[x]/[y].jpg' // 图层url
 }
 

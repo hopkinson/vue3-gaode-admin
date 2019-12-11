@@ -49,21 +49,20 @@ Vue.prototype.$echarts = echarts
 // 全局过滤器
 Object.keys(filters).forEach(k => Vue.filter(k, filters[k]))
 // 高德地图
-Vue.use(VueAMap)
 VueAMap.initAMapApiLoader({
   key: MAP.key,
   plugin: [
-    'AMap.Autocomplete',
-    'AMap.PlaceSearch',
-    'AMap.Scale',
-    'AMap.OverView',
     'AMap.ToolBar',
     'AMap.MapType',
     'AMap.PolyEditor',
-    'AMap.CircleEditor'
+    'AMap.MarkerClusterer'
   ],
-  v: '1.4.4'
+  v: '1.4.15'
 })
+setTimeout(() => {
+  localStorage.removeItem('_AMap_raster')
+  Vue.use(VueAMap)
+}, 0)
 /**
  * ==============
  *  插  件  使  用
