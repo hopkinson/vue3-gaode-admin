@@ -6,7 +6,4 @@
 
 <style lang="less">
 @import './assets/style/reset.less';
-#app {
-  height: 100%;
-}
 </style>

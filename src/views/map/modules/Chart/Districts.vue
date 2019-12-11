@@ -1,6 +1,6 @@
 <template>
   <!-- 当天最高时速 -->
-  <div ref="chart" class="chart"></div>
+  <div ref="chart" class="project__echarts"></div>
 </template>
 
 <script lang="ts">
@@ -92,15 +92,10 @@ export default class ChartWarning extends Vue {
   }
 
   // 监听 - params
-  @Watch('data', { deep: true, immediate: true })
+  @Watch('data', { deep: true })
   public watchData(val: any) {
     this.initData()
   }
 }
 </script>
-<style lang="less" scoped>
-.chart {
-  width: 400px;
-  height: 280px;
-}
-</style>
+<style lang="less" scoped></style>

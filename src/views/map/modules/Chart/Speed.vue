@@ -1,6 +1,6 @@
 <template>
   <!-- 当天最高时速 -->
-  <div ref="chart" class="chart"></div>
+  <div ref="chart" class="project__echarts"></div>
 </template>
 
 <script lang="ts">
@@ -29,6 +29,15 @@ export default class ChartWarning extends Vue {
         type: 'value'
       }
     ],
+    tooltip: {
+      backgroundColor: 'transparent',
+      formatter: function({ data }) {
+        return `
+        <div class="project__echarts--tooltip-bar">
+            <span class="project__echarts--tooltip-car-text">${data}</span>
+        </div>`
+      }
+    },
     // x轴
     xAxis: [
       {

@@ -2,9 +2,9 @@
   <div class="menu__container">
     <el-menu
       :default-active="active"
-      background-color="#3c6bd9"
-      text-color="#fff"
-      active-text-color="#e6a23c"
+      background-color="#051d4d"
+      text-color="transpent"
+      active-text-color="transpent"
       mode="horizontal"
       router
     >
@@ -13,7 +13,7 @@
         v-for="(item, index) in data"
         :key="index"
       >
-        <i class="menu__container--icon" :class="item.meta.icon"></i>
+        <!-- <i class="menu__container--icon" :class="item.meta.icon"></i> -->
         <span slot="title" class="menu__title">{{ item.meta.title }}</span>
       </el-menu-item>
     </el-menu>
@@ -46,7 +46,15 @@ export default class NavMenu extends Vue {
   border: none;
 }
 .menu {
+  &__title {
+    font-weight: bold;
+    color: #fff;
+  }
   &__container {
+    /deep/ .el-menu-item.is-active {
+      background-color: #1e345f !important;
+      border: none !important;
+    }
     &--icon {
       color: #fff;
       font-size: 20px;

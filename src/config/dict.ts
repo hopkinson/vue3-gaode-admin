@@ -8,33 +8,42 @@ export const MAP = {
 }
 
 // 交通状态的图例
-export const TRAFFIC_LEGEND = [
-  {
-    code: 1,
+export const TRAFFIC_LEGEND = {
+  1: {
     value: 'normal',
     label: '行驶',
     color: 'rgb(34, 168, 238)'
   },
-  {
-    code: 2,
+  2: {
     value: 'stop',
     label: '停驶',
     color: 'rgb(179, 194, 237)'
   },
-  {
-    code: 3,
+  3: {
     value: 'abnormal',
     label: '异常',
     color: 'rgb(255, 47, 45)'
   }
-]
-
+}
+// 告警
 export const WARNGING = {
-  status: [
-    { label: '违停', color: '' },
-    { label: '占道' },
-    { label: '偏航' },
-    { label: '超速' },
-    { label: '逆行' }
-  ]
+  // 状态
+  status: {
+    1: {
+      label: '违停',
+      color: ' rgb(250, 82, 145)'
+    },
+    2: {
+      label: '偏航',
+      color: 'rgb(49, 217, 164)'
+    },
+    3: {
+      label: '超速',
+      color: 'rgb(143, 131, 255)'
+    },
+    4: {
+      label: '逆行',
+      color: 'rgb(252, 155, 3)'
+    }
+  }
 }

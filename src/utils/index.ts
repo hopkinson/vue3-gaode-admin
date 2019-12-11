@@ -51,3 +51,11 @@ export const downloadFile = (function() {
     window.URL.revokeObjectURL(url)
   }
 })()
+// 分类转为一棵树
+export const sortOut = ($arr, key) => {
+  let result = $arr.reduce((prev, item) => {
+    prev[item[key]] ? prev[item[key]].push(item) : (prev[item[key]] = [item])
+    return prev
+  }, {})
+  return result
+}

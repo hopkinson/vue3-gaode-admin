@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="car__filter">
+    <!-- <div class="car__filter">
       <el-checkbox v-model="checked">选择全部</el-checkbox>
       <span
         class="project__car-status"
@@ -8,6 +8,9 @@
         v-for="(item, index) in dict"
         :key="index"
       ></span>
+    </div> -->
+    <div class="car__tip">
+      车辆总计：123辆
     </div>
     <el-table
       ref="table"
@@ -72,4 +75,11 @@ export default class TableList extends Vue {
   @Prop({ type: Array, default: () => [] }) readonly data!: Array<any>
 }
 </script>
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.car {
+  &__tip {
+    font-size: 12px;
+    color: rgb(255, 255, 255);
+  }
+}
+</style>
