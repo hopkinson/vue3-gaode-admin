@@ -54,7 +54,7 @@ export default class Layout extends Vue {
   // 是否显示退出
   @Prop({ type: Boolean, default: true }) readonly logout!: boolean
   // 是否显示导航菜单
-  @Prop({ type: Boolean, default: false }) readonly navMenu!: boolean
+  @Prop({ type: Boolean, default: true }) readonly navMenu!: boolean
   // 是否根据路由显示slot
   @Prop({ type: Boolean, default: false }) readonly router!: boolean
   // 是否显示面包屑

@@ -1,6 +1,9 @@
 <template>
   <div class="chart">
-    <div class="chart__title sprite_ico sprite_ico_panel_header">
+    <div
+      class="chart__title sprite_ico"
+      :class="`sprite_ico_panel_${size}-header`"
+    >
       <span>{{ title }}</span>
     </div>
     <div class="chart__inner" :style="chartStyle">
@@ -10,7 +13,10 @@
       </div>
       <slot></slot>
     </div>
-    <div class="chart__footer sprite_ico sprite_ico_panel_footer"></div>
+    <div
+      class="chart__footer sprite_ico"
+      :class="`sprite_ico_panel_${size}-footer`"
+    ></div>
   </div>
 </template>
 
@@ -26,14 +32,18 @@ export default class PanelComponent extends Vue {
   // 图标
   @Prop({ default: '', type: String }) public readonly unit!: string
   // 宽度
-  @Prop({ default: 381, type: Number }) public readonly width!: number
+  @Prop({ default: '', type: String }) public readonly size!: string
   // 高度
   @Prop({ default: 280, type: Number }) public readonly height!: number
   // 图表样式
   get chartStyle() {
-    const { width, height } = this
+    const { size, height } = this
+    const SIZE = {
+      big: 406,
+      small: 381
+    }
     return {
-      width: `${width}px`,
+      width: `${SIZE[size]}px`,
       height: `${height}px`
     }
   }
@@ -79,7 +89,7 @@ export default class PanelComponent extends Vue {
     font-size: 12px;
     &--position {
       position: absolute;
-      top: 0;
+      top: -16px;
       left: 24px;
     }
   }

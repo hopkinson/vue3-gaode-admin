@@ -12,17 +12,32 @@ export const TRAFFIC_LEGEND = {
   1: {
     value: 'normal',
     label: '行驶',
-    color: 'rgb(34, 168, 238)'
+    color: 'rgb(34, 168, 238)',
+    gradientColor: [
+      { offset: 0, color: 'rgb(8,177,255)' },
+      { offset: 0.58, color: 'rgb(4,116,255)' },
+      { offset: 1, color: 'rgb(0,54,255)' }
+    ]
   },
   2: {
     value: 'stop',
     label: '停驶',
-    color: 'rgb(179, 194, 237)'
+    color: 'rgb(179, 194, 237)',
+    gradientColor: [
+      { offset: 0, color: 'rgb(161,174,187)' },
+      { offset: 0.58, color: 'rgb(135,148,177)' },
+      { offset: 1, color: 'rgb(109,121,166)' }
+    ]
   },
   3: {
     value: 'abnormal',
     label: '异常',
-    color: 'rgb(255, 47, 45)'
+    color: 'rgb(255, 47, 45)',
+    gradientColor: [
+      { offset: 0, color: 'rgb(255,8,95)' },
+      { offset: 0.58, color: 'rgb(255,4,48)' },
+      { offset: 1, color: 'rgb(255,0,0)' }
+    ]
   }
 }
 // 告警

@@ -15,17 +15,23 @@ export default class ChartWarning extends Vue {
   // 图表配置数据
   @Prop({ default: () => [], type: Array }) public readonly data!: Array<any>
   option: any = {
+    grid: {
+      left: '6%',
+      right: '5%',
+      bottom: 0,
+      top: '16%',
+      containLabel: true
+    },
     legend: {
       data: [],
-      left: 'center',
-      align: 'left',
+      right: 30,
       top: '2%',
       textStyle: {
         color: '#fff'
       },
       itemWidth: 10,
       itemHeight: 10,
-      itemGap: 35
+      itemGap: 20
     },
     // y轴
     yAxis: [
@@ -49,7 +55,8 @@ export default class ChartWarning extends Vue {
         <div class="project__echarts--tooltip-bar">
             <span class="project__echarts--tooltip-car-text">${data.name}：${data.value}</span>
         </div>`
-      }
+      },
+      position: 'top'
     },
     // x轴
     xAxis: [
@@ -145,7 +152,7 @@ export default class ChartWarning extends Vue {
     ) // 图例
 
     // 绘制图表
-    const chart = this.$echarts.init(this.chart)
+    const chart = this.$echarts.init(this.chart, { renderer: 'svg' })
     chart.setOption(this.option)
   }
 

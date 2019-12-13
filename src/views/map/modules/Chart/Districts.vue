@@ -13,6 +13,13 @@ export default class ChartWarning extends Vue {
   // 图表配置数据
   @Prop({ default: () => [], type: Array }) public readonly data!: Array<any>
   option: any = {
+    grid: {
+      left: '2.5%',
+      right: '5%',
+      bottom: 0,
+      top: '16%',
+      containLabel: true
+    },
     // y轴
     yAxis: {
       data: [],
@@ -25,7 +32,7 @@ export default class ChartWarning extends Vue {
       },
       axisLabel: {
         show: true,
-        color: '#fff'
+        color: 'rgba(255, 255, 255, 0.702)'
       }
     },
     // x轴
@@ -66,7 +73,7 @@ export default class ChartWarning extends Vue {
             position: 'right',
             textStyle: {
               color: '#ffffff',
-              fontSize: '16'
+              fontSize: '12'
             }
           }
         },
@@ -87,7 +94,7 @@ export default class ChartWarning extends Vue {
     // 图表 - x轴
     this.option.series[0].data = _quantity
     // 绘制图表
-    const chart = this.$echarts.init(this.chart)
+    const chart = this.$echarts.init(this.chart, { renderer: 'svg' })
     chart.setOption(this.option)
   }
 

@@ -9,6 +9,8 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
+    margin: 0 6px;
+    display: inline-block;
     &.is-abnormal {
       background-color: rgb(255, 47, 45);
     }
@@ -27,41 +29,39 @@
       height: 22px;
       display: flex;
       align-items: center;
-      justify-content: center;
+      text-align: center;
       padding: 6px 12px;
-      overflow: hidden;
     }
     &--tooltip-pie {
       background-color: rgb(255, 255, 255);
+      color: rgb(51, 51, 51);
       box-shadow: 0px 1px 7.84px 0.16px rgba(20, 57, 141, 0.32);
       border-radius: 20px;
-      &-text {
-        color: rgb(51, 51, 51);
-        font-weight: bold;
-        padding-left: 4px;
-        font-size: 12px;
-      }
+      font-weight: bold;
+      padding-left: 4px;
+      font-size: 12px;
     }
     &--tooltip-bar {
       background-color: #22a8ee;
       border-radius: 2px;
       position: relative;
+      color: #fff;
+      font-weight: bold;
+      font-size: 12px;
+      text-align: center;
       &:after {
         content: '';
         position: absolute;
-        width: 6px;
-        height: 6px;
-        top: 0;
+        bottom: -11px;
         left: 50%;
         transform: translateX(-50%);
-        border-style: solid dashed dashed;
-        border-color: #22a8ee transparent transparent;
-      }
-      &-text {
-        color: #fff;
-        font-weight: bold;
-        padding-left: 4px;
-        font-size: 12px;
+        width: 0;
+        height: 0;
+        border-width: 6px;
+        border-style: solid;
+        border-color: transparent;
+        border-top-color: currentColor;
+        color: #22a8ee;
       }
     }
   }

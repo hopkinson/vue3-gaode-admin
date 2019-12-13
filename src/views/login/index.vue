@@ -139,7 +139,10 @@ export default class Login extends Vue {
 <style lang="less" scoped>
 @login-bg-color: rgb(48, 65, 86);
 .login {
-  background-color: @login-bg-color;
+  background: @login-bg-color url('/bg/login.png') no-repeat;
+  background-size: cover;
+  width: 100%;
+  height: 100%;
   &--inner {
     margin: 0 auto;
     width: 1240px;

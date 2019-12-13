@@ -3,16 +3,29 @@
     <!-- 图表 && 查询 -->
 
     <div class="map__chart--left">
+      <!-- 搜索  -->
+      <search-car-status></search-car-status>
+      <!-- 图表 -->
       <panel-chart
         title="告警统计"
         unit="单位（次）"
         :height="240"
-        class="map__chart--inner"
+        size="big"
+        class="map__chart--panel"
       >
-        <chart-warning :data="warning"></chart-warning>
+        <chart-warning
+          :data="warning"
+          class="map__chart--inner"
+        ></chart-warning>
       </panel-chart>
-      <panel-chart title="当天最高时速" unit="速度km/h" :height="200">
-        <chart-speed :data="speed"></chart-speed>
+      <panel-chart
+        title="当天最高时速"
+        unit="速度km/h"
+        :height="200"
+        size="big"
+        class="map__chart--panel"
+      >
+        <chart-speed :data="speed" class="map__chart--inner"></chart-speed>
       </panel-chart>
       <!-- 左下角 - 图例 -->
       <div class="map__legends map__legends--position">
@@ -27,10 +40,20 @@
       </div>
     </div>
     <div class="map__chart--right">
-      <panel-chart title="车辆状态" :height="194" class="map__chart--inner">
+      <panel-chart
+        title="车辆状态"
+        :height="194"
+        size="small"
+        class="map__chart--panel"
+      >
         <chart-cars :data="cars"></chart-cars>
       </panel-chart>
-      <panel-chart title="车辆区域分布" unit="单位（辆）" :height="212">
+      <panel-chart
+        title="车辆区域分布"
+        unit="单位（辆）"
+        size="small"
+        :height="212"
+      >
         <span slot="link">
           查看更多区域
           <i class="el-icon-arrow-right"></i>
@@ -53,6 +76,7 @@ import ChartCars from './modules/Chart/Cars.vue'
 import ChartWarning from './modules/Chart/Warning.vue'
 import MapHome from './modules/Map/Home.vue'
 import { TRAFFIC_LEGEND } from '@/config/dict'
+import SearchCarStatus from './modules/Search/CarStatus.vue'
 @Component({
   name: 'MapIndex',
   components: {
@@ -61,6 +85,7 @@ import { TRAFFIC_LEGEND } from '@/config/dict'
     ChartSpeed,
     ChartCars,
     ChartWarning,
+    SearchCarStatus,
     ChartDistricts
   }
 })
@@ -194,31 +219,23 @@ export default class MapIndex extends Vue {
     // 地区分布
     this.districts = [
       {
-        regionName: '黄埔',
+        regionName: '黄埔黄埔',
         quantity: 1
       },
       {
-        regionName: '黄埔qu',
+        regionName: '黄埔黄埔',
         quantity: 121
       },
       {
-        regionName: '黄11埔qu',
-        quantity: 122
-      },
-      {
-        regionName: '黄gg埔qu',
-        quantity: 126
-      },
-      {
-        regionName: '黄埔qu111',
-        quantity: 144
-      },
-      {
-        regionName: '黄gg埔1qu',
+        regionName: '黄埔黄埔',
         quantity: 129
       },
       {
-        regionName: '黄埔33qu111',
+        regionName: '黄埔黄埔',
+        quantity: 129
+      },
+      {
+        regionName: '黄埔黄埔黄',
         quantity: 12
       }
     ]
@@ -243,8 +260,13 @@ export default class MapIndex extends Vue {
     &--right {
       right: 28px;
     }
-    &--inner {
+    &--panel {
       margin-bottom: 20px;
+      position: relative;
+    }
+    &--inner {
+      position: absolute;
+      bottom: -6px;
     }
   }
   &__legends {
@@ -260,6 +282,26 @@ export default class MapIndex extends Vue {
       margin-right: 20px;
       text-align: center;
     }
+  }
+}
+.tooltip-bar {
+  background-color: #22a8ee;
+  border-radius: 2px;
+  position: relative;
+  color: #fff;
+  font-weight: bold;
+  padding-left: 4px;
+  font-size: 12px;
+  &:after {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border-style: solid dashed dashed;
+    border-color: #22a8ee transparent transparent;
   }
 }
 </style>

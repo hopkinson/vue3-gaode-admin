@@ -1,5 +1,6 @@
 <template>
-  <div id="app" :style="style">
+  <!-- :style="style" -->
+  <div id="app">
     <router-view />
   </div>
 </template>
