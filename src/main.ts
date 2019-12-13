@@ -57,7 +57,7 @@ VueAMap.initAMapApiLoader({
     'AMap.PolyEditor',
     'AMap.MarkerClusterer'
   ],
-  v: '1.4.15'
+  v: '1.4.6'
 })
 setTimeout(() => {
   localStorage.removeItem('_AMap_raster')

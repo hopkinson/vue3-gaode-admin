@@ -47,10 +47,6 @@ module.exports = {
         vuex: 'Vuex',
         axios: 'axios',
         'element-ui': 'ELEMENT'
-      },
-      {
-        AMap: 'AMap',
-        AMapUI: 'AMapUI'
       }
     )
     // 雪碧图

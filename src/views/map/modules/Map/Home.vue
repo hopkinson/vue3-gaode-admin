@@ -3,10 +3,10 @@
     class="map"
     vid="amap-vue"
     :zoom="zoom"
-    :plugin="plugin"
     :zooms="zooms"
     :events="events"
     :center="center"
+    :amapManager="amapManager"
   >
     <!-- 多边形 -->
     <el-amap-polygon
@@ -36,9 +36,8 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { MAP } from '@/config/dict'
 import { AMapManager } from 'vue-amap'
-import { lazyAMapApiLoaderInstance } from 'vue-amap'
 import PanelCarDetail from '../Panel/CarDetail.vue'
-const AMap = require('AMap')
+let amapManager = new AMapManager()
 @Component({
   name: 'MapHome',
   components: {
@@ -46,6 +45,7 @@ const AMap = require('AMap')
   }
 })
 export default class MapHome extends Vue {
+  amapManager = amapManager
   showInfo = false
   zoom: number = MAP.zoom
   zooms: Array<number> = MAP.zooms
@@ -53,7 +53,7 @@ export default class MapHome extends Vue {
   position: Array<number> = MAP.center
   markers: any = []
   markerRefs: any = []
-  plugin: Array<string> = ['PolyEditor']
+  plugin: Array<string> = ['PolyEditor', 'MarkerClusterer']
   polygons: any = [
     {
       strokeColor: 'red',
@@ -80,16 +80,15 @@ export default class MapHome extends Vue {
         getTileUrl: MAP.tileUrl,
         zIndex: 2
       })
-      setTimeout(() => {
-        let cluster = new AMap.MarkerClusterer(o, self.markerRefs, {
-          gridSize: 80,
-          renderCluserMarker: self._renderCluserMarker
-        })
-        console.log(cluster)
-      }, 1000)
+      // setTimeout(() => {
+      //   let cluster = new AMap.MarkerClusterer(o, self.markerRefs, {
+      //     gridSize: 80,
+      //     renderCluserMarker: self._renderCluserMarker
+      //   })
+      //   console.log(cluster)
+      // }, 1000)
     },
     moveend: () => {},
-    zoomchange: () => {},
     click: e => {
       alert('map clicked')
     }
@@ -100,18 +99,18 @@ export default class MapHome extends Vue {
     const self = this
     let basePosition = MAP.center
 
-    while (++index <= 30) {
-      markers.push({
-        position: [basePosition[0] + 0.01 * index, basePosition[1]],
-        content:
-          '<div style="text-align:center; background-color: hsla(180, 100%, 50%, 0.7); height: 24px; width: 24px; border: 1px solid hsl(180, 100%, 40%); border-radius: 12px; box-shadow: hsl(180, 100%, 50%) 0px 0px 1px;"></div>',
-        events: {
-          init(o) {
-            self.markerRefs.push(o)
-          }
-        }
-      })
-    }
+    // while (++index <= 30) {
+    //   markers.push({
+    //     position: [basePosition[0] + 0.01 * index, basePosition[1]],
+    //     content:
+    //       '<div style="text-align:center; background-color: hsla(180, 100%, 50%, 0.7); height: 24px; width: 24px; border: 1px solid hsl(180, 100%, 40%); border-radius: 12px; box-shadow: hsl(180, 100%, 50%) 0px 0px 1px;"></div>',
+    //     events: {
+    //       init(o) {
+    //         self.markerRefs.push(o)
+    //       }
+    //     }
+    //   })
+    // }
 
     this.markers = markers
   }

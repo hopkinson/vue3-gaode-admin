@@ -14,7 +14,10 @@
       <em>{{ current.week }}</em>
       <em>{{ current.time }}</em>
       <button-fullscreen></button-fullscreen>
-      <span class="header__footer--logout" @click.native="$emit('log-out')"
+      <span
+        class="header__footer--logout"
+        v-if="logout"
+        @click="$emit('log-out')"
         >退出</span
       >
     </div>
@@ -38,6 +41,7 @@ export default class NavHeader extends Vue {
   @Prop({ default: '' }) readonly title!: string
   // 用户信息
   @Prop({ default: () => ({}) }) readonly userInfo!: object
+  @Prop({ default: false, type: Boolean }) readonly logout!: boolean
 
   get current() {
     return {

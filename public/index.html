@@ -4,7 +4,10 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="renderer" content="webkit" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <meta
+      content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"
+      name="viewport"
+    />
     <link rel="icon" href="<%= BASE_URL %>favicon.ico" />
     <title>广州市黄埔区智能巡逻便民服务车监管平台</title>
     <!-- 使用CDN的CSS文件 -->
@@ -12,24 +15,9 @@
     htmlWebpackPlugin.options.cdn.css) { %>
     <link rel="stylesheet" href="<%= htmlWebpackPlugin.options.cdn.css[i] %>" />
     <% } %>
-    <script
-      type="text/javascript"
-      src="https://webapi.amap.com/maps?v=1.4.11&key=d8629d0fd7aacdae4a39f068968b96c0"
-    ></script>
     <!-- 使用CDN的JS文件 -->
     <% for (var i in htmlWebpackPlugin.options.cdn &&
-    htmlWebpackPlugin.options.cdn.js) { %>
-    <script
-      type="text/javascript"
-      src="<%= htmlWebpackPlugin.options.cdn.js[i] %>"
-    ></script>
-    <!--引入UI组件库（1.0版本） -->
-    <script src="http://webapi.amap.com/ui/1.0/main.js"></script>
-    <script
-      type="text/javascript"
-      src="http://webapi.amap.com/demos/js/liteToolbar.js"
-    ></script>
-    <% } %>
+    htmlWebpackPlugin.options.cdn.js) { %> <% } %>
   </head>
 
   <body>
