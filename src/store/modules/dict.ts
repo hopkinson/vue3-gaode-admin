@@ -1,5 +1,5 @@
 import Vuex, { MutationTree, ActionTree } from 'vuex'
-import { Store } from '@/types/store.d'
+import { Store } from '@/typings/Store'
 import $axios from '@ajax'
 const state = {
   dict: []

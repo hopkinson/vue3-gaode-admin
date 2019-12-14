@@ -1,5 +1,5 @@
 import Vuex, { MutationTree, ActionTree } from 'vuex'
-import { Store } from '@/types/store.d'
+import { Store } from '@/typings/Store'
 import { Route } from 'vue-router'
 const state = {
   saved_paths: [],

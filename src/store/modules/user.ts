@@ -1,6 +1,6 @@
 import Vuex, { MutationTree, ActionTree } from 'vuex'
-import { Store } from '@/types/store.d'
-import { Params } from '@/types/params.d'
+import { Store } from '@/typings/Store.d'
+import { Params } from '@/typings/Params.d'
 import cookie from 'js-cookie'
 import { TOKEN, REFRESH_TOKEN } from '@/config/constant'
 import $axios from '@ajax'

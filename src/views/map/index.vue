@@ -1,10 +1,12 @@
 <template>
   <div class="map">
     <!-- 图表 && 查询 -->
-
+    <!-- 搜索  -->
+    <search-car-status
+      class="map__chart--search"
+      v-model="showSearch"
+    ></search-car-status>
     <div class="map__chart--left">
-      <!-- 搜索  -->
-      <search-car-status></search-car-status>
       <!-- 图表 -->
       <panel-chart
         title="告警统计"
@@ -63,20 +65,33 @@
     </div>
 
     <!-- 地图 -->
-    <map-home></map-home>
+    <map-home
+      :track-markers="trackMarkers"
+      :speed="trackSpeed"
+      ref="map"
+    ></map-home>
+    <!-- 底部 - 抽屉 -->
+    <drawer-track
+      v-model="showDrawer"
+      :speed.sync="trackSpeed"
+      ref="drawer"
+      @play="handleControlTrack"
+    ></drawer-track>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Ref } from 'vue-property-decorator'
 import PanelChart from './modules/Panel/Chart.vue'
 import ChartSpeed from './modules/Chart/Speed.vue'
 import ChartDistricts from './modules/Chart/Districts.vue'
 import ChartCars from './modules/Chart/Cars.vue'
 import ChartWarning from './modules/Chart/Warning.vue'
+import DrawerTrack from './modules/Drawer/Track.vue'
 import MapHome from './modules/Map/Home.vue'
 import { TRAFFIC_LEGEND } from '@/config/dict'
 import SearchCarStatus from './modules/Search/CarStatus.vue'
+import trackMarkers from '@/mock/data.js'
 @Component({
   name: 'MapIndex',
   components: {
@@ -86,18 +101,28 @@ import SearchCarStatus from './modules/Search/CarStatus.vue'
     ChartCars,
     ChartWarning,
     SearchCarStatus,
-    ChartDistricts
+    ChartDistricts,
+    DrawerTrack
   }
 })
 export default class MapIndex extends Vue {
+  @Ref('drawer') drawer: any
+  @Ref('map') map: any
+  // 是否显示抽屉
+  showDrawer: boolean = false
+  // 是否显示筛选
+  showSearch: boolean = false
   // 图例 - 交通状态
   legends = TRAFFIC_LEGEND
+  trackSpeed: number = 0
   // 列表 - 时速
   speed: any = []
   districts: any = []
   warning: any = []
   cars: any = []
+  trackMarkers: Array<Array<number>> = [] // 标记点 - 轨迹回放
   created() {
+    this.trackMarkers = trackMarkers
     this.warning = [
       {
         alertTime: '08:00',
@@ -239,6 +264,12 @@ export default class MapIndex extends Vue {
         quantity: 12
       }
     ]
+    // 街道
+  }
+
+  // 控制轨迹的播放
+  handleControlTrack(isPlaying) {
+    isPlaying ? this.map.pauseTracker() : this.map.moveTracker()
   }
 }
 </script>
@@ -247,6 +278,12 @@ export default class MapIndex extends Vue {
 .map {
   height: 100%;
   &__chart {
+    &--search {
+      position: fixed;
+      top: 148px;
+      z-index: 99;
+      left: 30px;
+    }
     &--left,
     &--right {
       z-index: 1;
@@ -255,7 +292,8 @@ export default class MapIndex extends Vue {
       bottom: 0;
     }
     &--left {
-      left: 28px;
+      top: 200px;
+      left: 30px;
     }
     &--right {
       right: 28px;

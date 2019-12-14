@@ -34,7 +34,7 @@ class WS implements Socket {
     this.webSocket.onclose = () => {
       if (!this.intervalId) {
         this.intervalId = setInterval(() => {
-          console.log('=============正在尝试重新连接=============')
+          // console.log('=============正在尝试重新连接=============')
           this.main()
         }, 2000)
       }
@@ -43,7 +43,7 @@ class WS implements Socket {
   // 连接异常
   onerror() {
     this.webSocket.onerror = () => {
-      console.log('=============连接异常=============')
+      // console.log('=============连接异常=============')
     }
   }
   // 接收

@@ -1,4 +1,4 @@
-import { Store } from '@/types/store'
+import { Store } from '@/typings/Store'
 import Vuex, { MutationTree, ActionTree } from 'vuex'
 
 const state = {

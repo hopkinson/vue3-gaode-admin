@@ -158,7 +158,10 @@ module.exports = {
             '//unpkg.com/element-ui/lib/index.js'
           ]
         : [],
-      css: ['//unpkg.com/element-ui/lib/theme-chalk/index.css']
+      css: [
+        '//unpkg.com/element-ui/lib/theme-chalk/index.css',
+        '//at.alicdn.com/t/font_1563719_5xcbw645up.css'
+      ]
     }
     // 添加别名
     config.resolve.alias

@@ -1,10 +1,10 @@
 <template>
   <div class="chart">
-    <div class="chart__title"></div>
+    <div class="sprite_ico sprite_ico_select_header"></div>
     <div class="chart__inner">
       <slot></slot>
     </div>
-    <div class="chart__footer"></div>
+    <div class="sprite_ico sprite_ico_select_footer"></div>
   </div>
 </template>
 
@@ -22,24 +22,12 @@ export default class PanelComponent extends Vue {}
   position: relative;
   font-size: 12px;
   width: 408px;
-  &__title {
-    background: url('/images/select_header.png') no-repeat;
-    background-size: 100% 100%;
-    width: 100%;
-    height: 35px;
-    position: relative;
-  }
-  &__footer {
-    background: url('/images/select_footer.png') no-repeat;
-    background-size: 100% 100%;
-    height: 10px;
-    width: 100%;
-  }
+  background: #020215;
   &__inner {
-    width: 100%;
     position: relative;
-    background: url('/images/select_main.png') repeat-y;
-    background-size: 100%;
+    border-left: 1px solid #0f6980;
+    border-right: 1px solid #0f6980;
+    background: #020215;
   }
 }
 </style>

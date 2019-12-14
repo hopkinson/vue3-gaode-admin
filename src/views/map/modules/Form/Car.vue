@@ -1,7 +1,7 @@
 <template>
   <el-form :model="form" size="small">
     <el-form-item label="隶属单位：">
-      <el-option v-model="form.value" placeholder="请选择">
+      <el-option v-model="form.value" remote :remote-method="fetchunit">
         <el-option
           v-for="item in options"
           :key="item.value"
@@ -13,7 +13,7 @@
       </el-option>
     </el-form-item>
     <el-form-item label="运行状态：">
-      <el-option v-model="form.value" placeholder="请选择">
+      <el-option v-model="form.value" remote :remote-method="fetchunit">
         <el-option
           v-for="item in options"
           :key="item.value"
