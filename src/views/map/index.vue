@@ -1,40 +1,67 @@
 <template>
   <div class="map">
     <!-- 图表 && 查询 -->
-    <div class="map__chart">
-      <!-- 左边 -->
-      <div class="map__chart--left">
-        <panel-chart title="告警统计" unit="单位（次）">
-          <chart-warning :data="warning"></chart-warning>
-        </panel-chart>
-        <panel-chart title="当天最高时速" unit="速度km/h">
-          <chart-speed :data="speed"></chart-speed>
-        </panel-chart>
-        <!-- 左边 - 底部图例 -->
-        <div class="map__legends map__legends--position">
-          <div
-            v-for="(item, index) in legends"
-            :key="index"
-            class="map__legends--inner"
-          >
-            <img :src="`/images/pic_${item.value}.png`" :alt="item.label" />
-            <p>{{ item.label }}</p>
-          </div>
+
+    <div class="map__chart--left">
+      <!-- 搜索  -->
+      <search-car-status></search-car-status>
+      <!-- 图表 -->
+      <panel-chart
+        title="告警统计"
+        unit="单位（次）"
+        :height="240"
+        size="big"
+        class="map__chart--panel"
+      >
+        <chart-warning
+          :data="warning"
+          class="map__chart--inner"
+        ></chart-warning>
+      </panel-chart>
+      <panel-chart
+        title="当天最高时速"
+        unit="速度km/h"
+        :height="200"
+        size="big"
+        class="map__chart--panel"
+      >
+        <chart-speed :data="speed" class="map__chart--inner"></chart-speed>
+      </panel-chart>
+      <!-- 左下角 - 图例 -->
+      <div class="map__legends map__legends--position">
+        <div
+          v-for="(item, index) in legends"
+          :key="index"
+          class="map__legends--inner"
+        >
+          <i class="sprite_ico" :class="[`sprite_ico_pic_${item.value}`]"></i>
+          <p>{{ item.label }}</p>
         </div>
       </div>
-      <div class="map__chart--right">
-        <panel-chart title="车辆状态">
-          <chart-cars :data="cars"></chart-cars>
-        </panel-chart>
-        <panel-chart title="车辆区域分布" unit="单位（辆）">
-          <span slot="link">
-            查看更多区域
-            <i class="el-icon-arrow-right"></i>
-          </span>
-          <chart-districts :data="districts"></chart-districts>
-        </panel-chart>
-      </div>
     </div>
+    <div class="map__chart--right">
+      <panel-chart
+        title="车辆状态"
+        :height="194"
+        size="small"
+        class="map__chart--panel"
+      >
+        <chart-cars :data="cars"></chart-cars>
+      </panel-chart>
+      <panel-chart
+        title="车辆区域分布"
+        unit="单位（辆）"
+        size="small"
+        :height="212"
+      >
+        <span slot="link">
+          查看更多区域
+          <i class="el-icon-arrow-right"></i>
+        </span>
+        <chart-districts :data="districts"></chart-districts>
+      </panel-chart>
+    </div>
+
     <!-- 地图 -->
     <map-home></map-home>
   </div>
@@ -49,6 +76,7 @@ import ChartCars from './modules/Chart/Cars.vue'
 import ChartWarning from './modules/Chart/Warning.vue'
 import MapHome from './modules/Map/Home.vue'
 import { TRAFFIC_LEGEND } from '@/config/dict'
+import SearchCarStatus from './modules/Search/CarStatus.vue'
 @Component({
   name: 'MapIndex',
   components: {
@@ -57,6 +85,7 @@ import { TRAFFIC_LEGEND } from '@/config/dict'
     ChartSpeed,
     ChartCars,
     ChartWarning,
+    SearchCarStatus,
     ChartDistricts
   }
 })
@@ -69,8 +98,96 @@ export default class MapIndex extends Vue {
   warning: any = []
   cars: any = []
   created() {
-    this.warning = []
-    this.cars = []
+    this.warning = [
+      {
+        alertTime: '08:00',
+        alertTypeId: 1,
+        quantity: 19
+      },
+      {
+        alertTime: '08:00',
+        alertTypeId: 2,
+        quantity: 10
+      },
+      {
+        alertTime: '08:00',
+        alertTypeId: 3,
+        quantity: 40
+      },
+      {
+        alertTime: '08:00',
+        alertTypeId: 4,
+        quantity: 60
+      },
+      {
+        alertTime: '09:00',
+        alertTypeId: 1,
+        quantity: 29
+      },
+      {
+        alertTime: '09:00',
+        alertTypeId: 2,
+        quantity: 13
+      },
+      {
+        alertTime: '09:00',
+        alertTypeId: 3,
+        quantity: 43
+      },
+      {
+        alertTime: '09:00',
+        alertTypeId: 4,
+        quantity: 43
+      },
+      {
+        alertTime: '10:00',
+        alertTypeId: 1,
+        quantity: 29
+      },
+      {
+        alertTime: '10:00',
+        alertTypeId: 2,
+        quantity: 13
+      },
+      {
+        alertTime: '10:00',
+        alertTypeId: 3,
+        quantity: 43
+      },
+      {
+        alertTime: '10:00',
+        alertTypeId: 4,
+        quantity: 43
+      },
+      {
+        alertTime: '11:00',
+        alertTypeId: 1,
+        quantity: 79
+      },
+      {
+        alertTime: '11:00',
+        alertTypeId: 2,
+        quantity: 53
+      },
+      {
+        alertTime: '11:00',
+        alertTypeId: 3,
+        quantity: 53
+      },
+      {
+        alertTime: '11:00',
+        alertTypeId: 4,
+        quantity: 53
+      }
+    ]
+    this.cars = {
+      totalQuantity: 200,
+      statistics: [
+        { runState: 1, quantity: 30 },
+        { runState: 2, quantity: 10 },
+        { runState: 3, quantity: 160 }
+      ]
+    }
     // 最高时速
     this.speed = [
       {
@@ -102,31 +219,23 @@ export default class MapIndex extends Vue {
     // 地区分布
     this.districts = [
       {
-        regionName: '黄埔',
+        regionName: '黄埔黄埔',
         quantity: 1
       },
       {
-        regionName: '黄埔qu',
+        regionName: '黄埔黄埔',
         quantity: 121
       },
       {
-        regionName: '黄11埔qu',
-        quantity: 122
-      },
-      {
-        regionName: '黄gg埔qu',
-        quantity: 126
-      },
-      {
-        regionName: '黄埔qu111',
-        quantity: 144
-      },
-      {
-        regionName: '黄gg埔1qu',
+        regionName: '黄埔黄埔',
         quantity: 129
       },
       {
-        regionName: '黄埔33qu111',
+        regionName: '黄埔黄埔',
+        quantity: 129
+      },
+      {
+        regionName: '黄埔黄埔黄',
         quantity: 12
       }
     ]
@@ -138,23 +247,26 @@ export default class MapIndex extends Vue {
 .map {
   height: 100%;
   &__chart {
-    position: fixed;
-    top: 148px;
-    left: 28px;
-    right: 28px;
-    bottom: 0;
-    z-index: 1;
     &--left,
     &--right {
-      position: absolute;
-      top: 0;
+      z-index: 1;
+      position: fixed;
+      top: 148px;
       bottom: 0;
     }
     &--left {
-      left: 0;
+      left: 28px;
     }
     &--right {
-      right: 0;
+      right: 28px;
+    }
+    &--panel {
+      margin-bottom: 20px;
+      position: relative;
+    }
+    &--inner {
+      position: absolute;
+      bottom: -6px;
     }
   }
   &__legends {
@@ -170,6 +282,26 @@ export default class MapIndex extends Vue {
       margin-right: 20px;
       text-align: center;
     }
+  }
+}
+.tooltip-bar {
+  background-color: #22a8ee;
+  border-radius: 2px;
+  position: relative;
+  color: #fff;
+  font-weight: bold;
+  padding-left: 4px;
+  font-size: 12px;
+  &:after {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border-style: solid dashed dashed;
+    border-color: #22a8ee transparent transparent;
   }
 }
 </style>

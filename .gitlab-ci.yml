@@ -2,10 +2,10 @@ variables:
   BUILD_IMAGE: $REGISTRY_HOST/debian/node-dev-docker:10.16.3
   WORKSPACES: /builds/$CI_PROJECT_PATH
   DOCKER_IMAGE_REGISTRY: $REGISTRY_HOST/tubsoft
-  DOCKER_CONTAINER_NAME: slw-mall-web
+  DOCKER_CONTAINER_NAME: hgbd-car-web
   DOCKER_COMPOSE_NAME: web
-  RELEASE_COMPOSE_DIR: ~/boot/slw-mall
-  DEVELOP_COMPOSE_DIR: ~/boot/samples/slw-mall
+  RELEASE_COMPOSE_DIR: ~/boot/hgbd-car
+  DEVELOP_COMPOSE_DIR: ~/boot/samples/hgbd-car
 
 stages:
   - build

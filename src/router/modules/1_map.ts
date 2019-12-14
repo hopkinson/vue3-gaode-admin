@@ -10,7 +10,6 @@ export default {
   path: '/map',
   meta: {
     title: '首页',
-    icon: 'el-icon-shopping-bag-2',
     roles: ['admin']
   },
   children: [

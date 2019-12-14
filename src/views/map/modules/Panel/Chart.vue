@@ -1,16 +1,22 @@
 <template>
-  <div class="chart" :style="chartStyle">
-    <div class="chart__title">
+  <div class="chart">
+    <div
+      class="chart__title sprite_ico"
+      :class="`sprite_ico_panel_${size}-header`"
+    >
       <span>{{ title }}</span>
     </div>
-    <div class="chart__inner">
+    <div class="chart__inner" :style="chartStyle">
       <div class="chart__unit chart__unit--position">{{ unit }}</div>
       <div class="chart__link chart__link--position">
         <slot name="link"></slot>
       </div>
       <slot></slot>
     </div>
-    <div class="chart__footer"></div>
+    <div
+      class="chart__footer sprite_ico"
+      :class="`sprite_ico_panel_${size}-footer`"
+    ></div>
   </div>
 </template>
 
@@ -26,15 +32,19 @@ export default class PanelComponent extends Vue {
   // 图标
   @Prop({ default: '', type: String }) public readonly unit!: string
   // 宽度
-  @Prop({ default: '400px', type: String }) public readonly width!: string
+  @Prop({ default: '', type: String }) public readonly size!: string
   // 高度
-  @Prop({ default: '280px', type: String }) public readonly height!: string
+  @Prop({ default: 280, type: Number }) public readonly height!: number
   // 图表样式
   get chartStyle() {
-    const { width, height } = this
+    const { size, height } = this
+    const SIZE = {
+      big: 406,
+      small: 381
+    }
     return {
-      width,
-      height
+      width: `${SIZE[size]}px`,
+      height: `${height}px`
     }
   }
 }
@@ -42,14 +52,12 @@ export default class PanelComponent extends Vue {
 
 <style lang="less" scoped>
 .chart {
+  font-size: 0;
   &__title {
     text-align: center;
     color: rgb(255, 255, 255);
     font-weight: bold;
     font-size: 18px;
-    background: url('/images/panel_header.png') no-repeat;
-    background-size: 100% 100%;
-    height: 44px;
     position: relative;
     span {
       position: absolute;
@@ -60,14 +68,13 @@ export default class PanelComponent extends Vue {
     }
   }
   &__footer {
-    background: url('/images/panel_footer.png') no-repeat;
-    background-size: 100% 100%;
     height: 28px;
   }
   &__inner {
     position: relative;
-    background: url('/images/panel_main.png') repeat-y;
-    background-size: 100%;
+    border-left: 1px solid #0f6980;
+    border-right: 1px solid #0f6980;
+    background: #020215;
   }
   &__link {
     color: rgb(0, 253, 255);
@@ -79,9 +86,10 @@ export default class PanelComponent extends Vue {
   }
   &__unit {
     color: rgba(255, 255, 255, 0.702);
+    font-size: 12px;
     &--position {
       position: absolute;
-      top: 0;
+      top: -16px;
       left: 24px;
     }
   }

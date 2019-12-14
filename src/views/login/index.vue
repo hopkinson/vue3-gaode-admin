@@ -1,64 +1,70 @@
 <template>
-  <div class="login">
-    <!-- 表单 -->
-    <div class="login__form">
-      <!-- 标题 -->
-      <h3 class="login__form--title">{{ title }}</h3>
-      <!-- 表单 -->
-      <el-form
-        :model="form"
-        :rules="rules"
-        ref="loginForm"
-        label-position="left"
-        label-width="0px"
-      >
-        <el-form-item prop="username">
-          <span class="login__form--svg el-icon-user"></span>
-          <el-input
-            name="username"
-            type="text"
-            autocomplete="off"
-            v-model="form.username"
-            placeholder="账号"
-          />
-        </el-form-item>
-        <el-form-item ref="password" prop="password">
-          <span class="login__form--svg el-icon-key"></span>
-          <el-input
-            autocomplete="off"
-            :type="isPwdType ? 'password' : ''"
-            @keyup.enter.native="handleLogin"
-            v-model="form.password"
-            placeholder="密码"
-          ></el-input>
-          <span
-            class="login__form--showPwd login__form--svg"
-            v-show="!loading"
-            :class="isPwdType ? 'el-icon-view' : 'el-icon-baseball'"
-            @click="showPwd"
-          ></span>
-        </el-form-item>
-        <el-form-item>
-          <el-button
-            type="primary"
-            :loading="loading"
-            class="login__form--button"
-            @click.native.prevent="handleLogin"
+  <layout-defalut :nav="false" :router="false" :footer="false" :logout="false">
+    <div class="login">
+      <div class="login--inner">
+        <!-- 表单 -->
+        <div class="login__form">
+          <!-- 标题 -->
+          <h3 class="login__form--title">系统登录</h3>
+          <!-- 表单 -->
+          <el-form
+            :model="form"
+            :rules="rules"
+            ref="loginForm"
+            label-position="left"
+            label-width="0px"
           >
-            登录
-          </el-button>
-        </el-form-item>
-      </el-form>
+            <el-form-item prop="username">
+              <el-input
+                name="username"
+                type="text"
+                autocomplete="off"
+                v-model="form.username"
+                placeholder="用户名"
+              />
+            </el-form-item>
+            <el-form-item ref="password" prop="password">
+              <el-input
+                autocomplete="off"
+                :type="isPwdType ? 'password' : ''"
+                @keyup.enter.native="handleLogin"
+                v-model="form.password"
+                placeholder="密码"
+              >
+                <span
+                  slot="suffix"
+                  class="login__form--showPwd login__form--svg"
+                  v-show="!loading"
+                  :class="isPwdType ? 'el-icon-view' : 'el-icon-baseball'"
+                  @click="showPwd"
+                ></span>
+              </el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button
+                type="primary"
+                :loading="loading"
+                class="login__form--button"
+                @click.native.prevent="handleLogin"
+                >登录</el-button
+              >
+            </el-form-item>
+          </el-form>
+        </div>
+      </div>
     </div>
-  </div>
+  </layout-defalut>
 </template>
 
 <script lang="ts">
 import { Form as ElForm, Input, FormItem } from 'element-ui'
 import { Component, Vue } from 'vue-property-decorator'
+import LayoutDefalut from '@/layouts/default.vue'
 @Component({
   name: 'Login',
-  components: {}
+  components: {
+    LayoutDefalut
+  }
 })
 export default class Login extends Vue {
   title = process.env.VUE_APP_TITLE
@@ -132,30 +138,16 @@ export default class Login extends Vue {
 
 <style lang="less" scoped>
 @login-bg-color: rgb(48, 65, 86);
-@login-form-bg-color: rgb(72, 87, 106);
 .login {
-  height: 100vh;
-  overflow: hidden;
-  background-color: @login-bg-color;
-  & /deep/ .el-input {
-    width: 75%;
-  }
-  & /deep/ .el-input {
-    width: 75%;
-    .el-input__inner {
-      background: transparent;
-      border: 0;
-      appearance: none;
-      border-radius: 0;
-      padding: 12px 5px 12px 15px;
-      color: #fff;
-      height: 47px;
-    }
-  }
-  & /deep/ .el-form-item {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
+  background: @login-bg-color url('/bg/login.png') no-repeat;
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+  &--inner {
+    margin: 0 auto;
+    width: 1240px;
+    height: 100%;
+    position: relative;
   }
   &__container {
     width: 100%;
@@ -163,22 +155,32 @@ export default class Login extends Vue {
   }
   &__form {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    background-color: @login-form-bg-color;
-    border-radius: 10px;
-    transform: translate(-50%, -50%);
-    width: 350px;
-    padding: 35px 35px 15px;
+    top: 218px;
+    right: 100px;
+    background-color: #fff;
+    border-radius: 2px;
+    width: 318px;
+    padding: 30px;
+    & /deep/ .el-input__inner {
+      border-radius: 2px;
+    }
     &--button {
       width: 100%;
       letter-spacing: 4px;
+      box-shadow: 0px 4px 11.52px 0.48px rgba(1, 73, 255, 0.2);
+      border-radius: 2px;
+      background-image: linear-gradient(
+        0deg,
+        rgb(8, 177, 255) 0%,
+        rgb(4, 116, 255) 58%,
+        rgb(0, 54, 255) 100%
+      );
     }
     &--title {
-      font-size: 26px;
-      font-weight: 400;
-      color: #f9f9f9;
-      margin: 0 auto 40px;
+      font-size: 22px;
+      color: rgb(4, 27, 39);
+      font-weight: bold;
+      margin: 20px auto 30px;
       text-align: center;
       font-weight: bold;
     }
@@ -188,7 +190,7 @@ export default class Login extends Vue {
       font-size: 20px;
       text-align: center;
       display: inline-block;
-      color: #f9f9f9;
+      color: #cccccc;
     }
   }
 }

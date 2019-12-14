@@ -58,7 +58,9 @@
     "typescript": "~3.5.3",
     "uglifyjs-webpack-plugin": "^2.2.0",
     "vue-cli-plugin-style-resources-loader": "^0.1.4",
-    "vue-template-compiler": "^2.6.10"
+    "vue-template-compiler": "^2.6.10",
+    "webpack-build-notifier": "^2.0.0",
+    "webpack-spritesmith": "^1.0.2"
   },
   "husky": {
     "hooks": {

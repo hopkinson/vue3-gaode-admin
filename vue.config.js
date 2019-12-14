@@ -3,14 +3,41 @@ const webpack = require('webpack')
 const IS_PROD = ['production', 'prod'].includes(process.env.NODE_ENV)
 const productionGzipExtensions = /\.(js|css|json|txt|html|ico|svg)(\?.*)?$/i
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+// 压缩代码
 const CompressionWebpackPlugin = require('compression-webpack-plugin')
+// notifier
+const WebpackBuildNotifierPlugin = require('webpack-build-notifier')
+// 图片整合成雪碧图
+const SpritesmithPlugin = require('webpack-spritesmith')
 const resolve = dir => path.join(__dirname, dir)
+// customerTemplate
+const templateFunction = function(data) {
+  const shared = `.sprite_ico { background-image: url(I);display:inline-block;background-size: Wpx Hpx;}`
+    .replace('I', data.sprites[0].image)
+    .replace('W', data.spritesheet.width)
+    .replace('H', data.spritesheet.height)
+
+  const perSprite = data.sprites
+    .map(function(sprite) {
+      return `.sprite_ico_N { width: Wpx; height: Hpx; background-position: Xpx Ypx;}`
+        .replace('N', sprite.name)
+        .replace('W', sprite.width)
+        .replace('H', sprite.height)
+        .replace('X', sprite.offset_x)
+        .replace('Y', sprite.offset_y)
+    })
+    .join('\n')
+
+  return shared + '\n' + perSprite
+}
+
 module.exports = {
   // 输出文件目录
   outputDir: 'docker/release',
   // Vue-ECharts 默认在 webpack 环境下会引入未编译的源码版本
   transpileDependencies: ['vue-echarts', 'resize-detector'],
   configureWebpack: config => {
+    config.resolve.modules = ['node_modules', './src/assets/images']
     const plugins = []
     config.externals = Object.assign(
       {},
@@ -20,13 +47,54 @@ module.exports = {
         vuex: 'Vuex',
         axios: 'axios',
         'element-ui': 'ELEMENT'
-      },
-      {
-        AMap: 'AMap',
-        AMapUI: 'AMapUI'
       }
     )
+    // 雪碧图
+    plugins.push(
+      new SpritesmithPlugin({
+        src: {
+          cwd: path.resolve(__dirname, 'src/assets/icons'),
+          glob: '*.png'
+        },
+        // 输出雪碧图文件及样式文件
+        target: {
+          image: path.resolve(__dirname, 'src/assets/images/sprite.png'),
+          css: [
+            [
+              path.resolve(__dirname, 'src/assets/style/sprite.less'),
+              {
+                format: 'function_based_template'
+              }
+            ]
+          ]
+          // css: path.resolve(__dirname, './src/less/sprite.less')
+        },
+        // 自定义模板
+        customTemplates: {
+          function_based_template: templateFunction
+        },
+        // 样式文件中调用雪碧图地址写法
+        apiOptions: {
+          cssImageRef: '~sprite.png'
+        },
+        spritesmithOptions: {
+          // algorithm: 'top-down'
+          padding: 5
+        }
+      })
+    )
     if (IS_PROD) {
+      // 构建完成提醒
+      plugins.push(
+        new WebpackBuildNotifierPlugin({
+          title: 'project build',
+          suppressSuccess: true,
+          suppressWarning: true,
+          messageFormatter: function() {
+            return 'build completely'
+          }
+        })
+      )
       // gzip
       plugins.push(
         new CompressionWebpackPlugin({
@@ -52,8 +120,8 @@ module.exports = {
           parallel: true
         })
       )
-      config.plugins = [...config.plugins, ...plugins]
     }
+    config.plugins = [...config.plugins, ...plugins]
   },
   css: {
     extract: IS_PROD,

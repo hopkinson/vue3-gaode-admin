@@ -1,6 +1,6 @@
 <template>
   <!-- 当天最高时速 -->
-  <div ref="chart" class="chart"></div>
+  <div ref="chart" class="project__echarts"></div>
 </template>
 
 <script lang="ts">
@@ -14,6 +14,13 @@ export default class ChartWarning extends Vue {
   @Prop({ default: () => [], type: Array }) public readonly data!: Array<any>
 
   option: any = {
+    grid: {
+      left: '5.5%',
+      right: 18,
+      bottom: '3%',
+      top: 25,
+      containLabel: true
+    },
     // y轴
     yAxis: [
       {
@@ -24,28 +31,40 @@ export default class ChartWarning extends Vue {
           show: false
         },
         axisLabel: {
-          color: '#fff'
+          textStyle: {
+            color: '#fff',
+            fontSize: '12'
+          }
         },
         type: 'value'
       }
     ],
-    // x轴
-    xAxis: [
-      {
-        type: 'category',
-        data: [],
-        splitLine: {
-          show: false
-        },
-        axisLabel: {
-          color: '#fff'
-        },
-        axisTick: {
-          show: false,
-          alignWithLabel: true
-        }
+    tooltip: {
+      position: 'top',
+      backgroundColor: 'transparent',
+      formatter: function({ data }) {
+        return `
+        <div class="project__echarts--tooltip-bar">
+            <span class="project__echarts--tooltip-car-text">${data}</span>
+        </div>`
       }
-    ],
+    },
+    // x轴
+    xAxis: {
+      type: 'category',
+      data: [],
+      splitLine: {
+        show: false
+      },
+      axisLabel: {
+        color: '#fff',
+        interval: 0
+      },
+      axisTick: {
+        show: false,
+        alignWithLabel: true
+      }
+    },
     // 数据
     series: [
       {
@@ -93,7 +112,7 @@ export default class ChartWarning extends Vue {
     this.option.series[1].data = _speed.map(item => _maxSpeed)
 
     // 绘制图表
-    const chart = this.$echarts.init(this.chart)
+    const chart = this.$echarts.init(this.chart, { renderer: 'svg' })
 
     chart.setOption(this.option)
     // 每隔一个小时执行一次
