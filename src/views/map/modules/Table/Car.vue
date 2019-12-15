@@ -19,6 +19,7 @@
       :data="data"
       :row-key="rowKey"
       header-row-class-name="project__table--header"
+      row-class-name="project__table--row"
       @selection-change="selectionChange"
       @current-change="handleCurrentChange"
     >

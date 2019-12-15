@@ -7,7 +7,7 @@
       <h6>粤A3KX62</h6>
       <p>
         状态：
-        <span>违停</span>
+        <span class="is-danger">违停</span>
       </p>
       <p>隶属单位：市政府交通厅</p>
       <p>汽车类别：便民车</p>
@@ -38,6 +38,9 @@ export default class CarDetail extends Vue {
   position: relative;
   &__main {
     color: #fff;
+    .is-danger {
+      color: #ee1013;
+    }
   }
   &__submit {
   }

@@ -81,7 +81,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Ref } from 'vue-property-decorator'
+import { Component, Vue, Ref, Watch } from 'vue-property-decorator'
 import PanelChart from './modules/Panel/Chart.vue'
 import ChartSpeed from './modules/Chart/Speed.vue'
 import ChartDistricts from './modules/Chart/Districts.vue'
@@ -92,6 +92,7 @@ import MapHome from './modules/Map/Home.vue'
 import { TRAFFIC_LEGEND } from '@/config/dict'
 import SearchCarStatus from './modules/Search/CarStatus.vue'
 import trackMarkers from '@/mock/data.js'
+import { CompanyBody, CarsBodyRecords, CarIdBody } from '@/services'
 @Component({
   name: 'MapIndex',
   components: {
@@ -121,159 +122,61 @@ export default class MapIndex extends Vue {
   warning: any = []
   cars: any = []
   trackMarkers: Array<Array<number>> = [] // 标记点 - 轨迹回放
+  companyList: Array<CompanyBody> = [] // 所有单位信息
+  carList: Array<CarsBodyRecords> = [] // 车辆列表
   async created() {
     this.trackMarkers = trackMarkers
-    this.warning = [
-      {
-        alertTime: '08:00',
-        alertTypeId: 1,
-        quantity: 19
-      },
-      {
-        alertTime: '08:00',
-        alertTypeId: 2,
-        quantity: 10
-      },
-      {
-        alertTime: '08:00',
-        alertTypeId: 3,
-        quantity: 40
-      },
-      {
-        alertTime: '08:00',
-        alertTypeId: 4,
-        quantity: 60
-      },
-      {
-        alertTime: '09:00',
-        alertTypeId: 1,
-        quantity: 29
-      },
-      {
-        alertTime: '09:00',
-        alertTypeId: 2,
-        quantity: 13
-      },
-      {
-        alertTime: '09:00',
-        alertTypeId: 3,
-        quantity: 43
-      },
-      {
-        alertTime: '09:00',
-        alertTypeId: 4,
-        quantity: 43
-      },
-      {
-        alertTime: '10:00',
-        alertTypeId: 1,
-        quantity: 29
-      },
-      {
-        alertTime: '10:00',
-        alertTypeId: 2,
-        quantity: 13
-      },
-      {
-        alertTime: '10:00',
-        alertTypeId: 3,
-        quantity: 43
-      },
-      {
-        alertTime: '10:00',
-        alertTypeId: 4,
-        quantity: 43
-      },
-      {
-        alertTime: '11:00',
-        alertTypeId: 1,
-        quantity: 79
-      },
-      {
-        alertTime: '11:00',
-        alertTypeId: 2,
-        quantity: 53
-      },
-      {
-        alertTime: '11:00',
-        alertTypeId: 3,
-        quantity: 53
-      },
-      {
-        alertTime: '11:00',
-        alertTypeId: 4,
-        quantity: 53
-      }
-    ]
-    this.cars = {
-      totalQuantity: 200,
-      statistics: [
-        { runState: 1, quantity: 30 },
-        { runState: 2, quantity: 10 },
-        { runState: 3, quantity: 160 }
-      ]
-    }
-    // this.speed = await this.$ajax.ajax({
-    //   method: 'GET',
-    //   url: '1/car/speed'
-    // })
+    // 车辆 - 告警统计
+    this.warning = await this.$ajax.ajax({
+      method: 'GET',
+      url: 'v1/alerts'
+    })
+    // 车辆状态
+    this.cars = await this.$ajax.ajax({
+      method: 'GET',
+      url: 'v1/car/state'
+    })
+    // 最高时速
+    this.speed = await this.$ajax.ajax({
+      method: 'GET',
+      url: 'v1/car/speed'
+    })
 
-    this.speed = [
-      {
-        carNo: '粤A88888',
-        carId: 123,
-        speed: 120
-      },
-      {
-        carNo: '粤AKL562',
-        carId: 12,
-        speed: 60
-      },
-      {
-        carNo: '粤AKLD62',
-        carId: 188,
-        speed: 67
-      },
-      {
-        carNo: '粤A88772',
-        carId: 19,
-        speed: 90
-      },
-      {
-        carNo: '粤AKL512',
-        carId: 22,
-        speed: 80
-      }
-    ]
     // 地区分布
-    this.districts = [
-      {
-        regionName: '黄埔黄埔',
-        quantity: 1
-      },
-      {
-        regionName: '黄埔黄埔',
-        quantity: 121
-      },
-      {
-        regionName: '黄埔黄埔',
-        quantity: 129
-      },
-      {
-        regionName: '黄埔黄埔',
-        quantity: 129
-      },
-      {
-        regionName: '黄埔黄埔黄',
-        quantity: 12
-      }
-    ]
+    this.districts = await this.$ajax.ajax({
+      method: 'GET',
+      url: 'v1/car/distribution'
+    })
     // 街道
   }
 
   // 控制轨迹的播放
   handleControlTrack(isPlaying) {
     isPlaying ? this.map.pauseTracker() : this.map.moveTracker()
+  }
+
+  // 监听 - 倍速
+  @Watch('showSearch', {})
+  public async watchShowSearch(val: boolean) {
+    if (val && !this.companyList.length) {
+      // 车辆列表
+      if (!this.carList.length) {
+        const { records } = await this.$ajax.ajax({
+          method: 'POST',
+          url: 'v1/car',
+          data: {
+            pageNum: 0,
+            pageNo: 9999
+          }
+        })
+        this.carList = records
+      }
+      // 所有单位信息
+      this.companyList = await this.$ajax.ajax({
+        method: 'GET',
+        url: 'v1/car/company'
+      })
+    }
   }
 }
 </script>

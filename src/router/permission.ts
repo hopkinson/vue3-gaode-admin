@@ -27,7 +27,7 @@ router.beforeEach(async (to, from, next) => {
           const data = await store.dispatch('user/GetUserInfo')
           if (data) {
             await store.dispatch('permission/GenerateRoutes', { routes })
-            await store.dispatch('dict/GetDict')
+            // await store.dispatch('dict/GetDict')
             // 生成可访问的路由表
             router.addRoutes(
               store.getters['permission/addRouters'].concat({
