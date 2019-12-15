@@ -13,11 +13,16 @@
 import * as models from './models'
 
 /**
+ * @property `id` 车辆ID
  * @property `terminalNo` 终端编号
  * @property `carNo` 车牌号码
  * @property `location`
  */
 export interface CarLocationBody {
+  /**
+   * 车辆ID
+   */
+  id: string
   /**
    * 终端编号
    */

@@ -85,7 +85,7 @@ export class WrappedFetch {
     let config = {
       ...extra,
       method: method.toLocaleLowerCase(),
-      headers: { ...header, Authorization: cookie.get(TOKEN) || '' }
+      headers: { ...header, Authorization: `${cookie.get(TOKEN)}` || '' }
     }
     // json
     if (data) {

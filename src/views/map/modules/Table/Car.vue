@@ -9,56 +9,61 @@
         :key="index"
       ></span>
     </div>-->
-    <div class="car__tip">
+    <div class="table__tip">
       车辆总计：
-      <strong>123辆</strong>
+      <strong>{{ tableData.total || 0 }}辆</strong>
     </div>
+    <!-- @selection-change="selectionChange" -->
     <el-table
       ref="table"
       class="table"
-      :data="data"
-      :row-key="rowKey"
-      header-row-class-name="project__table--header"
-      row-class-name="project__table--row"
-      @selection-change="selectionChange"
-      @current-change="handleCurrentChange"
+      :data="tableData.records"
+      header-align="center"
+      align="center"
+      header-cell-class-name="project__table--header"
+      cell-class-name="project__table--row"
     >
-      <el-table-column
+      <!-- <el-table-column
         type="selection"
         width="55"
         :reserve-selection="reserveSelection"
         :selectable="selectable"
         v-if="showSelection"
-      ></el-table-column>
-      <el-table-column label="状态">
+      ></el-table-column>-->
+      <el-table-column label="状态" width="60px">
         <span
           class="project__car-status"
-          :class="[`is-${filterDict(scope.row.status, dict, 'value', 'code')}`]"
+          :class="scope.row.runState | filterClass"
           slot-scope="scope"
         ></span>
       </el-table-column>
-      <el-table-column label="单位" prop="beginDate"></el-table-column>
-      <el-table-column label="车牌号" prop="beginDate"></el-table-column>
-      <el-table-column label="操作">
-        <el-button
+      <el-table-column label="单位">
+        <el-tooltip
           slot-scope="scope"
-          type="primary"
-          size="mini"
-          plain
+          effect="dark"
+          :content="scope.row.companyName"
+          placement="top-start"
+        >
+          <span class="table__text--single">{{ scope.row.companyName }}</span>
+        </el-tooltip>
+      </el-table-column>
+      <el-table-column label="车牌号" prop="carNo"></el-table-column>
+      <el-table-column label="操作">
+        <span
+          class="table__btn--track"
           @click="$emit('play', scope.row)"
-          >轨迹回放</el-button
+          slot-scope="scope"
+          >轨迹回放</span
         >
       </el-table-column>
     </el-table>
-    <!-- 分页 -->
+    <!-- 分页  :current-page.sync="currentPage3"-->
     <el-pagination
-      @size-change="handleSizeChange"
+      class="table__pagination"
       @current-change="handleCurrentChange"
-      :current-page.sync="currentPage3"
-      :pager-count="6"
       layout="prev, pager, next, jumper"
-      :total="50"
-      :page-size="10"
+      :total="tableData.total"
+      :page-size="tableData.size"
       small
     ></el-pagination>
   </div>
@@ -68,22 +73,87 @@ import { Component, Vue, Mixins, Prop, Ref } from 'vue-property-decorator'
 import { TRAFFIC_LEGEND } from '@/config/dict'
 import { filterDict } from '@/utils/filters'
 @Component({
-  name: 'TableList'
+  name: 'TableList',
+  inheritAttrs: false,
+  filters: {
+    filterClass(val) {
+      return `is-${filterDict(
+        val,
+        Object.values(TRAFFIC_LEGEND),
+        'value',
+        'code'
+      )}`
+    }
+  }
 })
 export default class TableList extends Vue {
   @Ref() readonly table!: any
   // 字典 - 类型
   dict = TRAFFIC_LEGEND
+
   // 列表数据
-  @Prop({ type: Array, default: () => [] }) readonly data!: Array<any>
+  @Prop({ type: Boolean, default: false }) readonly hasSearchWord
+  // 列表数据
+  @Prop({ type: Object, default: () => {} }) readonly tableData
+
+  handleCurrentChange(val) {
+    this.$emit('current-change', val)
+  }
 }
 </script>
 <style lang="less" scoped>
-.car {
+.table {
+  &::before {
+    content: none;
+  }
+  & /deep/ .el-table__empty-block {
+    background: #020214;
+  }
   &__tip {
     font-size: 12px;
     color: rgb(255, 255, 255);
     margin-bottom: 12px;
+  }
+  &__text {
+    &--single {
+      .text-ellipsis-multi-line(1);
+    }
+  }
+  &__btn {
+    &--track {
+      display: inline-block;
+      width: 66px;
+      height: 21px;
+      line-height: 19px;
+      text-align: center;
+      background: transparent;
+      color: rgb(34, 168, 238);
+      font-size: 12px;
+      border: 1px solid rgb(34, 168, 238);
+      cursor: pointer;
+      &:hover {
+        background: rgb(34, 168, 238);
+        color: #fff;
+      }
+    }
+  }
+  &__pagination {
+    background: transparent;
+    margin-top: 30px;
+    text-align: center;
+    & /deep/ .btn-next,
+    & /deep/ .btn-prev,
+    & /deep/ .el-pager li {
+      background-color: transparent;
+      color: #fff;
+    }
+    & /deep/ .el-pagination__jump {
+      color: #fff;
+    }
+    & /deep/ .el-input__inner {
+      background: #020215;
+      color: #fff;
+    }
   }
 }
 </style>

@@ -13,40 +13,40 @@
 import * as models from './models'
 
 /**
- * @description 位置信息
- * @property `[alarmType]` 告警类型
- * @property `location` 坐标(格式: 113.339, 23.1874)
- * @property `marsLocation` 火星坐标(格式: 113.339, 23.1874)
+ * @description 当前位置
+ * @property `alarmType` 告警类型
+ * @property `location` 坐标(格式: 113.448, 23.1574)
+ * @property `marsLocation` 火星坐标(格式: 113.448, 23.1574)
  * @property `speed` 速度
  * @property `direction` 方位角
  * @property `locateTime` 定位时间
  * @property `runState` 车辆状态[1:行驶, 2:停驶, 3:异常]
  */
-export interface CarLocationLocation {
+export interface CarIdBodyLocation {
   /**
    * 告警类型
    */
-  alarmType?: number
+  alarmType: number
   /**
-   * 坐标(格式: 113.339, 23.1874)
+   * 坐标(格式: 113.448, 23.1574)
    */
   location: string
   /**
-   * 火星坐标(格式: 113.339, 23.1874)
+   * 火星坐标(格式: 113.448, 23.1574)
    */
   marsLocation: number
   /**
    * 速度
    */
-  speed: number
+  speed: string
   /**
    * 方位角
    */
-  direction: number
+  direction: string
   /**
    * 定位时间
    */
-  locateTime: string
+  locateTime: number
   /**
    * 车辆状态[1:行驶, 2:停驶, 3:异常]
    */

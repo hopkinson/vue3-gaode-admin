@@ -1,37 +1,40 @@
 <template>
-  <el-form :model="form" size="small">
-    <el-form-item label="隶属单位：">
+  <el-form :model="form" size="small" label-position="left">
+    <el-form-item label="隶属单位：" class="form__item">
       <el-select
+        clearable
         popper-class="project__popup--inner"
         class="form__select"
         v-model="form.companyId"
-        :visible-change="remoteCompany"
-        :loading="loading"
       >
         <el-option
-          v-for="item in optionsCompany"
-          :key="item.companyName"
-          :label="item.companyName"
+          class="form__select--option"
+          v-for="item in companyList"
+          :key="item.id"
+          :label="item.name"
           :value="item.id"
         ></el-option>
       </el-select>
     </el-form-item>
-    <el-form-item label="运行状态：">
+    <el-form-item label="运行状态：" class="form__item">
       <el-select
+        clearable
         popper-class="project__popup--inner"
         class="form__select"
         v-model="form.runState"
-        autocomplete
       >
-        <el-option label="所有状态" :value="empty" />
         <el-option
+          class="form__select--option"
           v-for="item in trafficDict"
           :key="item.value"
           :label="item.label"
           :value="item.value"
         >
-          <!-- <span class="form__state--dot" :style="{ background: item.color }"></span> -->
-          <!-- <span class="form__state--label">{{ item.label }}</span> -->
+          <span
+            class="form__state--dot"
+            :style="{ background: item.color }"
+          ></span>
+          <span class="form__state--label">{{ item.label }}</span>
         </el-option>
       </el-select>
     </el-form-item>
@@ -39,32 +42,34 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
+import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { TRAFFIC_LEGEND } from '@/config/dict'
+import { CompanyBody } from '@/services'
+interface Form {
+  companyId: string
+  runState: string
+}
 @Component({
-  name: 'TrackComponent'
+  name: 'TrackComponent',
+  inheritAttrs: false
 })
 export default class TrackComponent extends Vue {
   // 单位列表
-  @Prop({ type: Array, default: () => [] }) public readonly queryData!: Array<
-    any
+  @Prop({ type: Array, default: () => [] }) public readonly companyList!: Array<
+    CompanyBody
   >
-  @Prop({ type: Function, default: () => {} })
-  public readonly fetchCompany!: Function
-  empty = ''
-  form: any = {}
+  form = {
+    companyId: '',
+    runState: ''
+  }
   trafficDict = Object.values(TRAFFIC_LEGEND) // 字典 - 交通状况
-  loading: boolean = false // 加载中
   optionsCompany: Array<any> = [] // 隶属单位
   optionsRunState: Array<any> = [] // 运行状态
 
-  // 远程搜索 - 单位
-  async remoteCompany(status) {
-    if (status && !this.optionsCompany.length) {
-      this.loading = true
-      this.optionsCompany = await this.fetchCompany()
-      this.loading = false
-    }
+  // 监听 - params
+  @Watch('form', { deep: true })
+  public watchForm(val) {
+    this.$emit('change-filter', val)
   }
 }
 </script>
@@ -81,8 +86,25 @@ export default class TrackComponent extends Vue {
 </style>
 <style lang="less" scoped>
 .form {
+  &__item {
+    display: flex;
+    align-items: center;
+    & /deep/ .el-form-item__content {
+      flex: 1;
+    }
+  }
   &__select {
-    width: 77%;
+    width: 100%;
+    &--option {
+      &.is-empty {
+        border-bottom: 1px solid #202f4c;
+      }
+      &.hover,
+      &:hover {
+        background-color: #1e345f;
+        color: #fff;
+      }
+    }
     & /deep/ .el-icon-arrow-up:before {
       content: '\e78f';
     }
@@ -99,10 +121,11 @@ export default class TrackComponent extends Vue {
     }
   }
   &__state {
-    &--icon {
+    &--dot {
       border-radius: 50%;
       background-color: rgb(34, 168, 238);
       width: 8px;
+      display: inline-block;
       height: 8px;
     }
     &--label {

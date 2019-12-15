@@ -4,22 +4,23 @@
     <div class="status__form">
       <!-- 输入车牌号会在地图上显示 -->
       <!--  @select="select" -->
-      <el-autocomplete
+      <el-input
         class="status__form--autocomplete"
-        popper-class="my-autocomplete"
-        v-model="plate"
-        :fetch-suggestions="querySearch"
+        v-model="carNo"
         placeholder="输入车牌号查询"
       >
-        <!-- @click="handleIconClick" -->
-        <i
-          class="el-icon-search el-input__icon status__form--search"
-          slot="suffix"
-        ></i>
-        <template slot-scope="{ item }">
-          <div class="name">{{ item.carNo }}</div>
+        <template slot="suffix">
+          <i
+            v-if="carNo.length"
+            class="el-icon-circle-close el-input__icon status__form--search"
+            @click="carNo = ''"
+          ></i>
+          <i
+            class="el-icon-search el-input__icon status__form--search"
+            @click="handleSearch"
+          ></i>
         </template>
-      </el-autocomplete>
+      </el-input>
       <!-- 按钮-筛选（显示与不显示） -->
       <el-button
         @click="handleSelect"
@@ -41,9 +42,9 @@
     <!-- 筛选（具体信息显示） -->
     <panel-select v-if="value" class="status__panel">
       <!-- 筛选-条件 -->
-      <form-car></form-car>
+      <form-car v-bind="$attrs" v-on="$listeners"></form-car>
       <!-- 筛选-表格展示 -->
-      <table-car></table-car>
+      <table-car v-bind="$attrs" v-on="$listeners"></table-car>
     </panel-select>
   </div>
 </template>
@@ -53,9 +54,9 @@ import PanelSelect from '../Panel/Select.vue'
 import TableCar from '../Table/Car.vue'
 import FormCar from '../Form/Car.vue'
 import { Component, Vue, Prop, Model, Watch } from 'vue-property-decorator'
-
 @Component({
   name: 'SearchCarStatus',
+  inheritAttrs: false,
   components: {
     PanelSelect,
     FormCar,
@@ -63,27 +64,30 @@ import { Component, Vue, Prop, Model, Watch } from 'vue-property-decorator'
   }
 })
 export default class SearchCarStatus extends Vue {
-  // 车牌列表
-  @Prop({ type: Array, default: () => [] }) public readonly queryData!: Array<
-    any
-  >
   // v-model
   @Model('input', { type: Boolean, default: false })
   public readonly value!: boolean
-
+  // 是否有车牌号
+  hasSearchWord: boolean = false
   // 车牌号
-  plate: string = ''
+  carNo: string = ''
   // 筛选
   handleSelect() {
     this.$emit('input', !this.value)
   }
 
-  // 远程查询车牌号码
-  querySearch(query, callback) {
-    var results = query
-      ? this.queryData.filter(item => item.carNo.includes(query))
-      : this.queryData
-    callback(results)
+  // 搜索
+  handleSearch() {
+    this.$emit('search', this.carNo)
+    this.$emit('input', true)
+  }
+  // 监听 - params
+  @Watch('value', {})
+  public watchValue(val: string) {
+    console.log(val)
+    if (!val) {
+      this.carNo = ''
+    }
   }
 }
 </script>
@@ -99,6 +103,7 @@ export default class SearchCarStatus extends Vue {
     &--search {
       color: #73738e;
       font-weight: bold;
+      cursor: pointer;
     }
     &--button {
       padding: 11px 12px;

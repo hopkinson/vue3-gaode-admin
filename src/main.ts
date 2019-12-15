@@ -55,7 +55,8 @@ VueAMap.initAMapApiLoader({
     'AMap.ToolBar',
     'AMap.MapType',
     'AMap.PolyEditor',
-    'AMap.MarkerClusterer'
+    'AMap.MarkerClusterer',
+    'AMap.InfoWindow'
   ],
   v: '1.4.6'
 })

@@ -14,8 +14,9 @@ import * as models from './models'
 
 /**
  * @property `id` 主键ID
- * @property `companyName` 公司名称
  * @property `carNo` 车牌号码
+ * @property `companyId` 公司ID
+ * @property `companyName` 公司名称
  * @property `runState` 车辆状态[1:行驶, 2:停驶, 3:异常]
  */
 export interface CarsBodyRecords {
@@ -24,13 +25,17 @@ export interface CarsBodyRecords {
    */
   id: string
   /**
-   * 公司名称
-   */
-  companyName: string
-  /**
    * 车牌号码
    */
   carNo: string
+  /**
+   * 公司ID
+   */
+  companyId: string
+  /**
+   * 公司名称
+   */
+  companyName: string
   /**
    * 车辆状态[1:行驶, 2:停驶, 3:异常]
    */

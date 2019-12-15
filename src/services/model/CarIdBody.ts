@@ -15,9 +15,14 @@ import * as models from './models'
 /**
  * @property `id` 车辆ID
  * @property `carNo` 车牌号码
+ * @property `terminalNo` 终端bian hao
+ * @property `companyId` 公司ID
  * @property `companyName` 公司名称
- * @property `runState` 行驶状态
- * @property `[point]`
+ * @property `name` 车辆名称
+ * @property `typeId` 类型ID
+ * @property `typeName` 类型名称
+ * @property `model` 幸好
+ * @property `[location]`
  */
 export interface CarIdBody {
   /**
@@ -29,12 +34,32 @@ export interface CarIdBody {
    */
   carNo: string
   /**
+   * 终端bian hao
+   */
+  terminalNo: string
+  /**
+   * 公司ID
+   */
+  companyId: string
+  /**
    * 公司名称
    */
   companyName: string
   /**
-   * 行驶状态
+   * 车辆名称
    */
-  runState: string
-  point?: models.CarIdBodyPoint
+  name: string
+  /**
+   * 类型ID
+   */
+  typeId: string
+  /**
+   * 类型名称
+   */
+  typeName: string
+  /**
+   * 幸好
+   */
+  model: string
+  location?: models.CarIdBodyLocation
 }

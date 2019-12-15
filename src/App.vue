@@ -13,20 +13,18 @@ export default {
   },
   mounted() {
     onresize = () => {
-      this.resizeCenter()
+      this.$nextTick(() => {
+        // this.resizeCenter()
+      })
     }
-    this.resizeCenter()
+    // this.resizeCenter()
   },
   methods: {
     resizeCenter() {
-      const ratioX = window.innerWidth / 1920
-      const ratioY = window.innerHeight / 1080
-      const ratio = Math.min(ratioX, ratioY)
-      this.style = {
-        transform: `scale(${ratio})`,
-        transformOrigin: 'left top',
-        marginLeft: `${(window.innerWidth - 1920 * ratio) / 2}px`
-      }
+      let app = document.body
+      let width = document.body.clientWidth
+      app.style.zoom = `${width / 1920}`
+      app.style.minHeight = '100%' //注意这里必须设置最小高度为100%要不然高度不能满屏
     }
   }
 }

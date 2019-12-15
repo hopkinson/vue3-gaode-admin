@@ -20,5 +20,5 @@ import * as models from './models'
 export interface CarLocations {
   now?: string
   statusCode?: number
-  body?: Array<models.CarLocationsBody>
+  body?: Array<Array<number>>
 }

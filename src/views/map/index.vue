@@ -5,6 +5,13 @@
     <search-car-status
       class="map__chart--search"
       v-model="showSearch"
+      :table-data="searchCarBody"
+      :company-list="companyList"
+      @search="handleSearchCar"
+      @current-change="handleCurrentChange"
+      @fetch-company="handleSearchCompany"
+      @play="handleShowTrack"
+      @change-filter="handleChangeFilter"
     ></search-car-status>
     <div class="map__chart--left">
       <!-- 图表 -->
@@ -64,10 +71,13 @@
       </panel-chart>
     </div>
 
-    <!-- 地图 -->
+    <!-- 地图 @play-track="handleShowTrack" -->
     <map-home
       :track-markers="trackMarkers"
       :speed="trackSpeed"
+      :markers="carList"
+      :car-detail="carDetail"
+      @load-car-detail="loadCarDetail"
       ref="map"
     ></map-home>
     <!-- 底部 - 抽屉 -->
@@ -75,6 +85,7 @@
       v-model="showDrawer"
       :speed.sync="trackSpeed"
       ref="drawer"
+      :car-detail="carDetail"
       @play="handleControlTrack"
     ></drawer-track>
   </div>
@@ -91,8 +102,9 @@ import DrawerTrack from './modules/Drawer/Track.vue'
 import MapHome from './modules/Map/Home.vue'
 import { TRAFFIC_LEGEND } from '@/config/dict'
 import SearchCarStatus from './modules/Search/CarStatus.vue'
-import trackMarkers from '@/mock/data.js'
+import { warning, cars, districts, speed } from '@/mock/data.js'
 import { CompanyBody, CarsBodyRecords, CarIdBody } from '@/services'
+import SocketMessage from './mixins/websocket'
 @Component({
   name: 'MapIndex',
   components: {
@@ -106,9 +118,11 @@ import { CompanyBody, CarsBodyRecords, CarIdBody } from '@/services'
     DrawerTrack
   }
 })
-export default class MapIndex extends Vue {
+export default class MapIndex extends SocketMessage {
   @Ref('drawer') drawer: any
   @Ref('map') map: any
+  // 是否在播放轨迹回放
+  isPlaying: boolean = false
   // 是否显示抽屉
   showDrawer: boolean = false
   // 是否显示筛选
@@ -121,62 +135,114 @@ export default class MapIndex extends Vue {
   districts: any = []
   warning: any = []
   cars: any = []
+  carDetail = {}
   trackMarkers: Array<Array<number>> = [] // 标记点 - 轨迹回放
   companyList: Array<CompanyBody> = [] // 所有单位信息
-  carList: Array<CarsBodyRecords> = [] // 车辆列表
+  searchCarBody = {} // 搜索的车辆列表
+  carList: Array<any> = []
+  carParams = {
+    pageNo: '',
+    pageSize: 10,
+    companyId: '',
+    carNo: ''
+  }
   async created() {
-    this.trackMarkers = trackMarkers
-    // 车辆 - 告警统计
-    this.warning = await this.$ajax.ajax({
-      method: 'GET',
-      url: 'v1/alerts'
-    })
-    // 车辆状态
-    this.cars = await this.$ajax.ajax({
-      method: 'GET',
-      url: 'v1/car/state'
-    })
-    // 最高时速
-    this.speed = await this.$ajax.ajax({
-      method: 'GET',
-      url: 'v1/car/speed'
-    })
+    this.warning = warning
+    this.cars = cars
+    this.speed = speed
+    this.districts = districts
+    // // 车辆 - 告警统计
+    // this.warning = await this.$ajax.ajax({
+    //   method: 'GET',
+    //   url: 'v1/alerts'
+    // })
+    // // 车辆状态
+    // this.cars = await this.$ajax.ajax({
+    //   method: 'GET',
+    //   url: 'v1/car/state'
+    // })
+    // // 最高时速
+    // this.speed = await this.$ajax.ajax({
+    //   method: 'GET',
+    //   url: 'v1/car/speed'
+    // })
 
-    // 地区分布
-    this.districts = await this.$ajax.ajax({
-      method: 'GET',
-      url: 'v1/car/distribution'
-    })
-    // 街道
+    // // 地区分布
+    // this.districts = await this.$ajax.ajax({
+    //   method: 'GET',
+    //   url: 'v1/car/distribution'
+    // })
   }
 
   // 控制轨迹的播放
   handleControlTrack(isPlaying) {
-    isPlaying ? this.map.pauseTracker() : this.map.moveTracker()
+    this.isPlaying ? this.map.pauseTracker() : this.map.moveTracker()
+    this.isPlaying = !this.isPlaying
+  }
+  // 搜索汽车
+  handleSearchCar(carNo) {
+    this.carParams = Object.assign({}, this.carParams, {
+      carNo,
+      pageNo: 0
+    })
+  }
+  // 改变搜索条件
+  handleChangeFilter(form) {
+    this.carParams = Object.assign({}, this.carParams, {
+      ...form,
+      pageNo: 0
+    })
+  }
+  // 改变当前页
+  handleCurrentChange(pageNo) {
+    this.carParams = Object.assign({}, this.carParams, {
+      pageNo
+    })
+  }
+  // 点击轨迹回放 - 显示底部抽屉
+  handleShowTrack(data) {
+    this.showDrawer = true
+    this.loadCarDetail(data)
+  }
+
+  // 所有单位信息
+  async handleSearchCompany() {
+    return await this.$ajax.ajax({
+      method: 'GET',
+      url: 'v1/car/company'
+    })
+  }
+  // 加载汽车详情
+  async loadCarDetail(item) {
+    this.carDetail = await this.$ajax.ajax({
+      method: 'GET',
+      url: `v1/car/${item.id}`
+    })
   }
 
   // 监听 - 倍速
   @Watch('showSearch', {})
   public async watchShowSearch(val: boolean) {
     if (val && !this.companyList.length) {
-      // 车辆列表
-      if (!this.carList.length) {
-        const { records } = await this.$ajax.ajax({
-          method: 'POST',
-          url: 'v1/car',
-          data: {
-            pageNum: 0,
-            pageNo: 9999
-          }
-        })
-        this.carList = records
-      }
       // 所有单位信息
       this.companyList = await this.$ajax.ajax({
         method: 'GET',
-        url: 'v1/car/company'
+        url: 'v1/company'
       })
+      this.carParams.pageNo = '0'
     }
+  }
+
+  @Watch('carParams', { deep: true })
+  public async watchCarParams(val) {
+    // 车辆列表
+    const carBody = await this.$ajax.ajax({
+      method: 'POST',
+      url: 'v1/cars',
+      params: val,
+      data: val
+    })
+    this.searchCarBody = carBody
   }
 }
 </script>

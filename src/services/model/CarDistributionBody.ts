@@ -13,16 +13,16 @@
 import * as models from './models'
 
 /**
- * @property `regionName` 区域名称
+ * @property `companyName` 单位名称
  * @property `quantity` 数量
  */
 export interface CarDistributionBody {
   /**
-   * 区域名称
+   * 单位名称
    */
-  regionName: string
+  companyName: string
   /**
    * 数量
    */
-  quantity: string
+  quantity: number
 }

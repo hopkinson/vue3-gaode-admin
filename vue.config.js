@@ -12,22 +12,31 @@ const SpritesmithPlugin = require('webpack-spritesmith')
 const resolve = dir => path.join(__dirname, dir)
 // customerTemplate
 const templateFunction = function(data) {
-  const shared = `.sprite_ico { background-image: url(I);display:inline-block;background-size: Wpx Hpx;}`
-    .replace('I', data.sprites[0].image)
-    .replace('W', data.spritesheet.width)
-    .replace('H', data.spritesheet.height)
-
+  const shared = '.sprite_ico {display:inline-block; background-image: url(I); }'.replace(
+    'I',
+    data.sprites[0].image
+  )
+  //       // 注意：此处默认图标使用的是二倍图
   const perSprite = data.sprites
     .map(function(sprite) {
-      return `.sprite_ico_N { width: Wpx; height: Hpx; background-position: Xpx Ypx;}`
-        .replace('N', sprite.name)
-        .replace('W', sprite.width)
-        .replace('H', sprite.height)
-        .replace('X', sprite.offset_x)
-        .replace('Y', sprite.offset_y)
+      return '.sprite_ico_N { width: Wpx; height: Hpx;background-position: X Y;background-size: SWpx SHpx;}'
+        .replace(/N/g, sprite.name)
+        .replace(/SW/g, data.spritesheet.width)
+        .replace(/SH/g, data.spritesheet.height)
+        .replace(/W/g, sprite.width)
+        .replace(/H/g, sprite.height)
+        .replace(
+          /X/g,
+          ((sprite.x / (data.spritesheet.width - sprite.width)) * 100 || 0) +
+            '%'
+        )
+        .replace(
+          /Y/g,
+          ((sprite.y / (data.spritesheet.height - sprite.height)) * 100 || 0) +
+            '%'
+        )
     })
     .join('\n')
-
   return shared + '\n' + perSprite
 }
 
@@ -190,7 +199,7 @@ module.exports = {
         //本地
         // target: 'http://192.168.102.13:8080/',
         target: process.env.API,
-        ws: false,
+        ws: true,
         changeOrigin: true
       }
     }

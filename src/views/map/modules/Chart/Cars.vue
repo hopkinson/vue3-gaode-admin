@@ -6,7 +6,6 @@
 <script lang="ts">
 import { Component, Vue, Prop, Watch, Ref } from 'vue-property-decorator'
 import { TRAFFIC_LEGEND } from '@/config/dict'
-import { filterDict } from '@/utils/filters'
 @Component({
   name: 'ChartWarning'
 })

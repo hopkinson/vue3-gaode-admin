@@ -1,31 +1,95 @@
 <template>
   <el-form inline :model="form" size="small">
-    <el-form-item label="车牌号码：">
-      粤AXXXX
-    </el-form-item>
+    <el-form-item label="车牌号码：">{{ carDetail.carNo }}</el-form-item>
     <el-form-item label="开始时间：">
-      <el-date-picker v-model="form.beginDate" type="datetime">
-      </el-date-picker>
+      <el-date-picker
+        class="form__date"
+        v-model="form.beginTime"
+        type="datetime"
+        :picker-options="pickerOptions"
+      ></el-date-picker>
     </el-form-item>
     <el-form-item label="结束时间：">
-      <el-date-picker v-model="form.endDate" type="datetime"> </el-date-picker>
+      <el-date-picker
+        class="form__date"
+        v-model="form.endTime"
+        type="datetime"
+        :picker-options="pickerOptions"
+      ></el-date-picker>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="onSubmit" size="mini">确认</el-button>
+      <el-button
+        class="form__button"
+        type="primary"
+        @click="onSubmit"
+        size="mini"
+        >确认</el-button
+      >
     </el-form-item>
   </el-form>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
-
+import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
+import { CarLocationsBody } from '@/services'
+import { CarIdBody } from '@/services'
 @Component({
   name: 'TrackComponent'
 })
 export default class TrackComponent extends Vue {
-  form: any = {}
+  // 详情数据
+  @Prop({ type: Object, default: () => {} }) readonly carDetail!: CarIdBody
+
+  form: CarLocationsBody = {
+    carId: '',
+    beginTime: '',
+    endTime: ''
+  }
+  pickerOptions: any = {
+    disabledDate(time) {
+      return time.getTime() > Date.now()
+    },
+    shortcuts: [
+      {
+        text: '今天',
+        onClick(picker) {
+          picker.$emit('pick', new Date())
+        }
+      },
+      {
+        text: '昨天',
+        onClick(picker) {
+          const date = new Date()
+          date.setTime(date.getTime() - 3600 * 1000 * 24)
+          picker.$emit('pick', date)
+        }
+      }
+    ]
+  }
   onSubmit() {}
+
+  // 监听 - 倍速
+  @Watch('carDetail', { deep: true })
+  public async watchFormh(val: CarIdBody) {
+    this.form.carId = val.id
+  }
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="less" scoped>
+.form {
+  &__date {
+    & /deep/ .el-input__inner {
+      background-color: #1a1a1b;
+      border-radius: 0;
+      border: none;
+      color: #fff;
+    }
+  }
+  &__button {
+    background-color: rgb(34, 168, 238);
+    width: 88px;
+    border-radius: 0;
+  }
+}
+</style>

@@ -12,6 +12,7 @@ export const TRAFFIC_LEGEND = {
   1: {
     value: 'normal',
     label: '行驶',
+    code: 1,
     color: 'rgb(34, 168, 238)',
     gradientColor: [
       { offset: 0, color: 'rgb(8,177,255)' },
@@ -22,6 +23,7 @@ export const TRAFFIC_LEGEND = {
   2: {
     value: 'stop',
     label: '停驶',
+    code: 2,
     color: 'rgb(179, 194, 237)',
     gradientColor: [
       { offset: 0, color: 'rgb(161,174,187)' },
@@ -32,6 +34,7 @@ export const TRAFFIC_LEGEND = {
   3: {
     value: 'abnormal',
     label: '异常',
+    code: 3,
     color: 'rgb(255, 47, 45)',
     gradientColor: [
       { offset: 0, color: 'rgb(255,8,95)' },

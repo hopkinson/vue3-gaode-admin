@@ -1,20 +1,21 @@
 <template>
-  <div class="detail">
+  <div class="detail" v-if="value">
     <div class="sprite_ico sprite_ico_popup_detail__header">
-      <i class="iconfont icon-guanbi detail--close"></i>
+      <i
+        class="iconfont icon-guanbi detail--close"
+        @click="$emit('input', false)"
+      ></i>
     </div>
     <div class="detail__main">
-      <h6>粤A3KX62</h6>
+      <h6>{{ data.carNo }}</h6>
       <p>
         状态：
-        <span class="is-danger">违停</span>
+        <span class="is-danger">{{ state }}</span>
       </p>
-      <p>隶属单位：市政府交通厅</p>
-      <p>汽车类别：便民车</p>
-      <p>速度时间：45km/h</p>
-      <p>最后定位：暂无</p>
-      <p>定位时间：2019-11-23 16:22</p>
-      <div class="detail--button" @click="$emit('play-track', data)">
+      <p>隶属单位：{{ data.companyName || '无' }}</p>
+      <p>速度时间：{{ data.speed || 0 }}km/h</p>
+      <!-- <p>定位时间：{{ data.locateTime | formatDay('YYYY-MM-DD HH:mm:ss') }}</p> -->
+      <div class="detail--button" @click="trackPlay">
         轨迹回放
       </div>
     </div>
@@ -22,27 +23,61 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator'
-
+import { Component, Vue, Prop, Model } from 'vue-property-decorator'
+import { TRAFFIC_LEGEND, WARNGING } from '@/config/dict'
 @Component({
   name: 'CarDetail',
   inheritAttrs: false
 })
 export default class CarDetail extends Vue {
-  @Prop({ default: () => {}, type: Object }) public readonly carDetail!: any
+  // v-model
+  @Model('input', { type: Boolean, default: false })
+  public readonly value!: boolean
+
+  @Prop({ default: () => {}, type: Object }) public readonly data!: any
+
+  get state() {
+    const {
+      location: { runState, alertType }
+    } = this.data
+    let state = TRAFFIC_LEGEND[runState.toString()].value
+    if (state === 3) {
+      state = WARNGING.status[alertType.toString()].label
+    }
+    return state
+  }
+  trackPlay() {
+    this.$emit('play-track', this.data)
+    this.$emit('input', false)
+  }
 }
 </script>
 
 <style lang="less" scoped>
 .detail {
   position: relative;
+  font-size: 0;
   &__main {
     color: #fff;
+    position: relative;
+    border-left: 1px solid #0f6980;
+    border-right: 1px solid #0f6980;
+    border-bottom: 1px solid #0f6980;
+    background: #020215;
+    padding: 0 10px 20px;
+    font-size: 12px;
+    max-width: 221px;
     .is-danger {
       color: #ee1013;
     }
-  }
-  &__submit {
+    h6 {
+      font-size: 14px;
+      color: rgb(0, 253, 255);
+      margin-bottom: 12px;
+    }
+    p {
+      margin-bottom: 12px;
+    }
   }
   &--close {
     position: absolute;
@@ -50,6 +85,7 @@ export default class CarDetail extends Vue {
     right: 10px;
     font-size: 13px;
     color: #0ccfdd;
+    cursor: pointer;
   }
   &--button {
     width: 66px;
@@ -60,6 +96,12 @@ export default class CarDetail extends Vue {
     color: rgb(34, 168, 238);
     font-size: 12px;
     border: 1px solid rgb(34, 168, 238);
+    margin-top: 12px;
+    cursor: pointer;
+    &:hover {
+      background: rgb(34, 168, 238);
+      color: #fff;
+    }
   }
 }
 </style>
