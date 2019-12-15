@@ -160,7 +160,7 @@ module.exports = {
         : [],
       css: [
         '//unpkg.com/element-ui/lib/theme-chalk/index.css',
-        '//at.alicdn.com/t/font_1563719_5xcbw645up.css'
+        '//at.alicdn.com/t/font_1563719_z0kd1v7nz3.css'
       ]
     }
     // 添加别名

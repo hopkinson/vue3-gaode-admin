@@ -21,6 +21,28 @@
       background-color: rgb(179, 194, 237);
     }
   }
+  &__popup {
+    &--inner {
+      background-color: rgb(7, 23, 56);
+      border: none;
+      margin-top: 8px;
+      .popper__arrow {
+        border: none !important;
+        &::after {
+          border: none !important;
+        }
+      }
+    }
+  }
+  &__table {
+    &--header {
+      background-color: #020215 !important;
+      color: rgb(0, 195, 210);
+    }
+    &--row {
+      background-color: #020215 !important;
+    }
+  }
   &__echarts {
     width: 100%;
     height: 100%;

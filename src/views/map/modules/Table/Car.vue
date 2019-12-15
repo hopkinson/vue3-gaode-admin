@@ -8,15 +8,17 @@
         v-for="(item, index) in dict"
         :key="index"
       ></span>
-    </div> -->
+    </div>-->
     <div class="car__tip">
-      车辆总计：123辆
+      车辆总计：
+      <strong>123辆</strong>
     </div>
     <el-table
       ref="table"
       class="table"
       :data="data"
       :row-key="rowKey"
+      header-row-class-name="project__table--header"
       @selection-change="selectionChange"
       @current-change="handleCurrentChange"
     >
@@ -80,6 +82,7 @@ export default class TableList extends Vue {
   &__tip {
     font-size: 12px;
     color: rgb(255, 255, 255);
+    margin-bottom: 12px;
   }
 }
 </style>

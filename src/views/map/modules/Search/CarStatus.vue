@@ -15,14 +15,17 @@
         <i
           class="el-icon-search el-input__icon status__form--search"
           slot="suffix"
-        >
-        </i>
+        ></i>
         <template slot-scope="{ item }">
           <div class="name">{{ item.carNo }}</div>
         </template>
       </el-autocomplete>
       <!-- 按钮-筛选（显示与不显示） -->
-      <el-button @click="handleSelect" class="status__form--button">
+      <el-button
+        @click="handleSelect"
+        class="status__form--button"
+        :class="{ 'is-active': value }"
+      >
         <div class="status__form--button-inner">
           <i class="iconfont icon-qiche"></i>
           <span class="status__button--text">筛选</span>
@@ -100,6 +103,9 @@ export default class SearchCarStatus extends Vue {
     &--button {
       padding: 11px 12px;
       border-radius: 0;
+      &.is-active {
+        color: #22a8ee;
+      }
       &-inner {
         display: flex;
         align-items: center;

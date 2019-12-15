@@ -4,7 +4,6 @@
     <div class="chart__inner">
       <slot></slot>
     </div>
-    <div class="sprite_ico sprite_ico_select_footer"></div>
   </div>
 </template>
 
@@ -21,13 +20,15 @@ export default class PanelComponent extends Vue {}
 .chart {
   position: relative;
   font-size: 12px;
-  width: 408px;
+  width: 407px;
   background: #020215;
+  font-size: 0;
   &__inner {
-    position: relative;
     border-left: 1px solid #0f6980;
     border-right: 1px solid #0f6980;
+    border-bottom: 1px solid #0f6980;
     background: #020215;
+    padding: 0 20px 30px;
   }
 }
 </style>

@@ -121,7 +121,7 @@ export default class MapIndex extends Vue {
   warning: any = []
   cars: any = []
   trackMarkers: Array<Array<number>> = [] // 标记点 - 轨迹回放
-  created() {
+  async created() {
     this.trackMarkers = trackMarkers
     this.warning = [
       {
@@ -213,7 +213,11 @@ export default class MapIndex extends Vue {
         { runState: 3, quantity: 160 }
       ]
     }
-    // 最高时速
+    // this.speed = await this.$ajax.ajax({
+    //   method: 'GET',
+    //   url: '1/car/speed'
+    // })
+
     this.speed = [
       {
         carNo: '粤A88888',
