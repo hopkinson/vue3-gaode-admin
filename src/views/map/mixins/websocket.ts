@@ -26,7 +26,6 @@ export default class Table extends Vue {
     this.stompClient.connect(
       {},
       () => {
-        console.log(111)
         // this.stompClient.subscribe(
         //   '/socket/topic/alarms',
         //   msg => {
@@ -43,7 +42,6 @@ export default class Table extends Vue {
         // ) //用户加入接口
       },
       err => {
-        console.log('websocket失败', err)
         this.$message({
           message: '连接websocket失败'
         })

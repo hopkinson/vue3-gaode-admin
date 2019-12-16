@@ -196,14 +196,13 @@ module.exports = {
     port: '8085', // 代理断就
     hotOnly: true, // 热更新
     proxy: {
-      '/api/socket': {
-        target: process.env.API,
-        changeOrigin: true,
-        ws: true
-      },
+      // '/api/socket': {
+      //   target: process.env.API,
+      //   changeOrigin: true,
+      //   ws: true
+      // },
       '/api': {
         //本地
-        // target: 'http://192.168.102.13:8080/',
         target: process.env.API,
         changeOrigin: true
       }
