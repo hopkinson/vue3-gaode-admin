@@ -51,6 +51,7 @@ export default class ChartWarning extends Vue {
     tooltip: {
       backgroundColor: 'transparent',
       formatter: function({ data }) {
+        console.log(data)
         return `
         <div class="project__echarts--tooltip-bar">
             <span class="project__echarts--tooltip-car-text">${data.name}：${data.value}</span>
@@ -100,14 +101,16 @@ export default class ChartWarning extends Vue {
   }
 
   mounted() {
-    this.initData()
+    this.$nextTick(() => {
+      this.initData()
+    })
   }
 
   //   初始化数据
   initData() {
-    const sortedData = sortOut(this.data, 'alertTypeId')
+    const sortedData = sortOut(this.data, 'alarmType')
     const _quantity = this.data.map(item => Number(item.quantity)) // 告警数量
-    const _alertTime = this.data.map(item => item.alertTime) // 告警时间
+    const _alertTime = this.data.map(item => item.alarmTime) // 告警时间
     const _maxQuantity = Math.max.apply(null, _quantity)
     // 图表 - y轴
     const barData = Object.keys(sortedData).map((item, index) => {
@@ -125,7 +128,7 @@ export default class ChartWarning extends Vue {
         data: sortedData[item].map(v => {
           return {
             value: v.quantity,
-            name: WARNGING.status[v.alertTypeId.toString()].label
+            name: WARNGING.status[v.alarmType.toString()].label
           }
         })
       }
@@ -159,7 +162,9 @@ export default class ChartWarning extends Vue {
   // 监听 - params
   @Watch('data', { deep: true })
   public watchData(val: any) {
-    this.initData()
+    this.$nextTick(() => {
+      this.initData()
+    })
   }
 }
 </script>
