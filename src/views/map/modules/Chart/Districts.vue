@@ -87,7 +87,7 @@ export default class ChartWarning extends Vue {
 
   //   初始化数据
   initData() {
-    const _regionName = this.data.map(item => item.regionName)
+    const _regionName = this.data.map(item => item.companyName)
     const _quantity = this.data.map(item => Number(item.quantity))
     // 图表 - y轴
     this.option.yAxis.data = _regionName

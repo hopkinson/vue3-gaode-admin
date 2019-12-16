@@ -56,7 +56,6 @@ class WS implements Socket {
       {},
       () => {
         this.bConnected = true
-        console.log('success')
         if (this.subscriberQueue.length) {
           this.subscriberQueue.forEach(oSubscriber => {
             stompClient.subscribe(oSubscriber.topic, oSubscriber.callback)
@@ -66,16 +65,12 @@ class WS implements Socket {
       },
       error => {
         this.bFail = true
-        console.log('fail')
-        console.error(error)
       }
     )
   }
   disconnect() {
     if (this.$stompClient && this.bConnected) {
-      this.$stompClient.disconnect(() => {
-        console.log('stomp disconnect from server')
-      })
+      this.$stompClient.disconnect(() => {})
     }
   }
 }

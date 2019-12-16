@@ -84,7 +84,6 @@ export default class SearchCarStatus extends Vue {
   // 监听 - params
   @Watch('value', {})
   public watchValue(val: string) {
-    console.log(val)
     if (!val) {
       this.carNo = ''
     }
