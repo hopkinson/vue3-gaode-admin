@@ -48,16 +48,13 @@ module.exports = {
   configureWebpack: config => {
     config.resolve.modules = ['node_modules', './src/assets/images']
     const plugins = []
-    config.externals = Object.assign(
-      {},
-      IS_PROD && {
-        vue: 'Vue',
-        'vue-router': 'VueRouter',
-        vuex: 'Vuex',
-        axios: 'axios',
-        'element-ui': 'ELEMENT'
-      }
-    )
+    config.externals = {
+      vue: 'Vue',
+      'vue-router': 'VueRouter',
+      vuex: 'Vuex',
+      axios: 'axios',
+      'element-ui': 'ELEMENT'
+    }
     // 雪碧图
     plugins.push(
       new SpritesmithPlugin({
@@ -158,15 +155,13 @@ module.exports = {
     config.plugins.delete('preload')
     config.plugins.delete('prefetch')
     const cdn = {
-      js: IS_PROD
-        ? [
-            '//unpkg.com/vue@2.6.10/dist/vue.min.js',
-            '//unpkg.com/vue-router@3.0.6/dist/vue-router.min.js',
-            '//unpkg.com/vuex@3.1.1/dist/vuex.min.js',
-            '//unpkg.com/axios@0.19.0/dist/axios.min.js',
-            '//unpkg.com/element-ui/lib/index.js'
-          ]
-        : [],
+      js: [
+        '//unpkg.com/vue@2.6.10/dist/vue.min.js',
+        '//unpkg.com/vue-router@3.0.6/dist/vue-router.min.js',
+        '//unpkg.com/vuex@3.1.1/dist/vuex.min.js',
+        '//unpkg.com/axios@0.19.0/dist/axios.min.js',
+        '//unpkg.com/element-ui/lib/index.js'
+      ],
       css: [
         '//unpkg.com/element-ui/lib/theme-chalk/index.css',
         '//at.alicdn.com/t/font_1563719_z0kd1v7nz3.css'
