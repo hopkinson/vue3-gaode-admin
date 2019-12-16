@@ -2,32 +2,36 @@
   <div class="abnormal">
     <!-- 异常 - 图标 -->
     <div class="abnormal__icon">
-      <i
-        class="sprite_ico sprite_ico_bar_notice"
-        v-for="(item, index) in data"
-        :key="index"
-        @click="click(item)"
-      >
-        <span class="abnormal__icon--text">粤A3KX62异常</span>
-      </i>
+      <template v-for="(item, index) in data">
+        <i
+          :key="index"
+          v-if="!item.show"
+          class="sprite_ico sprite_ico_bar_notice abnormal__icon--item"
+          @click="click(item)"
+        >
+          <span class="abnormal__icon--text">{{ item.carNo }}异常</span>
+        </i>
+      </template>
     </div>
     <!-- 异常 - 对话框 -->
     <div class="abnormal__dialog" v-if="showDialog">
       <!-- 对话框 - 头部 -->
       <div class="sprite_ico sprite_ico_dialog__header">
-        <i class="iconfont icon-guanbi abnormal__dialog--close"></i>
+        <i
+          class="iconfont icon-guanbi abnormal__dialog--close"
+          @click="cancel"
+        ></i>
       </div>
       <!-- 对话框 - 内容 -->
       <div class="abnormal__dialog--inner">
         <i class="sprite_ico sprite_ico_dialog_abnormal"></i>
         <div class="abnormal__dialog--text">
-          粤AOR35L6异常偏离指定路线
+          {{ model.carNo }}
+          <span class="is-danger">异常{{ model | filterAbnormalType }}</span>
           <br />建议调度工作人员协调
         </div>
         <div class="abnormal__dialog--footer">
-          <div class="abnormal__dialog--button" @click="confirm">
-            实时查看
-          </div>
+          <div class="abnormal__dialog--button" @click="confirm">实时查看</div>
           <div class="abnormal__dialog--button is-plain" @click="cancel">
             取消
           </div>
@@ -39,9 +43,15 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
-
+import { WARNGING } from '@/config/dict'
 @Component({
-  name: 'ButtonAbnormal'
+  name: 'ButtonAbnormal',
+  filters: {
+    filterAbnormalType(val) {
+      const type = val.location ? val.location.alarmType : ''
+      return WARNGING.status[type.toString()].label
+    }
+  }
 })
 export default class ButtonAbnormal extends Vue {
   @Prop({ default: () => [], type: Array }) public readonly data!: Array<any>
@@ -53,6 +63,7 @@ export default class ButtonAbnormal extends Vue {
   click(item) {
     this.showDialog = true
     this.model = item
+    item.show = true
   }
   cancel() {
     this.showDialog = false
@@ -66,9 +77,10 @@ export default class ButtonAbnormal extends Vue {
 </script>
 
 <style lang="less" scoped>
+.is-danger {
+  color: #ff0000;
+}
 .abnormal {
-  position: fixed;
-
   &__icon {
     position: fixed;
     top: 100px;
@@ -77,15 +89,24 @@ export default class ButtonAbnormal extends Vue {
     &--text {
       position: absolute;
       top: 50%;
-      transform: translateY(-50%);
-      left: 35px;
-      color: rgb(255, 0, 0);
+      transform: translate(-50%, -50%);
+      left: 55%;
+      white-space: nowrap;
+      color: #ff0000;
+      line-height: 1;
       font-size: 12px;
       font-weight: bold;
+      font-style: normal;
     }
   }
   &__dialog {
-    position: relative;
+    width: 260px;
+    height: 185px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
     &--inner {
       border-left: 1px solid #0f6980;
       border-right: 1px solid #0f6980;
@@ -116,6 +137,7 @@ export default class ButtonAbnormal extends Vue {
       color: #fff;
       font-size: 12px;
       border: 1px solid rgb(34, 168, 238);
+      cursor: pointer;
       &.is-plain {
         background: transparent;
         color: rgb(34, 168, 238);

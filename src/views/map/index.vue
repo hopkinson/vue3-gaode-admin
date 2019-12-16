@@ -1,6 +1,10 @@
 <template>
   <div class="map">
-    <!-- 图表 && 查询 -->
+    <!-- 异常信息-->
+    <alert-abnormal
+      :data="abnormalList"
+      @confirm="loadCarDetail"
+    ></alert-abnormal>
     <!-- 搜索  -->
     <search-car-status
       v-if="!isFullScreen"
@@ -102,6 +106,7 @@
 import { Component, Vue, Ref, Watch } from 'vue-property-decorator'
 import PanelChart from './modules/Panel/Chart.vue'
 import ChartSpeed from './modules/Chart/Speed.vue'
+import AlertAbnormal from './modules/Alert/Abnormal.vue'
 import ChartDistricts from './modules/Chart/Districts.vue'
 import ChartCars from './modules/Chart/Cars.vue'
 import ChartWarning from './modules/Chart/Warning.vue'
@@ -127,6 +132,7 @@ import {
     ChartSpeed,
     ChartCars,
     ChartWarning,
+    AlertAbnormal,
     SearchCarStatus,
     ChartDistricts,
     DrawerTrack
@@ -158,6 +164,8 @@ export default class MapIndex extends Vue {
   searchCarBody = {} // 搜索的车辆列表
   carList: Array<CarLocationBody> = [] // 所有车辆的列表
   interval: number = 0
+  abnormalList = [] // 异常信息列表
+  websocket: any = null // websocket连接
   carParams = {
     pageNo: '',
     pageSize: 10,
@@ -168,10 +176,13 @@ export default class MapIndex extends Vue {
     this.warning = warning
     await this.pollingLocation()
     //订阅websocket消息
-    const websocket = new Websocket({
+    this.websocket = new Websocket({
       endPoint: process.env.VUE_APP_WS_API
     })
-    websocket.subscribe('/socket/topic/alarms', message => {})
+    this.websocket.subscribes('/socket/topic/alarms', ({ body }) => {
+      const result = JSON.parse(body)
+      this.abnormalList = result
+    })
     // 车辆状态
     this.cars = await this.$ajax.ajax({
       method: 'GET',
@@ -198,6 +209,7 @@ export default class MapIndex extends Vue {
   beforeDestroy() {
     clearInterval(this.interval)
     this.interval = 0
+    this.websocket.disconnect()
   }
   // 长轮询 - 返回车辆实时位置信息
   async pollingLocation() {
