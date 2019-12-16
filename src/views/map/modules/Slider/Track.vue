@@ -80,13 +80,13 @@ export default class DrawerTrackComponent extends Vue {
     }
   }
 
-  // 监听 - params
-  @Watch('passedLineLength', {})
-  public watchVLine(val: string) {
-    if (!val) {
-      this.carNo = ''
-    }
-  }
+  // // 监听 - params
+  // @Watch('passedLineLength', {})
+  // public watchVLine(val: string) {
+  //   if (!val) {
+  //     this.carNo = ''
+  //   }
+  // }
 }
 </script>
 
