@@ -82,7 +82,9 @@ export default class ChartWarning extends Vue {
     ]
   }
   mounted() {
-    this.initData()
+    this.$nextTick(() => {
+      this.initData()
+    })
   }
 
   //   初始化数据
@@ -101,7 +103,9 @@ export default class ChartWarning extends Vue {
   // 监听 - params
   @Watch('data', { deep: true })
   public watchData(val: any) {
-    this.initData()
+    this.$nextTick(() => {
+      this.initData()
+    })
   }
 }
 </script>

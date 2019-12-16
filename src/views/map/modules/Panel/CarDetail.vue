@@ -9,23 +9,29 @@
     <div class="detail__main">
       <h6>{{ data.carNo }}</h6>
       <p>
-        状态：
+        当前状态：
         <span :class="stateClass">{{ state }}</span>
       </p>
       <p>隶属单位：{{ data.companyName || '无' }}</p>
-      <p>速度时间：{{ data.speed || 0 }}km/h</p>
-      <!-- <p>定位时间：{{ data.locateTime | formatDay('YYYY-MM-DD HH:mm:ss') }}</p> -->
-      <div class="detail--button" @click="trackPlay">
-        轨迹回放
-      </div>
+      <p v-if="data.location">
+        当前速度：{{ data.location.speed || 0 }}公里/小时
+      </p>
+      <p>最后定位：{{ address }}</p>
+      <p v-if="data.location">
+        定位时间：{{
+          data.location.locateTime | formatDay('YYYY-MM-DD HH:mm:ss')
+        }}
+      </p>
+      <div class="detail--button" @click="trackPlay">轨迹回放</div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Model } from 'vue-property-decorator'
-import { TRAFFIC_LEGEND, WARNGING } from '@/config/dict'
+import { Component, Vue, Prop, Model, Watch } from 'vue-property-decorator'
+import { TRAFFIC_LEGEND, WARNGING, MAP } from '@/config/dict'
 import { CarLocationBody } from '@/services'
+import axios from 'axios'
 @Component({
   name: 'CarDetail',
   inheritAttrs: false
@@ -37,6 +43,8 @@ export default class CarDetail extends Vue {
 
   @Prop({ default: () => {}, type: Object })
   public readonly data!: CarLocationBody
+
+  address = '' // 地址
 
   get stateClass() {
     return this.state === '异常' ? ' is-danger' : ''
@@ -58,6 +66,25 @@ export default class CarDetail extends Vue {
   trackPlay() {
     this.$emit('play-track', this.data)
     // this.$emit('input', false)
+  }
+
+  // 监听 - params
+  @Watch('data', { deep: true })
+  public async watchData(val) {
+    const { location } = val
+    if (location) {
+      const {
+        data: {
+          regeocode: { formatted_address }
+        }
+      } = await axios.get('https://restapi.amap.com/v3/geocode/regeo', {
+        params: {
+          key: MAP.webapi,
+          location: location.location
+        }
+      })
+      this.address = formatted_address
+    }
   }
 }
 </script>

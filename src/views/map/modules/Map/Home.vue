@@ -152,7 +152,6 @@ export default class MapHome extends Vue {
       this.trackmarker.$$getInstance().moveAlong(this.trackMarkers, 200)
     })
   }
-  mounted() {}
   // 点坐标 - 模板
   markerTemplate({ carNo, location: { runState } }) {
     return `

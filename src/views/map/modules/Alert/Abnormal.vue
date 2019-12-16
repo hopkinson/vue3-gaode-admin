@@ -27,7 +27,7 @@
         <i class="sprite_ico sprite_ico_dialog_abnormal"></i>
         <div class="abnormal__dialog--text">
           {{ model.carNo }}
-          <span class="is-danger">异常{{ model | filterAbnormalType }}</span>
+          <span class="is-danger">{{ model | filterAbnormalType }}</span>
           <br />建议调度工作人员协调
         </div>
         <div class="abnormal__dialog--footer">

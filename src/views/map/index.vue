@@ -34,7 +34,7 @@
       </panel-chart>
       <panel-chart
         title="当天最高时速"
-        unit="速度km/h"
+        unit="速度（公里/小时）"
         :height="200"
         size="big"
         class="map__chart--panel"
@@ -173,8 +173,10 @@ export default class MapIndex extends Vue {
     carNo: ''
   }
   async created() {
-    this.warning = warning
     await this.pollingLocation()
+    setInterval(() => {
+      this.pollingLocation()
+    }, 30000)
     //订阅websocket消息
     this.websocket = new Websocket({
       endPoint: process.env.VUE_APP_WS_API
@@ -201,10 +203,10 @@ export default class MapIndex extends Vue {
     })
 
     // 车辆 - 告警统计
-    // this.warning = await this.$ajax.ajax({
-    //   method: 'GET',
-    //   url: 'v1/alerts'
-    // })
+    this.warning = await this.$ajax.ajax({
+      method: 'GET',
+      url: 'v1/alarms/collect'
+    })
   }
   beforeDestroy() {
     clearInterval(this.interval)
@@ -213,12 +215,10 @@ export default class MapIndex extends Vue {
   }
   // 长轮询 - 返回车辆实时位置信息
   async pollingLocation() {
-    this.interval = setInterval(async () => {
-      this.carList = await this.$ajax.ajax({
-        method: 'POST',
-        url: `v1/car/location`
-      })
-    }, 5000)
+    this.carList = await this.$ajax.ajax({
+      method: 'POST',
+      url: `v1/car/location`
+    })
   }
   // 控制轨迹的播放
   handleControlTrack(isPlaying) {
