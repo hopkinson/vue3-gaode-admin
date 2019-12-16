@@ -1,5 +1,6 @@
 export const MAP = {
   key: 'd8629d0fd7aacdae4a39f068968b96c0', // 密钥
+  webapi: '0334a4c9f0ffc7e9bea11544898a56fb', //web-api
   zoom: 19, //初始化地图层级
   center: [113.453468, 23.154044], //初始化地图中心点
   zooms: [3, 22], // 缩放

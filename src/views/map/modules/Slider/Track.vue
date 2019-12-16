@@ -4,28 +4,28 @@
     <i class="sprite_ico sprite_ico_track_back" @click="minusSpeed"></i>
     <!-- 播放/停止 sprite_ico_track_pause -->
     <i
-      class="sprite_ico sprite_ico_track_play"
+      class="sprite_ico"
       :class="`sprite_ico_track_${isplay ? 'pause' : 'play'}`"
       @click="playPause"
     ></i>
     <!-- 倍速 - 加速 -->
     <i class="sprite_ico sprite_ico_track_forward" @click="addSpeed"></i>
-    <span class="track__time"
+    <!-- <span class="track__time"
       >{{ trackMarkers.length }}/{{ passedLineLength }}</span
-    >
+    >-->
     <el-slider
       class="track__slider"
       @input="changeSlider"
       :max="trackMarkers.length"
       :value="passedLineLength"
-      :disabled="!isplay"
+      disabled
       :show-tooltip="false"
     ></el-slider>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue, PropSync, Prop } from 'vue-property-decorator'
+import { Component, Vue, PropSync, Prop, Watch } from 'vue-property-decorator'
 import { CarIdBody } from '@/services'
 const SPEED = 200
 @Component({
@@ -77,6 +77,14 @@ export default class DrawerTrackComponent extends Vue {
         message: '没有轨迹点可以播放',
         type: 'warning'
       })
+    }
+  }
+
+  // 监听 - params
+  @Watch('passedLineLength', {})
+  public watchVLine(val: string) {
+    if (!val) {
+      this.carNo = ''
     }
   }
 }
