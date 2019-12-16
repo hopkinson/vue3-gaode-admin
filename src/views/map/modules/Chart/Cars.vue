@@ -31,8 +31,10 @@ export default class ChartWarning extends Vue {
       itemGap: 20,
       formatter: name => {
         let oa = this.option.series[0].data
-        const percent =
-          (oa.find(i => i.name === name).value / this.data.totalQuantity) * 100
+        const percent = (
+          (oa.find(i => i.name === name).value / this.data.totalQuantity) *
+          100
+        ).toFixed(2)
         return '{a|' + name + '}' + '{b|' + percent + '}%'
       },
       textStyle: {
@@ -104,8 +106,27 @@ export default class ChartWarning extends Vue {
   }
   //   初始化数据
   initData() {
-    const { totalQuantity, statistics } = this.data
-    const carsData = statistics.map(item => {
+    const {
+      totalQuantity,
+      abnormalQuantity,
+      runningQuantity,
+      stopQuantity
+    } = this.data
+    const chartData = [
+      {
+        quantity: abnormalQuantity,
+        runState: 3
+      },
+      {
+        quantity: runningQuantity,
+        runState: 1
+      },
+      {
+        quantity: stopQuantity,
+        runState: 2
+      }
+    ]
+    const carsData = chartData.map(item => {
       return {
         value: item.quantity,
         name: TRAFFIC_LEGEND[item.runState.toString()].label,

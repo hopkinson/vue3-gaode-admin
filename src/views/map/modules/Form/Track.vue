@@ -69,7 +69,6 @@ export default class TrackComponent extends Vue {
   }
   // 能否查询 ：每个值都不能为空
   get canSearch() {
-    console.log(Object.values(this.form).every(i => i))
     return Object.values(this.form).every(i => i)
   }
 
