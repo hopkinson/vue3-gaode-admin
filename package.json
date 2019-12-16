@@ -3,14 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "npm run lint && vue-cli-service serve  --mode development",
+    "serve": "vue-cli-service serve  --mode development",
     "build": "vue-cli-service build --mode production",
     "lint": "vue-cli-service lint",
     "build:test": "vue-cli-service build --mode development",
     "docs": "vuepress dev docs",
     "docs:build": "vuepress build docs",
     "serve:prod": "npm run lint && vue-cli-service serve  --mode production",
-    "service": "npm run lint && tkit-service --clear"
+    "service": "tkit-service --clear && npm run lint"
   },
   "dependencies": {
     "@types/echarts": "^4.4.1",
