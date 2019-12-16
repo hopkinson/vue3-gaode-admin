@@ -251,11 +251,12 @@ export default class MapIndex extends Vue {
     this.trackMarkers = await this.$ajax.ajax({
       method: 'POST',
       url: 'v1/car/locations',
-      data: {
-        carId: 3,
-        beginTime: '2019-12-15T13:00:00',
-        endTime: '2019-12-15T15:00:00'
-      }
+      data: data
+      // data: {
+      //   carId: 3,
+      //   beginTime: '2019-12-15T13:00:00',
+      //   endTime: '2019-12-15T15:00:00'
+      // }
     })
   }
   async loadPreMarkers(val) {
