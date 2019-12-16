@@ -17,7 +17,12 @@
     <% } %>
     <!-- 使用CDN的JS文件 -->
     <% for (var i in htmlWebpackPlugin.options.cdn &&
-    htmlWebpackPlugin.options.cdn.js) { %> <% } %>
+    htmlWebpackPlugin.options.cdn.js) { %>
+    <script
+      type="text/javascript"
+      src="<%= htmlWebpackPlugin.options.cdn.js[i] %>"
+    ></script>
+    <% } %>
   </head>
 
   <body>
