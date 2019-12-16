@@ -14,6 +14,7 @@ import 'echarts/lib/chart/line'
 import 'echarts/lib/component/tooltip'
 import 'echarts/lib/component/legend'
 import 'echarts/lib/component/title'
+
 /**
  * ===============
  *  公共组件注册
@@ -64,6 +65,8 @@ setTimeout(() => {
   localStorage.removeItem('_AMap_raster')
   Vue.use(VueAMap)
 }, 0)
+// websocket
+
 /**
  * ==============
  *  插  件  使  用

@@ -6,7 +6,7 @@
     :zoom="zoom"
     :zooms="zooms"
     :events="events"
-    :center="center"
+    :center="position"
     :amapManager="amapManager"
   >
     <!-- 信息窗体 -->
@@ -29,7 +29,7 @@
     <el-amap-marker
       v-for="(item, index) in markers"
       :key="`market${index}`"
-      :position="[item.location.longitude, item.location.latitude]"
+      :position="item.location.location.split(',')"
       :events="markerEvent(item)"
       :content="markerTemplate(item)"
     ></el-amap-marker>
@@ -37,10 +37,10 @@
     <template v-if="showTrack">
       <el-amap-marker
         visible
-        :content="markerTemplate(item)"
         :offset="[-29, -105]"
         ref="trackmarker"
-        :position="trackMarkers[0]"
+        :content="markerTemplate(detail)"
+        :position="position"
       ></el-amap-marker>
       <!-- 折线 -->
       <el-amap-polyline
@@ -78,9 +78,11 @@ export default class MapHome extends Vue {
   //  倍速
   @Prop({ type: Number, default: 0 })
   public readonly speed!: number
-  //  是否显示轨迹
-  @Prop({ type: Boolean, default: false })
-  public readonly showTrack!: boolean
+
+  // //  是否显示轨迹
+  // @Prop({ type: Boolean, default: false })
+  // public readonly showTrack!: boolean
+
   // 折线&点 - 坐标（用于轨迹回放）
   @Prop({ type: Function, default: () => {} })
   public readonly fetchCarDetail!: Function
@@ -89,11 +91,11 @@ export default class MapHome extends Vue {
   public readonly carDetail!: CarIdBody
 
   amapManager = amapManager // map的实例
-  showInfo = false
+  showInfo = false // 是否显示窗体信息
+  showTrack = false // 是否显示轨迹
   zoom: number = MAP.zoom // 初始化缩放大小
   zooms: Array<number> = MAP.zooms // 缩放比例
-  center: Array<number> = MAP.center // 地图中心
-  position: Array<number> = MAP.center
+  position: Array<number | string> = [113.339, 23.1874] || MAP.center // 地图中心
   detail = {} // 详情
   plugin: Array<string> = ['PolyEditor', 'MarkerClusterer', 'InfoWindow']
   events = {
@@ -111,10 +113,10 @@ export default class MapHome extends Vue {
     return {
       click: () => {
         const {
-          location: { longitude, latitude }
+          location: { location }
         } = item
         this.detail = item
-        this.position = [longitude, latitude]
+        this.position = location.split(',')
         this.showInfo = !this.showInfo
         this.$emit('load-car-detail', item)
       }
@@ -147,17 +149,18 @@ export default class MapHome extends Vue {
   // 监听 - 轨迹
   @Watch('trackMarkers', { deep: true, immediate: true })
   public watchTrackMarkerts(val: Array<Array<number>>) {
-    if (val) {
-      // console.log(val)
+    this.showTrack = !!val && !!val.length
+    if (val.length) {
+      this.position = val[0]
     }
   }
 
   // 监听 - 轨迹
   @Watch('carDetail', { deep: true, immediate: true })
   public watchCarDetail(val: CarIdBody) {
-    if (val) {
-      const { location } = val
-      this.position = location ? location.location : []
+    if (Object.keys(val).length) {
+      // const { location } = val
+      // this.position = location ? location.location.split(',') : []
       setTimeout(() => {
         this.showInfo = true
       }, 350)
@@ -167,9 +170,7 @@ export default class MapHome extends Vue {
   // 监听 - 倍速
   @Watch('speed', {})
   public watchSpeed(val: number) {
-    this.$nextTick(() => {
-      this.trackmarker.moveAlong(this.trackMarkers, val)
-    })
+    this.trackmarker.$$getInstance().moveAlong(this.trackMarkers, val)
   }
 }
 </script>

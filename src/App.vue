@@ -1,5 +1,4 @@
 <template>
-  <!-- :style="style" -->
   <div id="app">
     <router-view />
   </div>
@@ -14,10 +13,10 @@ export default {
   mounted() {
     onresize = () => {
       this.$nextTick(() => {
-        // this.resizeCenter()
+        this.resizeCenter()
       })
     }
-    // this.resizeCenter()
+    this.resizeCenter()
   },
   methods: {
     resizeCenter() {

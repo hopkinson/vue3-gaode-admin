@@ -22,30 +22,28 @@ export default class Table extends Vue {
     let socket = new SockJS(process.env.VUE_APP_WS_API)
     // 获取STOMP子协议的客户端对象
     this.stompClient = Stomp.over(socket)
-    // 定义客户端的认证信息,按需求配置
-    let headers = {
-      Authorization: ''
-    }
     // 向服务器发起websocket连接
     this.stompClient.connect(
-      headers,
+      {},
       () => {
-        this.stompClient.subscribe(
-          '/socket/topic/alarms',
-          msg => {
-            // 订阅服务端提供的某个topic
-            console.log('广播成功')
-            console.log(msg) // msg.body存放的是服务端发送给我们的信息
-          },
-          headers
-        )
+        console.log(111)
+        // this.stompClient.subscribe(
+        //   '/socket/topic/alarms',
+        //   msg => {
+        //     // 订阅服务端提供的某个topic
+        //     console.log('广播成功')
+        //     console.log(msg) // msg.body存放的是服务端发送给我们的信息
+        //   },
+        //   {}
+        // )
         // this.stompClient.send(
         //   '/app/chat.addUser',
         //   headers,
-        //   JSON.stringify({ sender: '', chatType: 'JOIN' })
+        //   JSON.stringify({ sender: ' ', chatType: 'JOIN' })
         // ) //用户加入接口
       },
       err => {
+        console.log('websocket失败', err)
         this.$message({
           message: '连接websocket失败'
         })

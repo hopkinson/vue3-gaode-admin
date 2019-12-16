@@ -10,7 +10,7 @@
       @search="handleSearchCar"
       @current-change="handleCurrentChange"
       @fetch-company="handleSearchCompany"
-      @play="handleShowTrack"
+      @play="loadCarDetail"
       @change-filter="handleChangeFilter"
     ></search-car-status>
     <div class="map__chart--left">
@@ -71,22 +71,25 @@
       </panel-chart>
     </div>
 
-    <!-- 地图 @play-track="handleShowTrack" -->
+    <!-- 地图  -->
     <map-home
       :track-markers="trackMarkers"
       :speed="trackSpeed"
       :markers="carList"
       :car-detail="carDetail"
       @load-car-detail="loadCarDetail"
+      @play-track="handleShowTrack"
       ref="map"
     ></map-home>
     <!-- 底部 - 抽屉 -->
     <drawer-track
       v-model="showDrawer"
       :speed.sync="trackSpeed"
+      :track-markers="trackMarkers"
       ref="drawer"
       :car-detail="carDetail"
       @play="handleControlTrack"
+      @search-track="handleSearchTrack"
     ></drawer-track>
   </div>
 </template>
@@ -102,9 +105,14 @@ import DrawerTrack from './modules/Drawer/Track.vue'
 import MapHome from './modules/Map/Home.vue'
 import { TRAFFIC_LEGEND } from '@/config/dict'
 import SearchCarStatus from './modules/Search/CarStatus.vue'
+import Websocket from '@/plugins/websocket'
 import { warning, cars, districts, speed } from '@/mock/data.js'
-import { CompanyBody, CarsBodyRecords, CarIdBody } from '@/services'
-import SocketMessage from './mixins/websocket'
+import {
+  CompanyBody,
+  CarsBodyRecords,
+  CarIdBody,
+  CarLocationBody
+} from '@/services'
 @Component({
   name: 'MapIndex',
   components: {
@@ -118,7 +126,7 @@ import SocketMessage from './mixins/websocket'
     DrawerTrack
   }
 })
-export default class MapIndex extends SocketMessage {
+export default class MapIndex extends Vue {
   @Ref('drawer') drawer: any
   @Ref('map') map: any
   // 是否在播放轨迹回放
@@ -129,17 +137,18 @@ export default class MapIndex extends SocketMessage {
   showSearch: boolean = false
   // 图例 - 交通状态
   legends = TRAFFIC_LEGEND
-  trackSpeed: number = 0
+  trackSpeed: number = 200
   // 列表 - 时速
   speed: any = []
   districts: any = []
   warning: any = []
   cars: any = []
-  carDetail = {}
+  carDetail = {} // 汽车详情
   trackMarkers: Array<Array<number>> = [] // 标记点 - 轨迹回放
   companyList: Array<CompanyBody> = [] // 所有单位信息
   searchCarBody = {} // 搜索的车辆列表
-  carList: Array<any> = []
+  carList: Array<CarLocationBody> = [] // 所有车辆的列表
+  interval: number = 0
   carParams = {
     pageNo: '',
     pageSize: 10,
@@ -151,6 +160,11 @@ export default class MapIndex extends SocketMessage {
     this.cars = cars
     this.speed = speed
     this.districts = districts
+    //订阅websocket消息
+    const websocket = new Websocket({
+      endPoint: process.env.VUE_APP_WS_API
+    })
+    websocket.subscribe('/socket/topic/alarms', message => {})
     // // 车辆 - 告警统计
     // this.warning = await this.$ajax.ajax({
     //   method: 'GET',
@@ -172,8 +186,21 @@ export default class MapIndex extends SocketMessage {
     //   method: 'GET',
     //   url: 'v1/car/distribution'
     // })
+    await this.pollingLocation()
   }
-
+  beforeDestroy() {
+    clearInterval(this.interval)
+    this.interval = 0
+  }
+  // 长轮询 - 返回车辆实时位置信息
+  async pollingLocation() {
+    this.interval = setInterval(async () => {
+      this.carList = await this.$ajax.ajax({
+        method: 'POST',
+        url: `v1/car/location`
+      })
+    }, 5000)
+  }
   // 控制轨迹的播放
   handleControlTrack(isPlaying) {
     this.isPlaying ? this.map.pauseTracker() : this.map.moveTracker()
@@ -199,12 +226,21 @@ export default class MapIndex extends SocketMessage {
       pageNo
     })
   }
-  // 点击轨迹回放 - 显示底部抽屉
-  handleShowTrack(data) {
-    this.showDrawer = true
-    this.loadCarDetail(data)
+
+  // 返回实际轨迹
+  async handleSearchTrack(data) {
+    this.trackMarkers = await this.$ajax.ajax({
+      method: 'POST',
+      url: 'v1/car/locations',
+      data
+    })
   }
 
+  // 点击窗体的轨迹回放 - 显示底部抽屉
+
+  handleShowTrack() {
+    this.showDrawer = true
+  }
   // 所有单位信息
   async handleSearchCompany() {
     return await this.$ajax.ajax({
@@ -270,6 +306,7 @@ export default class MapIndex extends SocketMessage {
     }
     &--right {
       right: 28px;
+      top: 250px;
     }
     &--panel {
       margin-bottom: 20px;

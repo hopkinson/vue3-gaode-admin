@@ -1,67 +1,82 @@
+import SockJs from 'sockjs-client'
+import Stomp from 'stompjs'
 interface Socket {
-  url: string
-  intervalId: null | number
-  onerror: Function
-  onopen: Function
-  onmessage: Function
-  success: Function
+  disconnect: Function
+  subscribe: Function
+  init: Function
   send: Function
+  bConnected: boolean
+  bFail: boolean
+  $stompClient: any
+  subscriberQueue: any
 }
 class WS implements Socket {
-  intervalId: number | null
-  url: string
-  success: Function
-  webSocket: any
-  constructor(url: string, success: Function) {
-    this.intervalId = null
-    this.url = url
-    this.main()
-    this.success = success
+  bConnected = false
+  bFail = false
+  $stompClient: any = null
+  subscriberQueue: any = []
+  constructor(option: any) {
+    this.$stompClient = null
+    this.init(option)
   }
 
-  // 服务器已连接
-  onopen() {
-    this.webSocket.onopen = () => {
-      if (this.intervalId) {
-        window.clearInterval(this.intervalId)
-        this.intervalId = null
+  subscribe(strTopic, oCallback) {
+    if (this.bFail) {
+      throw 'stomp connect to server failed'
+    }
+    if (this.bConnected) {
+      this.$stompClient.subscribe(strTopic, oCallback)
+    } else {
+      this.subscriberQueue.push({
+        topic: strTopic,
+        callback: oCallback.bind(this)
+      })
+    }
+  }
+  send(...args) {
+    if (this.$stompClient && this.bConnected) {
+      if (args.length == 2) {
+        this.$stompClient.send(args[0], {}, args[1])
+      } else if (args.length == 3) {
+        this.$stompClient.send(args[0], args[1], args[2])
       }
-      this.success(this)
     }
-  }
-  // 网络连接已断开
-  onclose() {
-    this.webSocket.onclose = () => {
-      if (!this.intervalId) {
-        this.intervalId = setInterval(() => {
-          // console.log('=============正在尝试重新连接=============')
-          this.main()
-        }, 2000)
-      }
-    }
-  }
-  // 连接异常
-  onerror() {
-    this.webSocket.onerror = () => {
-      // console.log('=============连接异常=============')
-    }
-  }
-  // 接收
-  onmessage(callback: Function) {
-    this.webSocket.onmessage = (evt: any) => {
-      callback(evt.data)
-    }
-  }
-  //  发送
-  send(info: any) {
-    this.webSocket.send(info)
   }
 
-  main() {
-    this.webSocket = new WebSocket(`ws://${this.url}`)
-    this.onopen()
-    this.onclose()
-    this.onerror()
+  init(options) {
+    //init
+    let m_Options = options || {}
+
+    //初始化socket和stomp
+    let socket = new SockJs(m_Options.endPoint)
+    let stompClient = Stomp.over(socket)
+    this.$stompClient = stompClient
+
+    stompClient.connect(
+      {},
+      () => {
+        this.bConnected = true
+        console.log('success')
+        if (this.subscriberQueue.length) {
+          this.subscriberQueue.forEach(oSubscriber => {
+            stompClient.subscribe(oSubscriber.topic, oSubscriber.callback)
+          })
+          this.subscriberQueue = []
+        }
+      },
+      error => {
+        this.bFail = true
+        console.log('fail')
+        console.error(error)
+      }
+    )
+  }
+  disconnect() {
+    if (this.$stompClient && this.bConnected) {
+      this.$stompClient.disconnect(() => {
+        console.log('stomp disconnect from server')
+      })
+    }
   }
 }
 export default WS

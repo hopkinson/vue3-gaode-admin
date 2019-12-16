@@ -1,25 +1,26 @@
 <template>
   <el-drawer
     :modal="false"
-    :visible.sync="value"
+    :visible.sync="visible"
     direction="btt"
     size="auto"
     title="11"
     class="track__inner"
-    @input="$emit('input', value)"
   >
     <div class="track">
       <!-- 关闭 -->
-      <i class="track__close el-icon-close" @click="$emit('input', false)"></i>
+      <i class="track__close el-icon-close" @click="close"></i>
       <!-- 表单 -->
       <div class="track__item is-form">
         <form-track v-bind="$attrs" v-on="$listeners"></form-track>
       </div>
-      <div class="track__item">
+
+      <div class="track__item" :class="{ 'is-disabled': !isPlaying }">
         <slider-track
           v-bind="$attrs"
           ref="slider"
           v-on="$listeners"
+          :is-playing.sync="isPlaying"
         ></slider-track>
       </div>
     </div>
@@ -27,9 +28,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Model } from 'vue-property-decorator'
+import { Component, Vue, Model, Prop, Watch } from 'vue-property-decorator'
 import FormTrack from '../Form/Track.vue'
 import SliderTrack from '../Slider/Track.vue'
+import { CarIdBody } from '@/services'
 @Component({
   name: 'DrawerTrack',
   components: {
@@ -41,6 +43,23 @@ export default class DrawerTrack extends Vue {
   // v-model
   @Model('input', { type: Boolean, default: false })
   public readonly value!: boolean
+  // 是否播放中
+  visible = false
+  isPlaying = false
+  // 关闭
+  close() {
+    this.visible = false
+  }
+  // 监听 - params
+  @Watch('value', {})
+  public watchValue(val: boolean) {
+    this.visible = val
+  }
+  // 监听 - params
+  @Watch('visible', {})
+  public watchVisible(val: boolean) {
+    this.$emit('input', val)
+  }
 }
 </script>
 
@@ -55,6 +74,7 @@ export default class DrawerTrack extends Vue {
     color: #fff;
     font-size: 20px;
     cursor: pointer;
+    z-index: 1;
   }
   &__inner {
     & /deep/ .el-drawer__header {
@@ -73,8 +93,12 @@ export default class DrawerTrack extends Vue {
     align-items: center;
     border-top: 1px solid #1a1a1b;
     color: #fff;
+    position: relative;
     &.is-form {
       margin-left: 30px;
+    }
+    &.is-disabled:after {
+      opacity: 0.2;
     }
     & /deep/ .el-form-item__label {
       color: #fff;

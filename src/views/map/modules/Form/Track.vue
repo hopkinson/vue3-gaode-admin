@@ -22,6 +22,7 @@
         class="form__button"
         type="primary"
         @click="onSubmit"
+        :disabled="!canSearch"
         size="mini"
         >确认</el-button
       >
@@ -66,12 +67,22 @@ export default class TrackComponent extends Vue {
       }
     ]
   }
-  onSubmit() {}
+  // 能否查询 ：每个值都不能为空
+  get canSearch() {
+    console.log(Object.values(this.form).every(i => i))
+    return Object.values(this.form).every(i => i)
+  }
+
+  onSubmit() {
+    this.$emit('search-track', this.form)
+  }
 
   // 监听 - 倍速
-  @Watch('carDetail', { deep: true })
+  @Watch('carDetail', { deep: true, immediate: true })
   public async watchFormh(val: CarIdBody) {
-    this.form.carId = val.id
+    if (val) {
+      this.form.carId = val.id
+    }
   }
 }
 </script>
@@ -87,7 +98,7 @@ export default class TrackComponent extends Vue {
     }
   }
   &__button {
-    background-color: rgb(34, 168, 238);
+    // background-color: rgb(34, 168, 238);
     width: 88px;
     border-radius: 0;
   }

@@ -10,7 +10,7 @@
       <h6>{{ data.carNo }}</h6>
       <p>
         状态：
-        <span class="is-danger">{{ state }}</span>
+        <span :class="stateClass">{{ state }}</span>
       </p>
       <p>隶属单位：{{ data.companyName || '无' }}</p>
       <p>速度时间：{{ data.speed || 0 }}km/h</p>
@@ -25,6 +25,7 @@
 <script lang="ts">
 import { Component, Vue, Prop, Model } from 'vue-property-decorator'
 import { TRAFFIC_LEGEND, WARNGING } from '@/config/dict'
+import { CarLocationBody } from '@/services'
 @Component({
   name: 'CarDetail',
   inheritAttrs: false
@@ -34,21 +35,29 @@ export default class CarDetail extends Vue {
   @Model('input', { type: Boolean, default: false })
   public readonly value!: boolean
 
-  @Prop({ default: () => {}, type: Object }) public readonly data!: any
+  @Prop({ default: () => {}, type: Object })
+  public readonly data!: CarLocationBody
 
+  get stateClass() {
+    return this.state === '异常' ? ' is-danger' : ''
+  }
+  // 获取状态
   get state() {
-    const {
-      location: { runState, alertType }
-    } = this.data
-    let state = TRAFFIC_LEGEND[runState.toString()].value
-    if (state === 3) {
-      state = WARNGING.status[alertType.toString()].label
+    let state = ''
+    const { location } = this.data
+    if (location) {
+      state = TRAFFIC_LEGEND[location.runState.toString()].label
+      if (state === '异常') {
+        state = location.alarmType
+          ? WARNGING.status[location.alarmType.toString()].label
+          : '异常'
+      }
     }
     return state
   }
   trackPlay() {
     this.$emit('play-track', this.data)
-    this.$emit('input', false)
+    // this.$emit('input', false)
   }
 }
 </script>

@@ -1,10 +1,11 @@
 <template>
   <div class="chart">
+    {{ titleStyle }}
     <div
       class="chart__title sprite_ico"
       :class="`sprite_ico_panel_${size}-header`"
     >
-      <span>{{ title }}</span>
+      <span :style="titleStyle">{{ title }}</span>
     </div>
     <div class="chart__inner" :style="chartStyle">
       <div class="chart__unit chart__unit--position">{{ unit }}</div>
@@ -45,6 +46,17 @@ export default class PanelComponent extends Vue {
     return {
       width: `${SIZE[size]}px`,
       height: `${height}px`
+    }
+  }
+  // 标题样式
+  get titleStyle() {
+    const { size } = this
+    const LEFT = {
+      big: '50%',
+      small: '53.5%'
+    }
+    return {
+      left: `${LEFT[size]}`
     }
   }
 }
