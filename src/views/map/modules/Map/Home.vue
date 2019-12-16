@@ -118,18 +118,18 @@ export default class MapHome extends Vue {
   zoom: number = MAP.zoom // 初始化缩放大小
   zooms: Array<number> = MAP.zooms // 缩放比例
 
-  center: Array<number | string> = [113.339, 23.1874] || MAP.center // 地图中心
-  position: Array<number | string> = [113.339, 23.1874] || MAP.center // 地图中心
+  center: Array<number | string> = MAP.center // 地图中心
+  position: Array<number | string> = MAP.center // 地图中心
   preMarkers: Array<Array<number>> = [] // 预设轨迹
   plugin: Array<string> = ['PolyEditor', 'MarkerClusterer', 'InfoWindow']
   events = {
     init: o => {
       const self: any = this
       o.setMapStyle(MAP.mapStyle)
-      new AMap.TileLayer({
-        getTileUrl: MAP.tileUrl,
-        zIndex: 2
-      })
+      // new AMap.TileLayer({
+      //   getTileUrl: MAP.tileUrl,
+      //   zIndex: 99
+      // })
     }
   }
   markerEvent(item) {

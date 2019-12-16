@@ -2,7 +2,7 @@ import SockJs from 'sockjs-client'
 import Stomp from 'stompjs'
 interface Socket {
   disconnect: Function
-  subscribe: Function
+  subscribes: Function
   init: Function
   send: Function
   bConnected: boolean
@@ -20,7 +20,7 @@ class WS implements Socket {
     this.init(option)
   }
 
-  subscribe(strTopic, oCallback) {
+  subscribes(strTopic, oCallback) {
     if (this.bFail) {
       throw 'stomp connect to server failed'
     }
@@ -46,12 +46,10 @@ class WS implements Socket {
   init(options) {
     //init
     let m_Options = options || {}
-
     //初始化socket和stomp
     let socket = new SockJs(m_Options.endPoint)
     let stompClient = Stomp.over(socket)
     this.$stompClient = stompClient
-
     stompClient.connect(
       {},
       () => {
