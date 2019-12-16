@@ -29,7 +29,7 @@
     <el-amap-marker
       v-for="(item, index) in markers"
       :key="`market${index}`"
-      :position="item.location.location.split(',')"
+      :position="item.location.location | filterPosition"
       :events="markerEvent(item)"
       :content="markerTemplate(item)"
     ></el-amap-marker>
@@ -65,6 +65,11 @@ let amapManager = new AMapManager()
   name: 'MapHome',
   components: {
     PanelCarDetail
+  },
+  filters: {
+    filterPosition(val) {
+      return val ? val.split(',') : []
+    }
   }
 })
 export default class MapHome extends Vue {
@@ -116,7 +121,7 @@ export default class MapHome extends Vue {
           location: { location }
         } = item
         this.detail = item
-        this.position = location.split(',')
+        this.position = location ? location.split(',') : []
         this.showInfo = !this.showInfo
         this.$emit('load-car-detail', item)
       }

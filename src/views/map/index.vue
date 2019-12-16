@@ -157,36 +157,34 @@ export default class MapIndex extends Vue {
   }
   async created() {
     this.warning = warning
-    // this.cars = cars
-    // this.speed = speed
-    // this.districts = districts
+    await this.pollingLocation()
     //订阅websocket消息
     const websocket = new Websocket({
       endPoint: process.env.VUE_APP_WS_API
     })
     websocket.subscribe('/socket/topic/alarms', message => {})
-    // // 车辆 - 告警统计
-    // this.warning = await this.$ajax.ajax({
-    //   method: 'GET',
-    //   url: 'v1/alerts'
-    // })
-    // // 车辆状态
+    // 车辆状态
     this.cars = await this.$ajax.ajax({
       method: 'GET',
       url: 'v1/car/state'
     })
-    // // 最高时速
+    // 最高时速
     this.speed = await this.$ajax.ajax({
       method: 'GET',
       url: 'v1/car/speed'
     })
 
-    // // 地区分布
+    // 地区分布
     this.districts = await this.$ajax.ajax({
       method: 'GET',
       url: 'v1/car/distribution'
     })
-    await this.pollingLocation()
+
+    // 车辆 - 告警统计
+    // this.warning = await this.$ajax.ajax({
+    //   method: 'GET',
+    //   url: 'v1/alerts'
+    // })
   }
   beforeDestroy() {
     clearInterval(this.interval)
