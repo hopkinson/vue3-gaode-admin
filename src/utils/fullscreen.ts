@@ -1,3 +1,6 @@
+// https://github.com/any86/be-full
+// 任意元素全屏显示, 支持PC/移动端, 不到1kb.
+
 type RFSMethodName =
   | 'webkitRequestFullScreen'
   | 'requestFullscreen'

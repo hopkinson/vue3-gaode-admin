@@ -51,7 +51,7 @@
       <el-table-column label="操作">
         <span
           class="table__btn--track"
-          @click="$emit('play', scope.row)"
+          @click="playTrack(scope.row)"
           slot-scope="scope"
           >轨迹回放</span
         >
@@ -98,6 +98,9 @@ export default class TableList extends Vue {
 
   handleCurrentChange(val) {
     this.$emit('current-change', val)
+  }
+  playTrack(row) {
+    this.$emit('play', row)
   }
 }
 </script>

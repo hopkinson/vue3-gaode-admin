@@ -10,9 +10,14 @@
     ></i>
     <!-- 倍速 - 加速 -->
     <i class="sprite_ico sprite_ico_track_forward" @click="addSpeed"></i>
-    <span class="track__time">03:14/08:00</span>
+    <span class="track__time"
+      >{{ trackMarkers.length }}/{{ passedLineLength }}</span
+    >
     <el-slider
-      v-model="slider"
+      class="track__slider"
+      @input="changeSlider"
+      :max="trackMarkers.length"
+      :value="passedLineLength"
       :disabled="!isplay"
       :show-tooltip="false"
     ></el-slider>
@@ -37,8 +42,17 @@ export default class DrawerTrackComponent extends Vue {
 
   // 搜索参数 .sync
   @PropSync('isPlaying', { type: Boolean, default: false }) isplay!: boolean
+  // 获取已经经过点的长度 .sync
+  @PropSync('passedLength', { type: Number, default: 0 })
+  passedLineLength!: number
 
   slider: number = 0
+
+  // 当滑块发生改变时
+  changeSlider(val) {
+    // this.$emit('input', val)
+    this.$emit('update:passedLength', val)
+  }
   // 减速
   minusSpeed() {
     if (this.isplay) {
@@ -73,12 +87,16 @@ export default class DrawerTrackComponent extends Vue {
   display: flex;
   align-items: center;
   margin: 0 16px;
+  width: 100%;
   .sprite_ico {
     cursor: pointer;
   }
   .sprite_ico,
   &__time {
     margin-right: 27px;
+  }
+  &__slider {
+    width: 100%;
   }
   &__time {
     color: #fff;
