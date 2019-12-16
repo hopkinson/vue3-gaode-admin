@@ -6,7 +6,7 @@
     :zoom="zoom"
     :zooms="zooms"
     :events="events"
-    :center="position"
+    :center="center"
     :amapManager="amapManager"
   >
     <!-- 信息窗体 -->
@@ -19,7 +19,7 @@
       :offset="[160, 30]"
     >
       <panel-car-detail
-        :data="detail"
+        :data="carDetail"
         v-model="showInfo"
         v-bind="$attrs"
         v-on="$listeners"
@@ -34,25 +34,38 @@
       :content="markerTemplate(item)"
     ></el-amap-marker>
     <!-- 显示轨迹回放 -->
-    <template v-if="showTrack">
-      <el-amap-marker
-        visible
-        :offset="[-29, -105]"
-        ref="trackmarker"
-        :content="markerTemplate(detail)"
-        :position="position"
-      ></el-amap-marker>
-      <!-- 折线 -->
-      <el-amap-polyline
-        :path="trackMarkers"
-        strokeColor="#0177fa"
-      ></el-amap-polyline>
-    </template>
+
+    <el-amap-marker
+      visible
+      v-if="showTrack"
+      :offset="[-29, -105]"
+      ref="trackmarker"
+      :content="markerTemplate(carDetail)"
+      :position="position"
+    ></el-amap-marker>
+    <!-- 折线 - 实际-->
+    <el-amap-polyline
+      ref="trackPolyLine"
+      :path="trackMarkers"
+      strokeColor="#ffb71f"
+    ></el-amap-polyline>
+    <!-- 折线  - 预设-->
+    <el-amap-polyline
+      :path="preMarkers"
+      strokeColor="#0177fa"
+    ></el-amap-polyline>
   </el-amap>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch, Prop, Ref } from 'vue-property-decorator'
+import {
+  Component,
+  Vue,
+  Watch,
+  Prop,
+  Ref,
+  PropSync
+} from 'vue-property-decorator'
 import { MAP } from '@/config/dict'
 import { AMapManager } from 'vue-amap'
 import PanelCarDetail from '../Panel/CarDetail.vue'
@@ -74,6 +87,10 @@ let amapManager = new AMapManager()
 })
 export default class MapHome extends Vue {
   @Ref('trackmarker') trackmarker: any
+
+  // 获取已经经过点的长度 .sync
+  @PropSync('passedLength', { type: Number, default: 0 })
+  passedLineLength!: number
   // 折线&点 - 坐标（用于轨迹回放）
   @Prop({ type: Array, default: () => [] })
   public readonly trackMarkers!: Array<Array<number>>
@@ -84,9 +101,9 @@ export default class MapHome extends Vue {
   @Prop({ type: Number, default: 0 })
   public readonly speed!: number
 
-  // //  是否显示轨迹
-  // @Prop({ type: Boolean, default: false })
-  // public readonly showTrack!: boolean
+  //  请求预设轨迹的接口
+  @Prop({ type: Function, default: () => {} })
+  public readonly loadPreTrack!: Function
 
   // 折线&点 - 坐标（用于轨迹回放）
   @Prop({ type: Function, default: () => {} })
@@ -100,17 +117,19 @@ export default class MapHome extends Vue {
   showTrack = false // 是否显示轨迹
   zoom: number = MAP.zoom // 初始化缩放大小
   zooms: Array<number> = MAP.zooms // 缩放比例
+
+  center: Array<number | string> = [113.339, 23.1874] || MAP.center // 地图中心
   position: Array<number | string> = [113.339, 23.1874] || MAP.center // 地图中心
-  detail = {} // 详情
+  preMarkers: Array<Array<number>> = [] // 预设轨迹
   plugin: Array<string> = ['PolyEditor', 'MarkerClusterer', 'InfoWindow']
   events = {
     init: o => {
       const self: any = this
       o.setMapStyle(MAP.mapStyle)
-      // new AMap.TileLayer({
-      //   getTileUrl: MAP.tileUrl,
-      //   zIndex: 2
-      // })
+      new AMap.TileLayer({
+        getTileUrl: MAP.tileUrl,
+        zIndex: 2
+      })
     }
   }
   markerEvent(item) {
@@ -120,8 +139,8 @@ export default class MapHome extends Vue {
         const {
           location: { location }
         } = item
-        this.detail = item
         this.position = location ? location.split(',') : []
+        this.center = this.position
         this.showInfo = !this.showInfo
         this.$emit('load-car-detail', item)
       }
@@ -133,6 +152,7 @@ export default class MapHome extends Vue {
       this.trackmarker.$$getInstance().moveAlong(this.trackMarkers, 200)
     })
   }
+  mounted() {}
   // 点坐标 - 模板
   markerTemplate({ carNo, location: { runState } }) {
     return `
@@ -157,15 +177,40 @@ export default class MapHome extends Vue {
     this.showTrack = !!val && !!val.length
     if (val.length) {
       this.position = val[0]
+      this.center = this.position
+    }
+  }
+
+  // 监听 - 轨迹
+  @Watch('showTrack', {})
+  public watchShowTrack(val: Boolean) {
+    if (val) {
+      this.$nextTick(() => {
+        this.trackmarker.$$getInstance().on('moving', e => {
+          this.passedLineLength = e.passedPath.length
+          const accro = e.passedPath[e.passedPath.length - 1]
+          this.position = [accro.lng, accro.lat]
+          this.center = this.position
+        })
+      })
     }
   }
 
   // 监听 - 轨迹
   @Watch('carDetail', { deep: true, immediate: true })
-  public watchCarDetail(val: CarIdBody) {
+  public async watchCarDetail(val: CarIdBody) {
     if (Object.keys(val).length) {
-      // const { location } = val
-      // this.position = location ? location.location.split(',') : []
+      this.preMarkers = await this.loadPreTrack(val) // 加载预设轨迹
+      const { location } = val
+      if (!location) {
+        this.showInfo = false
+        return this.$message({
+          message: '没有轨迹可回放',
+          type: 'warning'
+        })
+      }
+      this.center = location ? location.location.split(',') : []
+      this.position = this.center
       setTimeout(() => {
         this.showInfo = true
       }, 350)

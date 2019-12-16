@@ -3,6 +3,7 @@
     <!-- 图表 && 查询 -->
     <!-- 搜索  -->
     <search-car-status
+      v-if="!isFullScreen"
       class="map__chart--search"
       v-model="showSearch"
       :table-data="searchCarBody"
@@ -13,7 +14,7 @@
       @play="loadCarDetail"
       @change-filter="handleChangeFilter"
     ></search-car-status>
-    <div class="map__chart--left">
+    <div class="map__chart--left" v-if="!isFullScreen">
       <!-- 图表 -->
       <panel-chart
         title="告警统计"
@@ -48,7 +49,7 @@
         </div>
       </div>
     </div>
-    <div class="map__chart--right">
+    <div class="map__chart--right" v-if="!isFullScreen">
       <panel-chart
         title="车辆状态"
         :height="194"
@@ -77,6 +78,8 @@
       :speed="trackSpeed"
       :markers="carList"
       :car-detail="carDetail"
+      :passed-length.sync="passedLength"
+      :loadPreTrack="loadPreMarkers"
       @load-car-detail="loadCarDetail"
       @play-track="handleShowTrack"
       ref="map"
@@ -84,6 +87,7 @@
     <!-- 底部 - 抽屉 -->
     <drawer-track
       v-model="showDrawer"
+      :passedLength.sync="passedLength"
       :speed.sync="trackSpeed"
       :track-markers="trackMarkers"
       ref="drawer"
@@ -107,11 +111,13 @@ import { TRAFFIC_LEGEND } from '@/config/dict'
 import SearchCarStatus from './modules/Search/CarStatus.vue'
 import Websocket from '@/plugins/websocket'
 import { warning, cars, districts, speed } from '@/mock/data.js'
+import { Getter } from 'vuex-class'
 import {
   CompanyBody,
   CarsBodyRecords,
   CarIdBody,
-  CarLocationBody
+  CarLocationBody,
+  CarStateBody
 } from '@/services'
 @Component({
   name: 'MapIndex',
@@ -129,6 +135,8 @@ import {
 export default class MapIndex extends Vue {
   @Ref('drawer') drawer: any
   @Ref('map') map: any
+
+  @Getter('app/isFullScreen') isFullScreen
   // 是否在播放轨迹回放
   isPlaying: boolean = false
   // 是否显示抽屉
@@ -137,12 +145,13 @@ export default class MapIndex extends Vue {
   showSearch: boolean = false
   // 图例 - 交通状态
   legends = TRAFFIC_LEGEND
+  passedLength = 0 // 已经路过的长度
   trackSpeed: number = 200
   // 列表 - 时速
   speed: any = []
   districts: any = []
   warning: any = []
-  cars: any = []
+  cars = {} // 车辆状态的信息
   carDetail = {} // 汽车详情
   trackMarkers: Array<Array<number>> = [] // 标记点 - 轨迹回放
   companyList: Array<CompanyBody> = [] // 所有单位信息
@@ -230,10 +239,19 @@ export default class MapIndex extends Vue {
     this.trackMarkers = await this.$ajax.ajax({
       method: 'POST',
       url: 'v1/car/locations',
-      data
+      data: {
+        carId: 3,
+        beginTime: '2019-12-15T13:00:00',
+        endTime: '2019-12-15T15:00:00'
+      }
     })
   }
-
+  async loadPreMarkers(val) {
+    return await this.$ajax.ajax({
+      method: 'GET',
+      url: `v1/route/car/${val.id}`
+    })
+  }
   // 点击窗体的轨迹回放 - 显示底部抽屉
 
   handleShowTrack() {
@@ -248,6 +266,7 @@ export default class MapIndex extends Vue {
   }
   // 加载汽车详情
   async loadCarDetail(item) {
+    this.trackMarkers = []
     this.carDetail = await this.$ajax.ajax({
       method: 'GET',
       url: `v1/car/${item.id}`
@@ -273,7 +292,7 @@ export default class MapIndex extends Vue {
     const carBody = await this.$ajax.ajax({
       method: 'POST',
       url: 'v1/cars',
-      params: val,
+      query: val,
       data: val
     })
     this.searchCarBody = carBody

@@ -6,13 +6,14 @@
 <script lang="ts">
 import { Component, Vue, Prop, Watch, Ref } from 'vue-property-decorator'
 import { TRAFFIC_LEGEND } from '@/config/dict'
+import { CarStateBody } from '@/services'
 @Component({
   name: 'ChartWarning'
 })
 export default class ChartWarning extends Vue {
   @Ref('chart') chart: any
   // 图表配置数据
-  @Prop({ default: () => ({}), type: Object }) public readonly data!: any
+  @Prop({ default: () => {}, type: Object }) public readonly data!: CarStateBody
   option: any = {
     grid: {
       top: '17%',

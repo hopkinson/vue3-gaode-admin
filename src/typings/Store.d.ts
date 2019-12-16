@@ -21,4 +21,7 @@ export declare namespace Store {
     active_path: string
     isCollapse: boolean
   }
+  export interface App {
+    isFullScreen: boolean
+  }
 }

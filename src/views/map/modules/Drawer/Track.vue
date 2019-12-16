@@ -28,7 +28,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Model, Prop, Watch } from 'vue-property-decorator'
+import {
+  Component,
+  Vue,
+  Model,
+  Prop,
+  Watch,
+  PropSync
+} from 'vue-property-decorator'
 import FormTrack from '../Form/Track.vue'
 import SliderTrack from '../Slider/Track.vue'
 import { CarIdBody } from '@/services'

@@ -13,10 +13,10 @@ export default {
   mounted() {
     onresize = () => {
       this.$nextTick(() => {
-        this.resizeCenter()
+        // this.resizeCenter()
       })
     }
-    this.resizeCenter()
+    // this.resizeCenter()
   },
   methods: {
     resizeCenter() {

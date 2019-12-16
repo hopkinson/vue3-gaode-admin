@@ -1,11 +1,18 @@
 <template>
   <div class="abnormal">
     <!-- 异常 - 图标 -->
-    <i class="sprite_ico sprite_ico_bar_notice abnormal__icon">
-      <span class="abnormal__icon--text">粤A3KX62异常</span>
-    </i>
+    <div class="abnormal__icon">
+      <i
+        class="sprite_ico sprite_ico_bar_notice"
+        v-for="(item, index) in data"
+        :key="index"
+        @click="click(item)"
+      >
+        <span class="abnormal__icon--text">粤A3KX62异常</span>
+      </i>
+    </div>
     <!-- 异常 - 对话框 -->
-    <div class="abnormal__dialog">
+    <div class="abnormal__dialog" v-if="showDialog">
       <!-- 对话框 - 头部 -->
       <div class="sprite_ico sprite_ico_dialog__header">
         <i class="iconfont icon-guanbi abnormal__dialog--close"></i>
@@ -18,8 +25,12 @@
           <br />建议调度工作人员协调
         </div>
         <div class="abnormal__dialog--footer">
-          <div class="abnormal__dialog--button"></div>
-          <div class="abnormal__dialog--button is-plain"></div>
+          <div class="abnormal__dialog--button" @click="confirm">
+            实时查看
+          </div>
+          <div class="abnormal__dialog--button is-plain" @click="cancel">
+            取消
+          </div>
         </div>
       </div>
     </div>
@@ -27,12 +38,31 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Prop } from 'vue-property-decorator'
 
 @Component({
   name: 'ButtonAbnormal'
 })
-export default class ButtonAbnormal extends Vue {}
+export default class ButtonAbnormal extends Vue {
+  @Prop({ default: () => [], type: Array }) public readonly data!: Array<any>
+
+  showDialog: boolean = false // 对话框
+  model = {}
+
+  // 点击
+  click(item) {
+    this.showDialog = true
+    this.model = item
+  }
+  cancel() {
+    this.showDialog = false
+    this.$emit('cancel')
+  }
+  confirm() {
+    this.showDialog = false
+    this.$emit('confirm', this.model)
+  }
+}
 </script>
 
 <style lang="less" scoped>

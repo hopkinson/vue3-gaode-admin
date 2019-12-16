@@ -4,6 +4,7 @@ import permission from './modules/permission'
 import user from './modules/user'
 import path from './modules/path'
 import dict from './modules/dict'
+import app from './modules/app'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -11,6 +12,7 @@ export default new Vuex.Store({
     permission,
     user,
     path,
-    dict
+    dict,
+    app
   }
 })
