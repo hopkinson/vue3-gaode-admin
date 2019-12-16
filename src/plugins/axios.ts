@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios'
 import { Notification } from 'element-ui'
 import { ElNotificationOptions } from 'element-ui/types/notification'
-import { WrappedFetchParams } from '@/typings/ajax'
+import { WrappedFetchParams } from '@/typings/Ajax'
 import uuid from '@/utils/uuid'
 import router from '@/router'
 import store from '@/store'

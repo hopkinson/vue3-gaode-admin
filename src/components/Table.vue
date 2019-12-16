@@ -81,7 +81,7 @@ import {
   cellCallbackParams,
   ElTable
 } from 'element-ui/types/table'
-import { Params } from '@/typings/params.d'
+import { Params } from '@/typings/Params.d'
 @Component({
   name: 'Table'
 })
