@@ -126,10 +126,11 @@ export default class MapHome extends Vue {
     init: o => {
       const self: any = this
       o.setMapStyle(MAP.mapStyle)
-      // new AMap.TileLayer({
-      //   getTileUrl: MAP.tileUrl,
-      //   zIndex: 99
-      // })
+      const googleLayer = new AMap.TileLayer({
+        getTileUrl: MAP.tileUrl,
+        zIndex: 2
+      })
+      googleLayer.setMap(o)
     }
   }
   markerEvent(item) {
