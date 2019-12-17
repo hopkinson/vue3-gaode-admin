@@ -15,8 +15,7 @@ import * as models from './models'
 /**
  * @description 位置信息
  * @property `[alarmType]` 告警类型
- * @property `location` 坐标(格式: 113.339, 23.1874)
- * @property `marsLocation` 火星坐标(格式: 113.339, 23.1874)
+ * @property `location` 火星坐标(格式: 113.339, 23.1874)
  * @property `speed` 速度
  * @property `direction` 方位角
  * @property `locateTime` 定位时间
@@ -28,13 +27,9 @@ export interface CarLocationLocation {
    */
   alarmType?: number
   /**
-   * 坐标(格式: 113.339, 23.1874)
-   */
-  location: string
-  /**
    * 火星坐标(格式: 113.339, 23.1874)
    */
-  marsLocation: number
+  location: string
   /**
    * 速度
    */

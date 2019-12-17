@@ -26,7 +26,7 @@
         @click="onSubmit"
         :disabled="!canSearch"
         size="mini"
-        >确认</el-button
+        >查询</el-button
       >
     </el-form-item>
   </el-form>
@@ -44,10 +44,11 @@ export default class TrackComponent extends Vue {
   @Prop({ type: Object, default: () => {} }) readonly carDetail!: CarIdBody
 
   form: CarLocationsBody = {
-    carId: '',
-    beginTime: '',
-    endTime: ''
+    carId: '3',
+    beginTime: '2019-12-15T13:00:00',
+    endTime: '2019-12-15T15:00:00'
   }
+
   pickerOptions: any = {
     disabledDate(time) {
       return time.getTime() > Date.now()

@@ -13,19 +13,19 @@
 import * as models from './models'
 
 /**
- * @property `alertTime` 告警时间
- * @property `alertTypeId` 告警类型ID
+ * @property `alarmTime` 告警时间
+ * @property `alarmType` 告警类型【0:偏航, 1:逆行, 2:违停, 3:超速】
  * @property `quantity` 告警数量
  */
-export interface AlertsBody {
+export interface AlarmsCollectBody {
   /**
    * 告警时间
    */
-  alertTime: string
+  alarmTime: string
   /**
-   * 告警类型ID
+   * 告警类型【0:偏航, 1:逆行, 2:违停, 3:超速】
    */
-  alertTypeId: string
+  alarmType: string
   /**
    * 告警数量
    */

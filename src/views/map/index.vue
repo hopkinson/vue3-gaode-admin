@@ -78,10 +78,11 @@
 
     <!-- 地图  -->
     <map-home
-      :track-markers="trackMarkers"
+      :track-markers.sync="trackMarkers"
       :speed="trackSpeed"
       :markers="carList"
       :car-detail="carDetail"
+      :isPlaying.sync="isPlaying"
       :passed-length.sync="passedLength"
       :loadPreTrack="loadPreMarkers"
       @load-car-detail="loadCarDetail"
@@ -90,11 +91,13 @@
     ></map-home>
     <!-- 底部 - 抽屉 -->
     <drawer-track
+      class="map__drawer"
       v-model="showDrawer"
       :passedLength.sync="passedLength"
       :speed.sync="trackSpeed"
       :track-markers="trackMarkers"
       ref="drawer"
+      :is-playing.sync="isPlaying"
       :car-detail="carDetail"
       @play="handleControlTrack"
       @search-track="handleSearchTrack"
@@ -250,23 +253,19 @@ export default class MapIndex extends Vue {
   async handleSearchTrack(data) {
     this.trackMarkers = await this.$ajax.ajax({
       method: 'POST',
-      url: 'v1/car/locations',
+      url: 'v1/car/track',
       data: data
-      // data: {
-      //   carId: 3,
-      //   beginTime: '2019-12-15T13:00:00',
-      //   endTime: '2019-12-15T15:00:00'
-      // }
     })
   }
+
   async loadPreMarkers(val) {
     return await this.$ajax.ajax({
       method: 'GET',
       url: `v1/route/car/${val.id}`
     })
   }
-  // 点击窗体的轨迹回放 - 显示底部抽屉
 
+  // 点击窗体的轨迹回放 - 显示底部抽屉
   handleShowTrack() {
     this.showDrawer = true
   }
@@ -345,6 +344,15 @@ export default class MapIndex extends Vue {
     &--inner {
       position: absolute;
       bottom: -6px;
+    }
+  }
+  &__drawer {
+    position: static !important;
+    & /deep/ .el-drawer__container {
+      position: fixed;
+      top: auto;
+      height: auto;
+      z-index: 2000;
     }
   }
   &__legends {

@@ -34,6 +34,9 @@ export type ParamsBodycarLocationPost = string
  */
 export type ParamsBodycarLocationsPost = models.CarLocationsBody
 /**
+ */
+export type ParamsBodycarTrackPost = models.CarTrackBody
+/**
  * @description carsPost参数
  * @property `[pageNum]` 页码
  * @property `[pageNo]` 页宽
@@ -108,10 +111,10 @@ export class DefaultApi {
    * @summary 告警统计
    
    
-   * @returns models.Alerts
+   * @returns models.AlarmsCollect
    */
-  public alertsGet = (): AjaxPromise<models.Alerts> => {
-    const path = '/alerts'
+  public alarmsCollectGet = (): AjaxPromise<models.AlarmsCollect> => {
+    const path = '/alarms/collect'
     const url = this.$basePath + path
     const p: any = {}
     return ajax.ajax(
@@ -254,6 +257,30 @@ export class DefaultApi {
     return ajax.ajax(
       {
         method: 'GET',
+        url,
+        ...p
+      },
+      path,
+      this.$basePath
+    )
+  }
+  /**
+   * 
+   * @summary 返回车辆行驶轨迹V2
+   
+   * @param data: ParamsBodycarTrackPost
+   * @returns models.CarTrack
+   */
+  public carTrackPost = (
+    data: ParamsBodycarTrackPost
+  ): AjaxPromise<models.CarTrack> => {
+    const path = '/car/track'
+    const url = this.$basePath + path
+    const p: any = {}
+    p.data = data
+    return ajax.ajax(
+      {
+        method: 'POST',
         url,
         ...p
       },

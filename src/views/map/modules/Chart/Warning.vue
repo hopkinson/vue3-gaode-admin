@@ -51,7 +51,6 @@ export default class ChartWarning extends Vue {
     tooltip: {
       backgroundColor: 'transparent',
       formatter: function({ data }) {
-        console.log(data)
         return `
         <div class="project__echarts--tooltip-bar">
             <span class="project__echarts--tooltip-car-text">${data.name}：${data.value}</span>
