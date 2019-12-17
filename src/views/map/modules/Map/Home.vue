@@ -3,6 +3,8 @@
     class="maphome"
     ref="map"
     vid="amap-vue"
+    :resizeEnable="true"
+    :expandZoomRange="true"
     :zoom="zoom"
     :zooms="zooms"
     :events="events"
@@ -125,6 +127,7 @@ export default class MapHome extends Vue {
   events = {
     init: o => {
       const self: any = this
+      o.setZoom
       o.setMapStyle(MAP.mapStyle)
       const googleLayer = new AMap.TileLayer({
         getTileUrl: MAP.tileUrl,
