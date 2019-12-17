@@ -2,27 +2,44 @@
   <div class="detail" v-if="value">
     <div class="sprite_ico sprite_ico_popup_detail__header">
       <i
+        v-if="!realTime"
         class="iconfont icon-guanbi detail--close"
         @click="$emit('input', false)"
       ></i>
     </div>
     <div class="detail__main">
-      <h6>{{ data.carNo }}</h6>
-      <p>
-        当前状态：
-        <span :class="stateClass">{{ state }}</span>
-      </p>
-      <p>隶属单位：{{ data.companyName || '无' }}</p>
-      <p v-if="data.location">
-        当前速度：{{ data.location.speed || 0 }}公里/小时
-      </p>
-      <p>最后定位：{{ address }}</p>
-      <p v-if="data.location">
-        定位时间：{{
-          data.location.locateTime | formatDay('YYYY-MM-DD HH:mm:ss')
-        }}
-      </p>
-      <div class="detail--button" @click="trackPlay">轨迹回放</div>
+      <h6 v-if="!realTime">{{ data.carNo }}</h6>
+      <template v-if="!realTime">
+        <p>
+          当前状态：
+          <span :class="stateClass">{{ state }}</span>
+        </p>
+        <p>隶属单位：{{ data.companyName || '无' }}</p>
+        <p v-if="data.location">
+          当前速度：{{ data.location.speed || 0 }}公里/小时
+        </p>
+        <p>最后定位：{{ address }}</p>
+        <p v-if="data.location">
+          定位时间：{{
+            data.location.locateTime | formatDay('YYYY-MM-DD HH:mm:ss')
+          }}
+        </p>
+        <div class="detail--button" @click="trackPlay">轨迹回放</div>
+      </template>
+      <template v-else>
+        <p>
+          经纬度：
+          {{ data.location }}
+        </p>
+        <p>
+          速度：
+          {{ data.speed }}公里/小时
+        </p>
+        <p>
+          定位时间：
+          {{ data.locateTime | formatDay('YYYY-MM-DD HH:mm:ss') }}
+        </p>
+      </template>
     </div>
   </div>
 </template>
@@ -30,8 +47,9 @@
 <script lang="ts">
 import { Component, Vue, Prop, Model, Watch } from 'vue-property-decorator'
 import { TRAFFIC_LEGEND, WARNGING, MAP } from '@/config/dict'
-import { CarLocationBody } from '@/services'
+import { CarLocationBody, CarIdBodyLocation } from '@/services'
 import axios from 'axios'
+
 @Component({
   name: 'CarDetail',
   inheritAttrs: false
@@ -41,8 +59,13 @@ export default class CarDetail extends Vue {
   @Model('input', { type: Boolean, default: false })
   public readonly value!: boolean
 
+  // 详情数据
   @Prop({ default: () => {}, type: Object })
   public readonly data!: CarLocationBody
+
+  // 是否实时数据
+  @Prop({ default: false, type: Boolean })
+  public readonly realTime!: boolean
 
   address = '' // 地址
 
@@ -53,7 +76,7 @@ export default class CarDetail extends Vue {
   get state() {
     let state = ''
     const { location } = this.data
-    if (location) {
+    if (location && !this.realTime) {
       state = TRAFFIC_LEGEND[location.runState.toString()].label
       if (state === '异常') {
         state = location.alarmType
@@ -72,7 +95,7 @@ export default class CarDetail extends Vue {
   @Watch('data', { deep: true })
   public async watchData(val) {
     const { location } = val
-    if (location) {
+    if (location && !this.realTime) {
       const {
         data: {
           regeocode: { formatted_address }

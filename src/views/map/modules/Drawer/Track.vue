@@ -2,6 +2,8 @@
   <el-drawer
     :modal="false"
     :visible.sync="visible"
+    :modal-append-to-body="false"
+    :wrapperClosable="false"
     direction="btt"
     size="auto"
     title="11"
@@ -15,12 +17,11 @@
         <form-track v-bind="$attrs" v-on="$listeners"></form-track>
       </div>
 
-      <div class="track__item" :class="{ 'is-disabled': !isPlaying }">
+      <div class="track__item">
         <slider-track
           v-bind="$attrs"
           ref="slider"
           v-on="$listeners"
-          :is-playing.sync="isPlaying"
         ></slider-track>
       </div>
     </div>
@@ -52,7 +53,6 @@ export default class DrawerTrack extends Vue {
   public readonly value!: boolean
   // 是否播放中
   visible = false
-  isPlaying = false
   // 关闭
   close() {
     this.visible = false

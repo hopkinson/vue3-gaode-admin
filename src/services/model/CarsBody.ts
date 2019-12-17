@@ -13,16 +13,20 @@
 import * as models from './models'
 
 /**
- * @property `[companyId]` 单位ID
- * @property `[carNo]` 车牌号码
+ * @property `[records]`
+ * @property `[total]`
+ * @property `[size]`
+ * @property `[current]`
+ * @property `[orders]`
+ * @property `[searchCount]`
+ * @property `[pages]`
  */
 export interface CarsBody {
-  /**
-   * 单位ID
-   */
-  companyId?: string
-  /**
-   * 车牌号码
-   */
-  carNo?: string
+  records?: Array<models.CarsBodyRecords>
+  total?: number
+  size?: number
+  current?: number
+  orders?: Array<string>
+  searchCount?: boolean
+  pages?: number
 }

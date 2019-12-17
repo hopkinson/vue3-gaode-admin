@@ -1,7 +1,7 @@
 export const MAP = {
   key: 'd8629d0fd7aacdae4a39f068968b96c0', // 密钥
   webapi: '0334a4c9f0ffc7e9bea11544898a56fb', //web-api
-  zoom: 19, //初始化地图层级
+  zoom: 18, //初始化地图层级
   center: [113.453468, 23.154044], //初始化地图中心点
   zooms: [3, 22], // 缩放
   mapStyle: 'amap://styles/darkblue',
@@ -48,11 +48,11 @@ export const TRAFFIC_LEGEND = {
 export const WARNGING = {
   // 状态
   status: {
-    1: {
+    2: {
       label: '违停',
       color: ' rgb(250, 82, 145)'
     },
-    2: {
+    0: {
       label: '偏航',
       color: 'rgb(49, 217, 164)'
     },
@@ -60,7 +60,7 @@ export const WARNGING = {
       label: '超速',
       color: 'rgb(143, 131, 255)'
     },
-    4: {
+    1: {
       label: '逆行',
       color: 'rgb(252, 155, 3)'
     }

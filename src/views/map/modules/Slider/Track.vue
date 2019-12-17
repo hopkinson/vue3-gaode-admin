@@ -70,7 +70,8 @@ export default class DrawerTrackComponent extends Vue {
   // 播放/暂停
   playPause() {
     if (this.trackMarkers.length) {
-      this.$emit('update:isPlaying', !this.isplay)
+      this.isplay = !this.isplay
+      this.$emit('update:isPlaying', this.isplay)
       this.$emit('play', this.isplay)
     } else {
       this.$message({
