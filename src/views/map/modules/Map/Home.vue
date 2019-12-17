@@ -1,5 +1,6 @@
 <template>
   <section class="maphome">
+    {{ isPlayTrack }}
     <el-amap
       ref="map"
       vid="amap-vue"
@@ -262,20 +263,27 @@ export default class MapHome extends Vue {
       this.preMarkers = await this.loadPreTrack(val) // 加载预设轨迹
       const { location } = val
       if (!location) {
-        this.$emit('upadte:isPlaying', false)
         this.showInfo = false
         return this.$message({
           message: '找不到位置',
           type: 'warning'
         })
       }
-      this.isAbnormal = !!location.alarmType
+      this.isAbnormal = !!location.alarmType // 异常
       this.center = location ? location.location.split(',') : []
       this.position = this.center
       setTimeout(() => {
         this.realTime = false
         this.showInfo = true
       }, 350)
+    }
+  }
+
+  // 监听 - 倍速
+  @Watch('realTime', {})
+  public watchRealTime(val: number) {
+    if (!val) {
+      this.$emit('upadte:isPlaying', false)
     }
   }
 

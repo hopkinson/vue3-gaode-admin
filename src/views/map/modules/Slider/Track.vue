@@ -1,5 +1,6 @@
 <template>
   <div class="track">
+    {{ isplay }}
     <!-- 倍速 - 减速 -->
     <i class="sprite_ico sprite_ico_track_back" @click="minusSpeed"></i>
     <!-- 播放/停止 sprite_ico_track_pause -->
@@ -18,7 +19,6 @@
       @input="changeSlider"
       :max="trackMarkers.length"
       :value="passedLineLength"
-      disabled
       :show-tooltip="false"
     ></el-slider>
   </div>
@@ -50,7 +50,6 @@ export default class DrawerTrackComponent extends Vue {
 
   // 当滑块发生改变时
   changeSlider(val) {
-    // this.$emit('input', val)
     this.$emit('update:passedLength', val)
   }
   // 减速
@@ -81,13 +80,15 @@ export default class DrawerTrackComponent extends Vue {
     }
   }
 
-  // // 监听 - params
-  // @Watch('passedLineLength', {})
-  // public watchVLine(val: string) {
-  //   if (!val) {
-  //     this.carNo = ''
-  //   }
-  // }
+  // 监听 - 倍速
+  @Watch('isplay', {})
+  public watchRealTime(val: boolean) {
+    if (!val) {
+      console.log(1111)
+      this.$emit('update:speed', 200)
+      this.$emit('update:passedLength', 1)
+    }
+  }
 }
 </script>
 

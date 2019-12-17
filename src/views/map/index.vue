@@ -279,6 +279,7 @@ export default class MapIndex extends Vue {
   // 加载汽车详情
   async loadCarDetail(item) {
     this.trackMarkers = []
+    this.isPlaying = false
     this.carDetail = await this.$ajax.ajax({
       method: 'GET',
       url: `v1/car/${item.id}`
