@@ -227,18 +227,3 @@ export default class MapHome extends Vue {
   }
 }
 </script>
-<style lang="less">
-.maphome {
-  & /deep/ .amap-info-content {
-    background: transparent;
-    border: none;
-    padding: 0;
-    line-height: inherit;
-  }
-
-  & /deep/ .amap-info-close,
-  & /deep/ .amap-info-sharp {
-    display: none;
-  }
-}
-</style>
