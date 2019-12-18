@@ -172,8 +172,8 @@ export default class MapIndex extends Vue {
   abnormalList = [] // 异常信息列表
   websocket: any = null // websocket连接
   carParams = {
-    pageNo: '',
-    pageSize: 10,
+    pageNum: '',
+    pageNo: 10,
     companyId: '',
     carNo: ''
   }
@@ -234,20 +234,20 @@ export default class MapIndex extends Vue {
   handleSearchCar(carNo) {
     this.carParams = Object.assign({}, this.carParams, {
       carNo,
-      pageNo: 0
+      pageNum: 0
     })
   }
   // 改变搜索条件
   handleChangeFilter(form) {
     this.carParams = Object.assign({}, this.carParams, {
       ...form,
-      pageNo: 0
+      pageNum: 0
     })
   }
   // 改变当前页
-  handleCurrentChange(pageNo) {
+  handleCurrentChange(pageNum) {
     this.carParams = Object.assign({}, this.carParams, {
-      pageNo
+      pageNum
     })
   }
   recordPassedLength(val) {
@@ -289,10 +289,11 @@ export default class MapIndex extends Vue {
   }
   // 加载汽车详情
   async loadCarDetail(item) {
-    const { location } = item
+    console.log('detail', item)
+    const { runState, location } = item
     this.trackMarkers = []
     this.isPlaying = false
-    if (!location.alarmType) {
+    if (runState !== 3 || (location && location.runState !== 3)) {
       this.carDetail = await this.$ajax.ajax({
         method: 'GET',
         url: `v1/car/${item.id}`
@@ -333,7 +334,7 @@ export default class MapIndex extends Vue {
         method: 'GET',
         url: 'v1/company'
       })
-      this.carParams.pageNo = '0'
+      this.carParams.pageNum = '0'
     }
   }
 

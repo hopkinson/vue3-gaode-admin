@@ -1,5 +1,6 @@
 <template>
   <section class="maphome">
+    {{ showTrack || !!Object.keys(carDetail).length }}
     <el-amap
       ref="map"
       vid="amap-vue"
@@ -9,6 +10,7 @@
       :zooms="zooms"
       :events="events"
       :center="center"
+      :plugin="plugin"
       :amapManager="amapManager"
     >
       <!-- 信息窗体 - 详情 -->
@@ -164,6 +166,13 @@ export default class MapHome extends Vue {
         zIndex: 2
       })
       googleLayer.setMap(o)
+      setTimeout(() => {
+        let cluster = new (AMap as any).MarkerClusterer(o, self.markers, {
+          gridSize: 30,
+          renderCluserMarker: self._renderCluserMarker
+        })
+        console.log(cluster)
+      }, 1000)
     }
   }
 
@@ -189,6 +198,7 @@ export default class MapHome extends Vue {
     return `
   <div class="project__map-marker">
     <i class="sprite_ico sprite_ico_icon_${runState === 3 &&
+      !!alarmType &&
       TRAFFIC_LEGEND[alarmType.toString()].value}" style="display:${
       runState === 3 ? 'none' : 'inline-block'
     }"></i> 
@@ -217,7 +227,30 @@ export default class MapHome extends Vue {
       this.marker.$$getInstance().pauseMove()
     })
   }
+  // 点坐标聚合
+  _renderCluserMarker(context) {
+    const count = this.markers.length
 
+    let factor = Math.pow(context.count / count, 1 / 18)
+    let div = document.createElement('div')
+    let Hue = 180 - factor * 180
+    let bgColor = 'hsla(' + Hue + ',100%,50%,0.7)'
+    let fontColor = 'hsla(' + Hue + ',100%,20%,1)'
+    div.style.backgroundColor = bgColor
+    let size = Math.round(30 + Math.pow(context.count / count, 1 / 5) * 20)
+    div.style.width = div.style.height = size + 'px'
+    div.style.borderRadius = '50%'
+    div.innerHTML = context.count
+    div.style.lineHeight = size + 'px'
+    div.style.color = fontColor
+    div.style.fontSize = '12px'
+    div.style.textAlign = 'center'
+    const result = `
+    <div style="color:#fff">312312312${Hue}</div>
+    `
+    context.marker.setOffset(new AMap.Pixel(-size / 2, -size / 2))
+    context.marker.setContent(result)
+  }
   // 监听 - 轨迹
   @Watch('getTrackMarkers', { deep: true, immediate: true })
   public watchTrackMarkerts(val: Array<CarIdBodyLocation>) {
