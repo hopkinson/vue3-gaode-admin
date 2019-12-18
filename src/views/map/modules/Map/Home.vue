@@ -1,6 +1,5 @@
 <template>
   <section class="maphome">
-    {{ isPlayTrack }}
     <el-amap
       ref="map"
       vid="amap-vue"
@@ -17,7 +16,7 @@
         :position="position"
         :visible="showInfo"
         :showShadow="false"
-        :offset="!realTime ? [160, 30] : [130, -40]"
+        :offset="!realTime ? [140, -40] : [130, -40]"
         closeWhenClickMap
         autoMove
       >
@@ -32,24 +31,29 @@
         </panel-car-detail>
       </el-amap-info-window>
       <!-- 点坐标 -->
-      <el-amap-marker
-        v-for="(item, index) in markers"
-        :key="`market${index}`"
-        :position="item.location.location | filterPosition"
-        :events="markerEvent(item)"
-        :content="markerTemplate(item)"
-      ></el-amap-marker>
-      <!-- 显示轨迹回放 -->
-      <template v-if="showTrack">
-        <!-- 点坐标 - 用户动画播放 -->
+      <template v-if="!showTrack">
         <el-amap-marker
+          v-for="(item, index) in markers"
+          :key="index"
           :offset="[-26, -103]"
-          ref="trackmarker"
-          :content="markerTemplate(carDetail)"
-          :position="position"
+          :position="item.location.location | filterPosition"
+          :events="markerEvent(item)"
+          :content="markerTemplate(item)"
         ></el-amap-marker>
-        <!-- 信息窗体 - 实际轨迹 -->
       </template>
+
+      <!-- 显示轨迹回放 -->
+      <!-- 点坐标 - 用户动画播放 -->
+      <el-amap-marker
+        ref="marker"
+        :offset="[-26, -103]"
+        :visible="showTrack"
+        :content="
+          Object.keys(carDetail).length ? markerTemplate(carDetail) : ''
+        "
+        :position="position"
+      ></el-amap-marker>
+      <!-- 信息窗体 - 实际轨迹 -->
       <!-- 折线 - 实际-->
       <el-amap-polyline
         ref="trackPolyLine"
@@ -101,12 +105,8 @@ let amapManager = new AMapManager()
   }
 })
 export default class MapHome extends Vue {
-  @Ref('trackmarker') trackmarker: any
+  @Ref('marker') marker: any
   @Ref('map') map: any
-
-  // 获取已经经过点的长度 .sync
-  @PropSync('passedLength', { type: Number, default: 0 })
-  passedLineLength!: number
 
   // 是否正在播放 .sync
   @PropSync('isPlaying', { type: Boolean, default: false })
@@ -119,6 +119,11 @@ export default class MapHome extends Vue {
   // 折线&点 - 坐标（用于轨迹回放）
   @Prop({ type: Array, default: () => [] })
   public readonly markers!: Array<any>
+
+  // 获取已经经过点的长度
+  @Prop({ type: Number, default: 0 })
+  public readonly passedLength!: number
+
   //  倍速
   @Prop({ type: Number, default: 0 })
   public readonly speed!: number
@@ -169,9 +174,11 @@ export default class MapHome extends Vue {
         const {
           location: { location }
         } = item
-        this.position = location ? location.split(',') : []
-        this.center = this.position
-        this.showInfo = !this.showInfo
+        setTimeout(() => {
+          this.position = location ? location.split(',') : []
+          this.center = this.position
+          this.showInfo = !this.showInfo
+        }, 200)
         this.$emit('load-car-detail', item)
       }
     }
@@ -181,9 +188,9 @@ export default class MapHome extends Vue {
   markerTemplate({ carNo, location: { runState, alarmType } }) {
     return `
   <div class="project__map-marker">
-    <i class="sprite_ico sprite_ico_icon_${alarmType &&
+    <i class="sprite_ico sprite_ico_icon_${runState === 3 &&
       TRAFFIC_LEGEND[alarmType.toString()].value}" style="display:${
-      !alarmType ? 'none' : 'inline-block'
+      runState === 3 ? 'none' : 'inline-block'
     }"></i> 
     <p>${carNo}</p>
     <i class="sprite_ico sprite_ico_icon_${
@@ -200,14 +207,14 @@ export default class MapHome extends Vue {
   // 轨迹 - 开始移动
   moveTracker() {
     this.$nextTick(() => {
-      this.trackmarker.$$getInstance().moveAlong(this.trackLocation, 200)
+      this.marker.$$getInstance().moveAlong(this.trackLocation, 200)
     })
   }
 
   // 轨迹 - 停止移动
   pauseTracker() {
     this.$nextTick(() => {
-      this.trackmarker.$$getInstance().pauseMove()
+      this.marker.$$getInstance().pauseMove()
     })
   }
 
@@ -216,9 +223,11 @@ export default class MapHome extends Vue {
   public watchTrackMarkerts(val: Array<CarIdBodyLocation>) {
     this.showTrack = !!val && !!val.length // 如果有坐标，则显示轨迹
     if (val.length) {
-      this.trackLocation = val.map(item => item.location.split(','))
-      this.position = val[0].location.split(',')
-      this.center = this.position
+      setTimeout(() => {
+        this.trackLocation = val.map(item => item.location.split(','))
+        this.position = val[0].location.split(',')
+        this.center = this.position
+      }, 200)
     }
   }
 
@@ -227,28 +236,24 @@ export default class MapHome extends Vue {
   public watchShowTrack(val: boolean) {
     if (val) {
       this.realTime = true
-      this.realTimeDetail = this.getTrackMarkers[0]
+      this.realTimeDetail = this.getTrackMarkers[0] // 实时信息
       this.$nextTick(() => {
         // 监听 - 轨迹移动中
-        this.trackmarker.$$getInstance().on('moving', e => {
-          this.passedLineLength = e.passedPath.length // 获取已经经过点的长度
-          if (this.passedLineLength === this.trackLocation.length) {
+        this.marker.$$getInstance().on('moving', e => {
+          this.$emit('on-passed-line', e.passedPath.length) // 获取已经经过点的长度
+          if (e.passedPath.length === this.trackLocation.length) {
             this.realTime = false
             this.$emit('upadte:isPlaying', false)
           }
           //截取未运动的点
-          if (this.passedLineLength >= 2) {
+          if (e.passedPath.length >= 2) {
             this.NoPassedLine = this.trackLocation.slice(
-              this.passedLineLength - 2
+              e.passedPath.length - 2
             )
           }
           //已经经过的点
-          this.trackPassedLocation = e.passedPath
-          //将未运动的点变成新的点
+          this.trackPassedLocation = e.passedPath //将未运动的点变成新的点
           // this.trackLocation = this.NoPassedLine
-          this.trackmarker
-            .$$getInstance()
-            .setExtData(this.getTrackMarkers[e.passedPath.length - 1])
           this.realTimeDetail = this.getTrackMarkers[e.passedPath.length - 1]
           const accro = e.passedPath[e.passedPath.length - 1]
           setTimeout(() => {
@@ -276,28 +281,39 @@ export default class MapHome extends Vue {
         })
       }
       this.isAbnormal = !!location.alarmType // 异常
-      this.center = location ? location.location.split(',') : []
-      this.position = this.center
       setTimeout(() => {
+        this.center = location ? location.location.split(',') : []
+        this.position = this.center
         this.realTime = false
         this.showInfo = true
       }, 350)
     }
   }
 
-  // 监听 - 倍速
+  // 监听 - 是否实时播放
   @Watch('realTime', {})
   public watchRealTime(val: number) {
     if (!val) {
       this.$emit('upadte:isPlaying', false)
+      this.marker.$$getInstance().stopMove()
     }
   }
 
-  // 监听 - 倍速
-  @Watch('speed', {})
-  public watchSpeed(val: number) {
-    this.trackmarker.$$getInstance().moveAlong(this.trackLocation, val)
+  // 监听 - 滑动
+  @Watch('passedLength', {})
+  public watchpassedLength(val: number) {
+    if (!this.isPlayTrack) {
+      this.$nextTick(() => {
+        this.marker.$$getInstance().moveTo(this.trackLocation[val], 0)
+      })
+    }
   }
+
+  // // 监听 - 倍速
+  // @Watch('speed', {})
+  // public watchSpeed(val: number) {
+  //   this.marker.$$getInstance().moveAlong(this.trackLocation, val)
+  // }
 }
 </script>
 <style lang="less" scoped>

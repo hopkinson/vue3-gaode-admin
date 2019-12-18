@@ -1,9 +1,8 @@
 <template>
   <div class="track">
-    {{ isplay }}
     <!-- 倍速 - 减速 -->
     <i class="sprite_ico sprite_ico_track_back" @click="minusSpeed"></i>
-    <!-- 播放/停止 sprite_ico_track_pause -->
+    <!-- 播放/停止  -->
     <i
       class="sprite_ico"
       :class="`sprite_ico_track_${isplay ? 'pause' : 'play'}`"
@@ -11,15 +10,16 @@
     ></i>
     <!-- 倍速 - 加速 -->
     <i class="sprite_ico sprite_ico_track_forward" @click="addSpeed"></i>
+    <!-- TODO -->
     <!-- <span class="track__time"
       >{{ trackMarkers.length }}/{{ passedLineLength }}</span
     >-->
     <el-slider
       class="track__slider"
-      @input="changeSlider"
       :max="trackMarkers.length"
-      :value="passedLineLength"
       :show-tooltip="false"
+      :value="value"
+      @input="input"
     ></el-slider>
   </div>
 </template>
@@ -40,18 +40,14 @@ export default class DrawerTrackComponent extends Vue {
   // 搜索参数 .sync
   @PropSync('speed', { type: Number, default: 0 }) speeds!: number
 
+  // value slider的值
+  @Prop({ type: Number, default: 0 }) value!: number
+
   // 搜索参数 .sync
   @PropSync('isPlaying', { type: Boolean, default: false }) isplay!: boolean
-  // 获取已经经过点的长度 .sync
-  @PropSync('passedLength', { type: Number, default: 0 })
-  passedLineLength!: number
 
-  slider: number = 0
+  slider: number = 0 // 获取已经经过点的长度(操作slider)
 
-  // 当滑块发生改变时
-  changeSlider(val) {
-    this.$emit('update:passedLength', val)
-  }
   // 减速
   minusSpeed() {
     if (this.isplay) {
@@ -79,14 +75,14 @@ export default class DrawerTrackComponent extends Vue {
       })
     }
   }
-
+  input(val) {
+    this.$emit('input', val)
+  }
   // 监听 - 倍速
   @Watch('isplay', {})
   public watchRealTime(val: boolean) {
     if (!val) {
-      console.log(1111)
       this.$emit('update:speed', 200)
-      this.$emit('update:passedLength', 1)
     }
   }
 }

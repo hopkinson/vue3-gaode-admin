@@ -44,9 +44,9 @@ export default class TrackComponent extends Vue {
   @Prop({ type: Object, default: () => {} }) readonly carDetail!: CarIdBody
 
   form: CarLocationsBody = {
-    carId: '3',
-    beginTime: '2019-12-15T13:00:00',
-    endTime: '2019-12-15T15:00:00'
+    carId: '',
+    beginTime: '',
+    endTime: ''
   }
 
   pickerOptions: any = {

@@ -28,7 +28,7 @@
           v-for="item in trafficDict"
           :key="item.value"
           :label="item.label"
-          :value="item.value"
+          :value="item.code"
         >
           <span
             class="form__state--dot"

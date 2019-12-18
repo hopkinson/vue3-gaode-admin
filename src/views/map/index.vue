@@ -83,8 +83,9 @@
       :markers="carList"
       :car-detail="carDetail"
       :isPlaying.sync="isPlaying"
-      :passed-length.sync="passedLength"
+      :passedLength="passedLength"
       :loadPreTrack="loadPreMarkers"
+      @on-passed-line="recordPassedLength"
       @load-car-detail="loadCarDetail"
       @play-track="handleShowTrack"
       ref="map"
@@ -92,8 +93,8 @@
     <!-- 底部 - 抽屉 -->
     <drawer-track
       class="map__drawer"
-      v-model="showDrawer"
-      :passedLength.sync="passedLength"
+      :show.sync="showDrawer"
+      v-model="passedLength"
       :speed.sync="trackSpeed"
       :track-markers="trackMarkers"
       ref="drawer"
@@ -249,7 +250,9 @@ export default class MapIndex extends Vue {
       pageNo
     })
   }
-
+  recordPassedLength(val) {
+    this.passedLength = val
+  }
   // 返回实际轨迹
   async handleSearchTrack(data) {
     this.trackMarkers = await this.$ajax.ajax({
