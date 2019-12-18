@@ -8,12 +8,10 @@
       ></i>
     </div>
     <div class="detail__main">
-      <h6 v-if="!realTime">{{ data.carNo }}</h6>
+      <!-- 汽车具体信息 -->
       <template v-if="!realTime">
-        <p>
-          当前状态：
-          <span :class="stateClass">{{ state }}</span>
-        </p>
+        <h6 :class="stateClass">{{ data.carNo }}</h6>
+        <p>当前状态：{{ state }}</p>
         <p>隶属单位：{{ data.companyName || '无' }}</p>
         <p v-if="data.location">
           当前速度：{{ data.location.speed || 0 }}公里/小时
@@ -24,8 +22,11 @@
             data.location.locateTime | formatDay('YYYY-MM-DD HH:mm:ss')
           }}
         </p>
-        <div class="detail--button" @click="trackPlay">轨迹回放</div>
+        <div class="detail--button">
+          <slot name="button"></slot>
+        </div>
       </template>
+      <!-- 实时信息 -->
       <template v-else>
         <p>
           经纬度：
@@ -47,7 +48,7 @@
 <script lang="ts">
 import { Component, Vue, Prop, Model, Watch } from 'vue-property-decorator'
 import { TRAFFIC_LEGEND, WARNGING, MAP } from '@/config/dict'
-import { CarLocationBody, CarIdBodyLocation } from '@/services'
+import { CarLocationBody, CarIdBodyLocation, AlarmsIdBody } from '@/services'
 import axios from 'axios'
 
 @Component({
@@ -63,15 +64,25 @@ export default class CarDetail extends Vue {
   @Prop({ default: () => {}, type: Object })
   public readonly data!: CarLocationBody
 
+  // 详情数据
+  @Prop({ default: () => {}, type: Object })
+  public readonly abnormalData!: AlarmsIdBody
+
   // 是否实时数据
   @Prop({ default: false, type: Boolean })
   public readonly realTime!: boolean
 
   address = '' // 地址
 
+  // 是否显示异常信息
+  get isAbnormal() {
+    return Object.keys(this.abnormalData).length
+  }
+
   get stateClass() {
     return this.state === '异常' ? ' is-danger' : ''
   }
+
   // 获取状态
   get state() {
     let state = ''
@@ -86,27 +97,33 @@ export default class CarDetail extends Vue {
     }
     return state
   }
-  trackPlay() {
-    this.$emit('play-track', this.data)
-    // this.$emit('input', false)
-  }
 
+  async loadAddress(location) {
+    const {
+      data: {
+        regeocode: { formatted_address }
+      }
+    } = await axios.get('https://restapi.amap.com/v3/geocode/regeo', {
+      params: {
+        key: MAP.webapi,
+        location: location
+      }
+    })
+    this.address = formatted_address
+  }
   // 监听 - params
   @Watch('data', { deep: true })
-  public async watchData(val) {
+  public watchData(val) {
     const { location } = val
     if (location && !this.realTime) {
-      const {
-        data: {
-          regeocode: { formatted_address }
-        }
-      } = await axios.get('https://restapi.amap.com/v3/geocode/regeo', {
-        params: {
-          key: MAP.webapi,
-          location: location.location
-        }
-      })
-      this.address = formatted_address
+      this.loadAddress(location.location)
+    }
+  }
+  @Watch('abnormalData', { deep: true })
+  public watchAbnormalData(val) {
+    const { location } = val
+    if (location) {
+      this.loadAddress(location)
     }
   }
 }

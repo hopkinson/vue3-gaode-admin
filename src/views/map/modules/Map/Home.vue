@@ -27,7 +27,9 @@
           :realTime="realTime"
           v-bind="$attrs"
           v-on="$listeners"
-        ></panel-car-detail>
+        >
+          <span @click="trackPlay" slot="button">轨迹回放</span>
+        </panel-car-detail>
       </el-amap-info-window>
       <!-- 点坐标 -->
       <el-amap-marker
@@ -189,6 +191,10 @@ export default class MapHome extends Vue {
     }"></i>
   </div>
   `
+  }
+  // 轨迹回放
+  trackPlay() {
+    this.$emit('play-track', { realTime: this.realTime, data: this.carDetail })
   }
 
   // 轨迹 - 开始移动

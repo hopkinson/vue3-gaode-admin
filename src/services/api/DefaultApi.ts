@@ -16,6 +16,17 @@ import * as models from '../model/models'
 /* tslint:disable:no-unused-variable member-ordering object-literal-shorthand */
 
 /**
+ * @description alarmsIdGet参数
+ * @property `id` 告警ID
+ */
+export interface ParamsalarmsIdGet {
+  // pathParams
+  /**
+   * 告警ID
+   */
+  id: string
+}
+/**
  * @description carIdGet参数
  * @property `id` 车辆ID
  */
@@ -117,6 +128,34 @@ export class DefaultApi {
     const path = '/alarms/collect'
     const url = this.$basePath + path
     const p: any = {}
+    return ajax.ajax(
+      {
+        method: 'GET',
+        url,
+        ...p
+      },
+      path,
+      this.$basePath
+    )
+  }
+  /**
+   * 
+   * @summary 返回指定主键ID的告警详情
+   * @param params ParamsalarmsIdGet
+   
+   * @returns models.AlarmsId
+   */
+  public alarmsIdGet = (
+    params: ParamsalarmsIdGet
+  ): AjaxPromise<models.AlarmsId> => {
+    const path = '/alarms/{id}'
+    const url =
+      this.$basePath +
+      path.replace(/\{([^}]+)\}/g, (all, param) =>
+        param in params ? params[param] : param
+      )
+    const p: any = {}
+    ajax.check(params.id, 'id')
     return ajax.ajax(
       {
         method: 'GET',
