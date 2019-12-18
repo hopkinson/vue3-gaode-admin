@@ -1,5 +1,7 @@
 export * from './AlarmsCollect'
 export * from './AlarmsCollectBody'
+export * from './AlarmsId'
+export * from './AlarmsIdBody'
 export * from './ApiV1SettingRouteId'
 export * from './ApiV1SettingRouteIdBody'
 export * from './CarDistribution'

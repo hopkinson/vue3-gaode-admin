@@ -107,6 +107,7 @@ export default class ButtonAbnormal extends Vue {
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 1000;
+    font-size: 0;
     &--inner {
       border-left: 1px solid #0f6980;
       border-right: 1px solid #0f6980;

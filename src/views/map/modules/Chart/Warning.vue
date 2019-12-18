@@ -51,10 +51,13 @@ export default class ChartWarning extends Vue {
     tooltip: {
       backgroundColor: 'transparent',
       formatter: function({ data }) {
-        return `
+        return Object.keys(data).length
+          ? `
         <div class="project__echarts--tooltip-bar">
-            <span class="project__echarts--tooltip-car-text">${data.name}：${data.value}</span>
+            <span class="project__echarts--tooltip-car-text">${data.name ||
+              ''}：${data.value || ''}</span>
         </div>`
+          : ''
       },
       position: 'top'
     },

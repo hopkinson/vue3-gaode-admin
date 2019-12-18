@@ -29,14 +29,7 @@
 </template>
 
 <script lang="ts">
-import {
-  Component,
-  Vue,
-  Model,
-  Prop,
-  Watch,
-  PropSync
-} from 'vue-property-decorator'
+import { Component, Vue, Model, Watch, PropSync } from 'vue-property-decorator'
 import FormTrack from '../Form/Track.vue'
 import SliderTrack from '../Slider/Track.vue'
 import { CarIdBody } from '@/services'
@@ -48,9 +41,10 @@ import { CarIdBody } from '@/services'
   }
 })
 export default class DrawerTrack extends Vue {
-  // v-model
-  @Model('input', { type: Boolean, default: false })
-  public readonly value!: boolean
+  // 是否正在播放 .sync
+  @PropSync('show', { type: Boolean, default: false })
+  isShow!: boolean
+
   // 是否播放中
   visible = false
   // 关闭
@@ -58,14 +52,14 @@ export default class DrawerTrack extends Vue {
     this.visible = false
   }
   // 监听 - params
-  @Watch('value', {})
+  @Watch('isShow', {})
   public watchValue(val: boolean) {
     this.visible = val
   }
   // 监听 - params
   @Watch('visible', {})
   public watchVisible(val: boolean) {
-    this.$emit('input', val)
+    this.$emit('update:show', val)
   }
 }
 </script>

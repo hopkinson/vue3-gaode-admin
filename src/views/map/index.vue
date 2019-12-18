@@ -83,8 +83,9 @@
       :markers="carList"
       :car-detail="carDetail"
       :isPlaying.sync="isPlaying"
-      :passed-length.sync="passedLength"
+      :passedLength="passedLength"
       :loadPreTrack="loadPreMarkers"
+      @on-passed-line="recordPassedLength"
       @load-car-detail="loadCarDetail"
       @play-track="handleShowTrack"
       ref="map"
@@ -92,8 +93,8 @@
     <!-- 底部 - 抽屉 -->
     <drawer-track
       class="map__drawer"
-      v-model="showDrawer"
-      :passedLength.sync="passedLength"
+      :show.sync="showDrawer"
+      v-model="passedLength"
       :speed.sync="trackSpeed"
       :track-markers="trackMarkers"
       ref="drawer"
@@ -127,6 +128,7 @@ import {
   CarLocationBody,
   CarStateBody
 } from '@/services'
+
 @Component({
   name: 'MapIndex',
   components: {
@@ -155,7 +157,7 @@ export default class MapIndex extends Vue {
   // 图例 - 交通状态
   legends = TRAFFIC_LEGEND
   passedLength = 0 // 已经路过的长度
-  trackSpeed: number = 200
+  trackSpeed: number = 200 // 初始化速度
   // 列表 - 时速
   speed: any = []
   districts: any = []
@@ -248,7 +250,9 @@ export default class MapIndex extends Vue {
       pageNo
     })
   }
-
+  recordPassedLength(val) {
+    this.passedLength = val
+  }
   // 返回实际轨迹
   async handleSearchTrack(data) {
     this.trackMarkers = await this.$ajax.ajax({
@@ -257,7 +261,7 @@ export default class MapIndex extends Vue {
       data: data
     })
   }
-
+  // 加载预设
   async loadPreMarkers(val) {
     return await this.$ajax.ajax({
       method: 'GET',
@@ -266,8 +270,15 @@ export default class MapIndex extends Vue {
   }
 
   // 点击窗体的轨迹回放 - 显示底部抽屉
-  handleShowTrack() {
-    this.showDrawer = true
+  handleShowTrack({ realTime }) {
+    if (realTime) {
+      this.showDrawer = true
+    } else {
+      this.showDrawer = false
+      setTimeout(() => {
+        this.showDrawer = true
+      }, 200)
+    }
   }
   // 所有单位信息
   async handleSearchCompany() {
@@ -278,11 +289,39 @@ export default class MapIndex extends Vue {
   }
   // 加载汽车详情
   async loadCarDetail(item) {
+    const { location } = item
     this.trackMarkers = []
-    this.carDetail = await this.$ajax.ajax({
-      method: 'GET',
-      url: `v1/car/${item.id}`
-    })
+    this.isPlaying = false
+    if (!location.alarmType) {
+      this.carDetail = await this.$ajax.ajax({
+        method: 'GET',
+        url: `v1/car/${item.id}`
+      })
+    } else {
+      const data = await this.$ajax.ajax({
+        method: 'GET',
+        url: `v1/alarms/${item.id}`
+      })
+      this.carDetail = {
+        id: item.id || 0,
+        carNo: data.carNo,
+        terminalNo: item.terminalNo || 0,
+        companyId: '',
+        companyName: data.companyName,
+        name: '',
+        typeId: '',
+        typeName: '',
+        model: '',
+        location: {
+          alarmType: data.type,
+          location: data.location,
+          speed: data.speed,
+          direction: data.direction,
+          locateTime: data.alarmTime,
+          runState: 3
+        }
+      }
+    }
   }
 
   // 监听 - 倍速
