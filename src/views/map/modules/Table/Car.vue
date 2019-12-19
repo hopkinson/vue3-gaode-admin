@@ -150,6 +150,10 @@ export default class TableList extends Vue {
       background-color: transparent;
       color: #fff;
     }
+    & /deep/ .el-pager li.active {
+      background-color: transparent;
+      color: rgb(34, 168, 238);
+    }
     & /deep/ .el-pagination__jump {
       color: #fff;
     }

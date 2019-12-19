@@ -5,7 +5,7 @@ export const MAP = {
   center: [113.469004, 23.103796], //初始化地图中心点
   zooms: [3, 22], // 缩放
   mapStyle: 'amap://styles/darkblue',
-  tileUrl: 'http://zwcf5200.cn:10698/SubHD/tile/raster/[z]/[x]/[y].jpg' // 图层url
+  tileUrl: 'http://183.62.55.237:7405/SubHD/tile/raster/[z]/[x]/[y].jpg' // 图层url
 }
 
 // 交通状态的图例
