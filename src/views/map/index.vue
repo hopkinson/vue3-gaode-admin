@@ -157,7 +157,7 @@ export default class MapIndex extends Vue {
   // 图例 - 交通状态
   legends = TRAFFIC_LEGEND
   passedLength = 0 // 已经路过的长度
-  trackSpeed: number = 200 // 初始化速度
+  trackSpeed: number = 20 // 初始化速度
   // 列表 - 时速
   speed: any = []
   districts: any = []
@@ -183,13 +183,13 @@ export default class MapIndex extends Vue {
       this.pollingLocation()
     }, 30000)
     //订阅websocket消息
-    this.websocket = new Websocket({
-      endPoint: process.env.VUE_APP_WS_API
-    })
-    this.websocket.subscribes('/socket/topic/alarms', ({ body }) => {
-      const result = JSON.parse(body)
-      this.abnormalList = result
-    })
+    // this.websocket = new Websocket({
+    //   endPoint: process.env.VUE_APP_WS_API
+    // })
+    // this.websocket.subscribes('/socket/topic/alarms', ({ body }) => {
+    //   const result = JSON.parse(body)
+    //   this.abnormalList = result
+    // })
     // 车辆状态
     this.cars = await this.$ajax.ajax({
       method: 'GET',
@@ -227,6 +227,7 @@ export default class MapIndex extends Vue {
   }
   // 控制轨迹的播放
   handleControlTrack(isPlaying) {
+    console.log('播放状态', isPlaying ? 'pauseTracker' : 'moveTracker')
     this.isPlaying ? this.map.pauseTracker() : this.map.moveTracker()
     this.isPlaying = !this.isPlaying
   }

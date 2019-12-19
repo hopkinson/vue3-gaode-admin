@@ -19,6 +19,7 @@
       :max="trackMarkers.length"
       :show-tooltip="false"
       :value="value"
+      disabled
       @input="input"
     ></el-slider>
   </div>
@@ -47,19 +48,29 @@ export default class DrawerTrackComponent extends Vue {
   @PropSync('isPlaying', { type: Boolean, default: false }) isplay!: boolean
 
   slider: number = 0 // 获取已经经过点的长度(操作slider)
-
-  // 减速
-  minusSpeed() {
-    if (this.isplay) {
-      const speed = this.speeds <= SPEED ? SPEED : this.speeds - SPEED
-      this.$emit('update:speed', speed)
-    }
-  }
+  speedCount: number = 1 // 倍速
   // 加速
   addSpeed() {
     if (this.isplay) {
-      const speed = this.speeds + SPEED
-      this.$emit('update:speed', speed)
+      if (this.speeds < 1000) {
+        this.speedCount++
+      } else {
+        this.speedCount = 5
+      }
+      this.$emit('update:speed', this.speeds * this.speedCount)
+    }
+  }
+  // 减速
+  minusSpeed() {
+    if (this.isplay) {
+      if (this.speeds > 200) {
+        this.speedCount--
+        this.speedCount = 1
+      } else {
+        this.speedCount = 1
+        this.$emit('update:speed', 200)
+      }
+      this.$emit('update:speed', this.speeds * this.speedCount)
     }
   }
   // 播放/暂停
@@ -79,12 +90,12 @@ export default class DrawerTrackComponent extends Vue {
     this.$emit('input', val)
   }
   // 监听 - 倍速
-  @Watch('isplay', {})
-  public watchRealTime(val: boolean) {
-    if (!val) {
-      this.$emit('update:speed', 200)
-    }
-  }
+  // @Watch('isplay', {})
+  // public watchRealTime(val: boolean) {
+  //   if (!val) {
+  //     this.$emit('update:speed', 200)
+  //   }
+  // }
 }
 </script>
 

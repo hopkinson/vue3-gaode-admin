@@ -54,6 +54,8 @@
       font-size: 12px;
       padding: 5px 0 !important;
       border-bottom: 0 !important;
+      color:#fff;
+      font-size: 13px;
       & /deep/ .cell {
         line-height: 150%;
       }
@@ -119,6 +121,32 @@
         margin-bottom: 8px;
       }
     }
+    &-cluserMarker {
+      .circle {
+        position: absolute;
+        width: 50%;
+        height: 50%;
+        top: 25%;
+        left: 25%;
+        border: 1px solid rgb(6, 148, 255);
+        border-radius: 50%;
+        z-index: -1;
+        animation: wave-scale 2s linear infinite;
+      }
+      .sprite_ico {
+        position: relative;
+      }
+      span {
+        position: absolute;
+        bottom: 5px;
+        left: 50%;
+        transform: translateX(-50%) scale(0.9);
+        color: #fff;
+        font-size: 12px;
+        font-weight: bold;
+        font-style: normal;
+      }
+    }
     &-infoWindow {
       position: relative;
       &--main {
@@ -149,14 +177,14 @@
 }
 
 .maphome {
-   .amap-info-content {
+  .amap-info-content {
     background: transparent;
     border: none;
     padding: 0;
     line-height: inherit;
   }
- .amap-info-close,
- .amap-info-sharp {
+  .amap-info-close,
+  .amap-info-sharp {
     display: none;
   }
 }
