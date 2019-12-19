@@ -289,7 +289,6 @@ export default class MapIndex extends Vue {
   }
   // 加载汽车详情
   async loadCarDetail(item) {
-    console.log('detail', item)
     const { runState, location } = item
     this.trackMarkers = []
     this.isPlaying = false

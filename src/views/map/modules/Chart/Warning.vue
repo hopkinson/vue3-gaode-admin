@@ -120,7 +120,7 @@ export default class ChartWarning extends Vue {
         name: WARNGING.status[item.toString()].label,
         type: 'bar',
         barMaxWidth: 6,
-        barGap: '100%',
+        barGap: '50%',
         zlevel: 2,
         itemStyle: {
           normal: {
@@ -146,12 +146,12 @@ export default class ChartWarning extends Vue {
         itemStyle: {
           color: '#071430'
         },
-        data: Array(Object.keys(sortedData).length).fill(_maxQuantity)
+        data: Array([...new Set(_alertTime)].length).fill(_maxQuantity)
       }
     })
     this.option.xAxis[0].data = [...new Set(_alertTime)] // 图表 - x轴
     this.option.xAxis[1].data = [...new Set(_alertTime)] // 图表 - x轴
-    this.option.series = [...barData, ...barBackgound] // 柱子的数据 和 背景
+    this.option.series = [...barBackgound, ...barData] // 柱子的数据 和 背景
     this.option.legend.data = Object.values(WARNGING.status).map(
       item => item.label
     ) // 图例
