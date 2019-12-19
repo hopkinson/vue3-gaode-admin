@@ -1,6 +1,5 @@
 <template>
   <section class="maphome">
-    {{ showTrack || !!Object.keys(carDetail).length }}
     <el-amap
       ref="map"
       vid="amap-vue"
@@ -150,6 +149,7 @@ export default class MapHome extends Vue {
   realTimeDetail = {} // 实时窗体详情
   center: Array<number | string> = MAP.center // 地图中心
   position: Array<number | string> = MAP.center // 地图中心
+  markerRefs: any = [] // 点聚合
   preMarkers: Array<Array<number>> = [] // 预设轨迹
   trackPassedLocation: Array<Array<number>> = [] // 已经走过的轨迹
   NoPassedLine: Array<Array<number | string>> = [] // 将未运动的点变成新的点
@@ -158,7 +158,6 @@ export default class MapHome extends Vue {
   trackLocation: Array<Array<number | string>> = [] //轨迹的坐标系
   events = {
     init: o => {
-      const self: any = this
       o.setZoom
       o.setMapStyle(MAP.mapStyle)
       const googleLayer = new AMap.TileLayer({
@@ -166,12 +165,12 @@ export default class MapHome extends Vue {
         zIndex: 2
       })
       googleLayer.setMap(o)
+      const self = this
       setTimeout(() => {
-        let cluster = new (AMap as any).MarkerClusterer(o, self.markers, {
-          gridSize: 30,
-          renderCluserMarker: self._renderCluserMarker
+        let cluster = new (AMap as any).MarkerClusterer(o, self.markerRefs, {
+          gridSize: 60,
+          renderClusterMarker: self._renderCluserMarker
         })
-        console.log(cluster)
       }, 1000)
     }
   }
@@ -179,6 +178,9 @@ export default class MapHome extends Vue {
   markerEvent(item) {
     // 点击 静态的点坐标 - 显示车辆详情信息
     return {
+      init: o => {
+        this.markerRefs.push(o)
+      },
       click: () => {
         const {
           location: { location }
@@ -201,7 +203,7 @@ export default class MapHome extends Vue {
       !!alarmType &&
       TRAFFIC_LEGEND[alarmType.toString()].value}" style="display:${
       runState === 3 ? 'none' : 'inline-block'
-    }"></i> 
+    }"></i>
     <p>${carNo}</p>
     <i class="sprite_ico sprite_ico_icon_${
       TRAFFIC_LEGEND[runState.toString()].value
@@ -230,7 +232,6 @@ export default class MapHome extends Vue {
   // 点坐标聚合
   _renderCluserMarker(context) {
     const count = this.markers.length
-
     let factor = Math.pow(context.count / count, 1 / 18)
     let div = document.createElement('div')
     let Hue = 180 - factor * 180
