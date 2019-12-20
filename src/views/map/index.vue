@@ -2,8 +2,8 @@
   <div class="map">
     <!-- 异常信息-->
     <alert-abnormal
-      :data="abnormalList"
-      @confirm="loadCarDetail"
+      :num="abnormalNum"
+      @confirm="loadCarDetail($event, { abnormal: true })"
     ></alert-abnormal>
     <!-- 搜索  -->
     <search-car-status
@@ -80,11 +80,14 @@
     <map-home
       :track-markers.sync="trackMarkers"
       :speed="trackSpeed"
+      :map-center="mapCenter"
       :markers="carList"
       :car-detail="carDetail"
-      :isPlaying.sync="isPlaying"
+      :isPlay="isPlaying"
+      :isEnd.sync="isEnd"
       :passedLength="passedLength"
       :loadPreTrack="loadPreMarkers"
+      @stop-move="stopMoveTracker"
       @on-passed-line="recordPassedLength"
       @load-car-detail="loadCarDetail"
       @play-track="handleShowTrack"
@@ -94,13 +97,15 @@
     <drawer-track
       class="map__drawer"
       :show.sync="showDrawer"
-      v-model="passedLength"
       :speed.sync="trackSpeed"
-      :track-markers="trackMarkers"
+      v-model="totalPassedLength"
+      :trackMarkersLength="trackMarkers.length"
       ref="drawer"
-      :is-playing.sync="isPlaying"
+      :isEnd="isEnd"
+      :isPlaying.sync="isPlaying"
       :car-detail="carDetail"
       @play="handleControlTrack"
+      @stop="stopTrack"
       @search-track="handleSearchTrack"
     ></drawer-track>
   </div>
@@ -150,6 +155,8 @@ export default class MapIndex extends Vue {
   @Getter('app/isFullScreen') isFullScreen
   // 是否在播放轨迹回放
   isPlaying: boolean = false
+  // 是否停止播放
+  isEnd: boolean = false
   // 是否显示抽屉
   showDrawer: boolean = false
   // 是否显示筛选
@@ -157,19 +164,21 @@ export default class MapIndex extends Vue {
   // 图例 - 交通状态
   legends = TRAFFIC_LEGEND
   passedLength = 0 // 已经路过的长度
-  trackSpeed: number = 200 // 初始化速度
+  trackSpeed: number = 100 // 初始化速度
   // 列表 - 时速
   speed: any = []
   districts: any = []
   warning: any = []
   cars = {} // 车辆状态的信息
   carDetail = {} // 汽车详情
+  mapCenter: Array<number | string> = [] // 点击车辆获取的位置
   trackMarkers: Array<Array<number>> = [] // 标记点 - 轨迹回放
   companyList: Array<CompanyBody> = [] // 所有单位信息
   searchCarBody = {} // 搜索的车辆列表
   carList: Array<CarLocationBody> = [] // 所有车辆的列表
   interval: number = 0
-  abnormalList = [] // 异常信息列表
+  totalPassedLength: number = 0 // 总共路过的轨迹
+  abnormalNum = 0 // 异常信息数量
   websocket: any = null // websocket连接
   carParams = {
     pageNum: '',
@@ -188,7 +197,7 @@ export default class MapIndex extends Vue {
     })
     this.websocket.subscribes('/socket/topic/alarms', ({ body }) => {
       const result = JSON.parse(body)
-      this.abnormalList = result
+      this.abnormalNum = result
     })
     // 车辆状态
     this.cars = await this.$ajax.ajax({
@@ -229,6 +238,11 @@ export default class MapIndex extends Vue {
   handleControlTrack(isPlaying) {
     this.isPlaying ? this.map.pauseTracker() : this.map.moveTracker()
     this.isPlaying = !this.isPlaying
+    this.isEnd = false
+  }
+  // 停止轨迹的播放
+  stopTrack() {
+    this.isEnd = true
   }
   // 搜索汽车
   handleSearchCar(carNo) {
@@ -250,8 +264,9 @@ export default class MapIndex extends Vue {
       pageNum
     })
   }
-  recordPassedLength(val) {
-    this.passedLength = val
+  recordPassedLength({ passed, total }) {
+    this.passedLength = passed
+    this.totalPassedLength = total
   }
   // 返回实际轨迹
   async handleSearchTrack(data) {
@@ -260,6 +275,12 @@ export default class MapIndex extends Vue {
       url: 'v1/car/track',
       data: data
     })
+    if (!this.trackMarkers.length) {
+      this.$message({
+        message: '没有任何轨迹',
+        type: 'warning'
+      })
+    }
   }
   // 加载预设
   async loadPreMarkers(val) {
@@ -268,7 +289,11 @@ export default class MapIndex extends Vue {
       url: `v1/route/car/${val.id}`
     })
   }
-
+  stopMoveTracker() {
+    this.isPlaying = false
+    this.trackSpeed = 100
+    this.totalPassedLength = 0
+  }
   // 点击窗体的轨迹回放 - 显示底部抽屉
   handleShowTrack({ realTime }) {
     if (realTime) {
@@ -288,15 +313,16 @@ export default class MapIndex extends Vue {
     })
   }
   // 加载汽车详情
-  async loadCarDetail(item) {
+  async loadCarDetail(item, { loadAbnormal = false } = {}) {
     const { runState, location } = item
     this.trackMarkers = []
     this.isPlaying = false
-    if (runState !== 3 || (location && location.runState !== 3)) {
-      this.carDetail = await this.$ajax.ajax({
+    if (!loadAbnormal) {
+      const data = await this.$ajax.ajax({
         method: 'GET',
         url: `v1/car/${item.id}`
       })
+      this.carDetail = data
     } else {
       const data = await this.$ajax.ajax({
         method: 'GET',
@@ -307,6 +333,7 @@ export default class MapIndex extends Vue {
         carNo: data.carNo,
         terminalNo: item.terminalNo || 0,
         companyId: '',
+        center: data.location.split(','),
         companyName: data.companyName,
         name: '',
         typeId: '',
@@ -322,6 +349,7 @@ export default class MapIndex extends Vue {
         }
       }
     }
+    this.mapCenter = (this.carDetail as any).location.location.split(',')
   }
 
   // 监听 - 倍速

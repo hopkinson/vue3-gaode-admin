@@ -50,17 +50,21 @@ export const WARNGING = {
   status: {
     2: {
       label: '违停',
+      value: 'weiting',
       color: ' rgb(250, 82, 145)'
     },
     0: {
       label: '偏航',
+      value: 'pianhang',
       color: 'rgb(49, 217, 164)'
     },
     3: {
       label: '超速',
+      value: 'chaosu',
       color: 'rgb(143, 131, 255)'
     },
     1: {
+      value: 'nixing',
       label: '逆行',
       color: 'rgb(252, 155, 3)'
     }

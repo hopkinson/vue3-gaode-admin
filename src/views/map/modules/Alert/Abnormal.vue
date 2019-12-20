@@ -2,16 +2,20 @@
   <div class="abnormal">
     <!-- 异常 - 图标 -->
     <div class="abnormal__icon">
-      <template v-for="(item, index) in data">
+      <!-- <template v-if="!!num">
         <i
-          :key="index"
-          v-if="!item.show"
           class="sprite_ico sprite_ico_bar_notice abnormal__icon--item"
-          @click="click(item)"
+          @click="click"
         >
-          <span class="abnormal__icon--text">{{ item.carNo }}异常</span>
+          <span class="abnormal__icon--text">{{ num }}条异常信息</span>
         </i>
       </template>
+      <i
+        class="sprite_ico sprite_ico_bar_notice abnormal__icon--item"
+        @click="click"
+      >
+        <span class="abnormal__icon--text">异常信息</span>
+      </i> -->
     </div>
     <!-- 异常 - 对话框 -->
     <div class="abnormal__dialog" v-if="showDialog">
@@ -54,7 +58,7 @@ import { WARNGING } from '@/config/dict'
   }
 })
 export default class ButtonAbnormal extends Vue {
-  @Prop({ default: () => [], type: Array }) public readonly data!: Array<any>
+  @Prop({ default: 0, type: Number }) public readonly num!: number
 
   showDialog: boolean = false // 对话框
   model = {}
