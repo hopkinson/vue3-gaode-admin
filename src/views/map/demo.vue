@@ -76,12 +76,10 @@ module.exports = {
       events: {
         init(o) {
           setTimeout(() => {
-            console.log(self.markerRefs)
-            let cluster = new AMap.MarkerClusterer(o, self.markerRefs, {
+            new AMap.MarkerClusterer(o, self.markerRefs, {
               gridSize: 80,
               renderCluserMarker: self._renderCluserMarker
             })
-            console.log(cluster)
           }, 1000)
         }
       }
