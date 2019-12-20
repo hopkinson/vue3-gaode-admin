@@ -22,9 +22,7 @@
             data.location.locateTime | formatDay('YYYY-MM-DD HH:mm:ss')
           }}
         </p>
-        <div class="detail--button">
-          <slot name="button"></slot>
-        </div>
+        <slot name="button"></slot>
       </template>
       <!-- 实时信息 -->
       <template v-else>
@@ -162,22 +160,6 @@ export default class CarDetail extends Vue {
     font-size: 13px;
     color: #0ccfdd;
     cursor: pointer;
-  }
-  &--button {
-    width: 66px;
-    height: 26px;
-    line-height: 26px;
-    text-align: center;
-    background: transparent;
-    color: rgb(34, 168, 238);
-    font-size: 12px;
-    border: 1px solid rgb(34, 168, 238);
-    margin-top: 12px;
-    cursor: pointer;
-    &:hover {
-      background: rgb(34, 168, 238);
-      color: #fff;
-    }
   }
 }
 </style>
