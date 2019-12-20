@@ -18,7 +18,7 @@
       @play="loadCarDetail"
       @change-filter="handleChangeFilter"
     ></search-car-status>
-    <div class="map__chart--left" v-if="!isFullScreen">
+    <div class="map__chart--left" v-if="!isFullScreen && false">
       <!-- 图表 -->
       <panel-chart
         title="告警统计"
@@ -53,7 +53,7 @@
         </div>
       </div>
     </div>
-    <div class="map__chart--right" v-if="!isFullScreen">
+    <div class="map__chart--right" v-if="!isFullScreen && false">
       <panel-chart
         title="车辆状态"
         :height="194"

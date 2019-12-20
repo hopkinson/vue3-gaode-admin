@@ -56,23 +56,28 @@
         :position="position"
       ></el-amap-marker>
       <!-- 信息窗体 - 实际轨迹 -->
-      <!-- 折线 - 实际-->
+      <!-- 折线 - 总的线 -->
       <el-amap-polyline
-        ref="trackPolyLine"
-        :path="trackLocation"
+        ref="polyline"
+        :path="originTrack"
         :strokeColor="!isAbnormal ? '#fff000' : '#ff010b'"
       ></el-amap-polyline>
       <!-- 折线 - 已走的轨迹 -->
       <el-amap-polyline
-        ref="trackPolyLine"
         :path="havePassedLine"
         strokeColor="#435a70"
       ></el-amap-polyline>
-      <!-- 折线  - 预设-->
+      <!-- 折线 - 未走的轨迹 -->
       <el-amap-polyline
+        :path="NoPassedLine"
+        :strokeColor="!isAbnormal ? '#fff000' : '#ff010b'"
+      ></el-amap-polyline>
+      <!-- 折线  - 预设-->
+      <!-- <el-amap-polyline
+        :z-index="51"
         :path="preMarkers"
         strokeColor="#0177fa"
-      ></el-amap-polyline>
+      ></el-amap-polyline> -->
     </el-amap>
     <slot></slot>
   </section>
@@ -157,6 +162,7 @@ export default class MapHome extends Vue {
   plugin: Array<string> = ['PolyEditor', 'MarkerClusterer', 'InfoWindow']
   isAbnormal: boolean = false // 是否属于异常
   trackLocation: Array<Array<number | string>> = [] //轨迹的坐标系
+  originTrack: Array<Array<number | string>> = []
   // passedLineLength: number = 0 // 获取已经经过点的长度
   events = {
     init: o => {
@@ -196,6 +202,9 @@ export default class MapHome extends Vue {
     return {
       init: o => {
         this.markerRefs.push(o)
+      },
+      moving: val => {
+        console.log(val)
       },
       click: () => {
         const {
@@ -260,6 +269,7 @@ export default class MapHome extends Vue {
     if (val.length) {
       setTimeout(() => {
         this.trackLocation = val.map(item => item.location.split(','))
+        this.originTrack = this.trackLocation
         this.position = val[0].location.split(',')
         this.center = this.position
       }, 200)
@@ -274,7 +284,7 @@ export default class MapHome extends Vue {
       // 监听 - 轨迹移动中
       this.marker.$$getInstance().on('moving', e => {
         this.realTime = true
-        console.log('--移动中--')
+        console.log('--移动中--', e.passedPath.length)
         this.$emit('on-passed-line', e.passedPath.length) // 获取已经经过点的长度
         this.havePassedLine = e.passedPath // 已经经过的点
         setTimeout(() => {
@@ -339,12 +349,14 @@ export default class MapHome extends Vue {
     if (this.isPlay) {
       console.log('播放中')
       //截取未运动的点
-      if (this.passedLength >= 2) {
-        this.NoPassedLine = this.trackLocation.slice(this.passedLength - 2)
-        this.trackLocation = this.NoPassedLine
-        // this.$emit('update:trackMarkers', this.trackLocation)
-      }
-      this.marker.$$getInstance().moveAlong(this.trackLocation, newVal)
+      this.NoPassedLine = this.trackLocation.slice(this.passedLength)
+      // this.$emit('update:trackMarkers', this.trackLocation)
+      //将未运动的点变成新的点
+      this.trackLocation = this.NoPassedLine
+      this.marker.$$getInstance().pauseMove()
+      setTimeout(() => {
+        this.marker.$$getInstance().moveAlong(this.NoPassedLine, newVal)
+      }, 350)
     }
   }
 }
