@@ -55,7 +55,7 @@ export default class ChartWarning extends Vue {
           ? `
         <div class="project__echarts--tooltip-bar">
             <span class="project__echarts--tooltip-car-text">${data.name ||
-              ''}：${data.value || ''}</span>
+              ''}：${data.value || ''}(${data.alarmTime})</span>
         </div>`
           : ''
       },
@@ -130,6 +130,7 @@ export default class ChartWarning extends Vue {
         data: sortedData[item].map(v => {
           return {
             value: v.quantity,
+            alarmTime: v.alarmTime,
             name: WARNGING.status[v.alarmType.toString()].label
           }
         })
