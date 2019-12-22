@@ -187,7 +187,7 @@ export default class MapIndex extends Vue {
     carNo: ''
   }
   async created() {
-    await this.pollingLocation()
+    this.pollingLocation()
     setInterval(() => {
       this.pollingLocation()
     }, 30000)
