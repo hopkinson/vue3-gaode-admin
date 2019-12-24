@@ -54,8 +54,7 @@ module.exports = {
         vue: 'Vue',
         'vue-router': 'VueRouter',
         vuex: 'Vuex',
-        axios: 'axios',
-        'element-ui': 'ELEMENT'
+        axios: 'axios'
       }
     )
     // 雪碧图
@@ -88,7 +87,7 @@ module.exports = {
         },
         spritesmithOptions: {
           // algorithm: 'top-down'
-          padding: 5
+          padding: 1
         }
       })
     )
@@ -167,10 +166,7 @@ module.exports = {
             '//unpkg.com/element-ui/lib/index.js'
           ]
         : [],
-      css: [
-        '//unpkg.com/element-ui/lib/theme-chalk/index.css',
-        '//at.alicdn.com/t/font_1563719_z0kd1v7nz3.css'
-      ]
+      css: ['//at.alicdn.com/t/font_1563719_z0kd1v7nz3.css']
     }
     // 添加别名
     config.resolve.alias

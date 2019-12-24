@@ -11,9 +11,14 @@
       :events="events"
       :center="center"
       :plugin="plugin"
-      :amapManager="amapManager"
     >
-      <!-- 信息窗体 - 详情 realTime ? realTimeDetail : -->
+      <!-- 多边形 - 围栏列表 -->
+      <!-- <el-amap-polygon
+        :path="polygon.path"
+        v-for="(polygon, index) in polygons"
+        :key="`polygon${index}`"
+      ></el-amap-polygon> -->
+      <!-- 信息窗体 - 详情 -->
       <el-amap-info-window
         :position="position"
         :visible="showInfo"
@@ -56,8 +61,9 @@
         "
         :position="position"
       ></el-amap-marker>
+      <!-- 折线 - 预设路线 -->
+      <!-- <el-amap-polyline :path="polyline.path"></el-amap-polyline> -->
     </el-amap>
-    <slot></slot>
   </section>
 </template>
 
@@ -71,13 +77,10 @@ import {
   PropSync
 } from 'vue-property-decorator'
 import { MAP } from '@/config/dict'
-import { AMapManager } from 'vue-amap'
 import PanelCarDetail from '../Panel/CarDetail.vue'
 import { CarIdBody, CarIdBodyLocation } from '@/services'
 import { TRAFFIC_LEGEND, WARNGING } from '@/config/dict'
 
-// import Amap = AMap
-let amapManager = new AMapManager()
 @Component({
   name: 'MapHome',
   components: {
@@ -132,8 +135,10 @@ export default class MapHome extends Vue {
   // 汽车详情
   @Prop({ type: Object, default: () => {} })
   public readonly carDetail!: CarIdBody
+  // 围栏列表坐标
+  @Prop({ type: Array, default: () => [] })
+  public readonly fenceList!: Array<any>
 
-  amapManager = amapManager // map的实例
   showInfo = false // 是否显示窗体信息
   showTrack = false // 是否显示轨迹
   realTime = false
@@ -143,6 +148,7 @@ export default class MapHome extends Vue {
   center: Array<number | string> = MAP.center // 地图中心
   position: Array<number | string> = MAP.center // 地图中心
   markerRefs: any = [] // 点聚合
+  fence: Array<Array<number>> = [] // 围栏坐标
   preMarkers: Array<Array<number>> = [] // 预设轨迹
   havePassedLine: Array<Array<number>> = [] // 已经走过的轨迹
   originTrack: Array<Array<number | string>> = [] // 原始数据// 备份
@@ -150,19 +156,21 @@ export default class MapHome extends Vue {
   plugin: Array<string> = ['PolyEditor', 'MarkerClusterer', 'InfoWindow']
   isAbnormal: boolean = false // 是否属于异常
   trackLocation: Array<Array<number | string>> = [] //轨迹的坐标系
+  passedLineLength: number = 0 // 获取已经经过点的长度
+  mouseTool: any = {} //注册全局绘制围栏插件实例
   polyline: any = {}
   newPolyline: any = {}
-  passedLineLength: number = 0 // 获取已经经过点的长度
   events = {
     init: o => {
-      o.setZoom
       o.setMapStyle(MAP.mapStyle)
+      // 设置高精度图层
       const googleLayer = new AMap.TileLayer({
         getTileUrl: MAP.tileUrl,
         zIndex: 2
       })
       googleLayer.setMap(o)
       const self = this
+      // 设置聚合坐标
       setTimeout(() => {
         let cluster = new (AMap as any).MarkerClusterer(o, self.markerRefs, {
           gridSize: 60,
@@ -216,6 +224,33 @@ export default class MapHome extends Vue {
       }
     }
   }
+  // 引入绘图插件  全局调用绘图插件
+  initMouseTool() {
+    this.mouseTool = new (AMap as any).MouseTool(this.map.$$getInstance())
+    this.mouseTool.polygon({
+      fillColor: 'rgb(55, 70, 95)',
+      strokeColor: 'rgb(0, 140, 255)',
+      strokeStyle: 'dashed',
+      strokeWeight: 2,
+      fillOpacity: 0.4
+    })
+    //监听draw事件可获取画好的覆盖物
+    this.mouseTool.on('draw', e => {
+      //每次只能传四个点，所以先清空
+      this.fence = []
+      //画出来的坐标放在存放在数组里面
+      e.obj.getPath().forEach(({ lng, lat }) => {
+        this.fence.push([lng, lat])
+      })
+    })
+  }
+  // 关闭绘图插件 清除你之前画的图像
+  destroyMouseTool() {
+    this.mouseTool.close(true)
+    this.fence = []
+  }
+
+  showToolPolygon() {}
 
   // 点坐标 - 模板
   markerTemplate({ carNo, location: { runState, alarmType } }) {

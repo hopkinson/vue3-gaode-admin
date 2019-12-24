@@ -14,7 +14,7 @@ import 'echarts/lib/chart/line'
 import 'echarts/lib/component/tooltip'
 import 'echarts/lib/component/legend'
 import 'echarts/lib/component/title'
-
+import 'element-ui/lib/theme-chalk/index.css'
 /**
  * ===============
  *  公共组件注册
@@ -62,11 +62,9 @@ setTimeout(() => {
       'AMap.PolyEditor',
       'AMap.MarkerClusterer',
       'AMap.InfoWindow',
-      'AMap.Autocomplete',
-      'AMap.PlaceSearch',
       'AMap.Scale',
       'AMap.OverView',
-      'AMap.CircleEditor'
+      'AMap.MouseTool'
     ],
     v: '1.4.6'
   })

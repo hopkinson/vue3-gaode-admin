@@ -1,11 +1,11 @@
 <template>
   <div class="map">
-    <!-- 异常信息-->
+    <!-- 1. 异常信息-->
     <alert-abnormal
       :num="abnormalNum"
       @confirm="loadCarDetail($event, { abnormal: true })"
     ></alert-abnormal>
-    <!-- 搜索  -->
+    <!-- 2. 搜索  -->
     <search-car-status
       v-if="!isFullScreen"
       class="map__chart--search"
@@ -18,8 +18,9 @@
       @play="loadCarDetail"
       @change-filter="handleChangeFilter"
     ></search-car-status>
+    <!-- 3. 左侧 -->
     <div class="map__chart--left" v-if="!isFullScreen">
-      <!-- 图表 -->
+      <!-- 3.1 左侧-图表 -->
       <panel-chart
         title="告警统计"
         unit="单位（次）"
@@ -41,7 +42,7 @@
       >
         <chart-speed :data="speed" class="map__chart--inner"></chart-speed>
       </panel-chart>
-      <!-- 左下角 - 图例 -->
+      <!-- 3.2 左侧-图例 -->
       <div class="map__legends map__legends--position">
         <div
           v-for="(item, index) in legends"
@@ -53,7 +54,9 @@
         </div>
       </div>
     </div>
+    <!-- 4.右侧 -->
     <div class="map__chart--right" v-if="!isFullScreen">
+      <!-- 4.1右侧-图表 -->
       <panel-chart
         title="车辆状态"
         :height="194"
@@ -74,6 +77,13 @@
         </span>
         <chart-districts :data="districts"></chart-districts>
       </panel-chart>
+      <!-- 4.2右侧-围栏按钮 -->
+      <button-fence
+        v-if="false"
+        @add="addFence"
+        @close="closeFence"
+        :fence.sync="fenceList"
+      ></button-fence>
     </div>
 
     <!-- 地图  -->
@@ -85,6 +95,7 @@
       :car-detail="carDetail"
       :isPlay="isPlaying"
       :isEnd.sync="isEnd"
+      :fenceList="fenceList"
       :passedLength="passedLength"
       :loadPreTrack="loadPreMarkers"
       @stop-move="stopMoveTracker"
@@ -120,6 +131,7 @@ import ChartDistricts from './modules/Chart/Districts.vue'
 import ChartCars from './modules/Chart/Cars.vue'
 import ChartWarning from './modules/Chart/Warning.vue'
 import DrawerTrack from './modules/Drawer/Track.vue'
+import ButtonFence from './modules/Button/Fence.vue'
 import MapHome from './modules/Map/Home.vue'
 import { TRAFFIC_LEGEND } from '@/config/dict'
 import SearchCarStatus from './modules/Search/CarStatus.vue'
@@ -141,6 +153,7 @@ import {
     PanelChart,
     ChartSpeed,
     ChartCars,
+    ButtonFence,
     ChartWarning,
     AlertAbnormal,
     SearchCarStatus,
@@ -177,6 +190,7 @@ export default class MapIndex extends Vue {
   searchCarBody = {} // 搜索的车辆列表
   carList: Array<CarLocationBody> = [] // 所有车辆的列表
   interval: number = 0
+  fenceList: Array<any> = [] //围栏列表
   totalPassedLength: number = 0 // 总共路过的轨迹
   abnormalNum = 0 // 异常信息数量
   websocket: any = null // websocket连接
@@ -233,6 +247,7 @@ export default class MapIndex extends Vue {
       method: 'POST',
       url: `v1/car/location`
     })
+    await this.pollingLocation()
   }
   // 控制轨迹的播放
   handleControlTrack(isPlaying) {
@@ -281,6 +296,16 @@ export default class MapIndex extends Vue {
         type: 'warning'
       })
     }
+  }
+  // 浏览电子围栏
+  viewFence(list) {}
+  // 新增电子围栏
+  addFence() {
+    this.map.initMouseTool()
+  }
+  // 关闭编辑电子围栏
+  closeFence() {
+    this.map.destroyMouseTool()
   }
   // 加载预设
   async loadPreMarkers(val) {
