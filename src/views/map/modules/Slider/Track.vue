@@ -8,7 +8,7 @@
       :class="`sprite_ico_track_${isplay && !end ? 'pause' : 'play'}`"
       @click="playPause"
     ></i>
-    <i class="sprite_ico sprite_ico_track_stop" @click="stop"></i>
+    <i class="sprite_ico sprite_ico_stop track__stop" @click="stop"></i>
     <!-- 倍速 - 加速 -->
     <i class="sprite_ico sprite_ico_track_forward" @click="addSpeed()"></i>
     <!-- TODO -->
@@ -120,6 +120,9 @@ export default class DrawerTrackComponent extends Vue {
   align-items: center;
   margin: 0 16px;
   width: 100%;
+  &__stop {
+    width: 24px;
+  }
   .sprite_ico {
     cursor: pointer;
   }
