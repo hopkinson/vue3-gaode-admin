@@ -79,7 +79,6 @@
       </panel-chart>
       <!-- 4.2右侧-围栏按钮 -->
       <button-fence
-        v-if="false"
         @add="addFence"
         @close="closeFence"
         :fence.sync="fenceList"
@@ -99,6 +98,7 @@
       :passedLength="passedLength"
       :loadPreTrack="loadPreMarkers"
       @stop-move="stopMoveTracker"
+      @add-fence="handleaddFence"
       @on-passed-line="recordPassedLength"
       @load-car-detail="loadCarDetail"
       @play-track="handleShowTrack"
@@ -138,6 +138,7 @@ import SearchCarStatus from './modules/Search/CarStatus.vue'
 import Websocket from '@/plugins/websocket'
 import { warning, cars, districts, speed } from '@/mock/data.js'
 import { Getter } from 'vuex-class'
+import { addFence, getFenceList } from './utils/webapi'
 import {
   CompanyBody,
   CarsBodyRecords,
@@ -297,16 +298,7 @@ export default class MapIndex extends Vue {
       })
     }
   }
-  // 浏览电子围栏
-  viewFence(list) {}
-  // 新增电子围栏
-  addFence() {
-    this.map.initMouseTool()
-  }
-  // 关闭编辑电子围栏
-  closeFence() {
-    this.map.destroyMouseTool()
-  }
+
   // 加载预设
   async loadPreMarkers(val) {
     return await this.$ajax.ajax({
@@ -375,6 +367,24 @@ export default class MapIndex extends Vue {
       }
     }
     this.mapCenter = (this.carDetail as any).location.location.split(',')
+  }
+
+  // 浏览电子围栏
+  async viewFence(list) {
+    this.fenceList = await getFenceList()
+  }
+  // 新增电子围栏
+  addFence() {
+    this.map.initMouseTool()
+  }
+  // 关闭编辑电子围栏
+  closeFence() {
+    this.map.destroyMouseTool()
+  }
+
+  // 新建电子围栏
+  async createFence(points) {
+    const gid = await addFence(points)
   }
 
   // 监听 - 倍速

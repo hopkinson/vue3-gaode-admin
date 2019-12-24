@@ -1,5 +1,6 @@
 <template>
   <section class="maphome">
+    {{ fence }}
     <el-amap
       ref="map"
       class="maphome__inner"
@@ -13,10 +14,19 @@
       :plugin="plugin"
     >
       <!-- 多边形 - 围栏列表 -->
+      <el-amap-polygon
+        :path="fence"
+        fillColor="rgb(55, 70, 95)"
+        strokeColor="rgb(0, 140, 255)"
+        strokeStyle="dashed"
+        :strokeWeight="2"
+        :event="polygonEvent"
+        :fillOpacity="0.4"
+      ></el-amap-polygon>
       <!-- <el-amap-polygon
-        :path="polygon.path"
         v-for="(polygon, index) in polygons"
-        :key="`polygon${index}`"
+        :key="index"
+        :path="polygon.path"
       ></el-amap-polygon> -->
       <!-- 信息窗体 - 详情 -->
       <el-amap-info-window
@@ -160,6 +170,7 @@ export default class MapHome extends Vue {
   mouseTool: any = {} //注册全局绘制围栏插件实例
   polyline: any = {}
   newPolyline: any = {}
+  // 地图事件
   events = {
     init: o => {
       o.setMapStyle(MAP.mapStyle)
@@ -193,6 +204,13 @@ export default class MapHome extends Vue {
       }, 1000)
     }
   }
+
+  polygonEvent = {
+    click: o => {
+      console.log(o)
+    }
+  }
+  // 轨迹点坐标事件
   trackMarkerEvent(detail) {
     return {
       click: () => {
@@ -205,6 +223,7 @@ export default class MapHome extends Vue {
       }
     }
   }
+  // 点坐标事件
   markerEvent(item) {
     // 点击 静态的点坐标 - 显示车辆详情信息
     return {
@@ -224,6 +243,7 @@ export default class MapHome extends Vue {
       }
     }
   }
+
   // 引入绘图插件  全局调用绘图插件
   initMouseTool() {
     this.mouseTool = new (AMap as any).MouseTool(this.map.$$getInstance())
@@ -240,7 +260,18 @@ export default class MapHome extends Vue {
       this.fence = []
       //画出来的坐标放在存放在数组里面
       e.obj.getPath().forEach(({ lng, lat }) => {
-        this.fence.push([lng, lat])
+        this.$confirm('是否将绘制的范围添加到电子围栏里？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+          .then(() => {
+            this.fence.push([lng, lat])
+            this.$emit('add-fence', this.fence)
+          })
+          .catch(() => {
+            this.fence = []
+          })
       })
     })
   }
