@@ -14,7 +14,7 @@ import * as models from './models'
 
 /**
  * @property `alarmTime` 告警时间
- * @property `alarmType` 告警类型【0:偏航, 1:逆行, 2:违停, 3:超速】
+ * @property `type` 告警类型 基础类型为【0:无告警, 1:偏航, 2逆行, 4:违停, 8:超速】 多种告警则数值累加，如3为偏航+逆行
  * @property `quantity` 告警数量
  */
 export interface AlarmsCollectBody {
@@ -23,9 +23,9 @@ export interface AlarmsCollectBody {
    */
   alarmTime: string
   /**
-   * 告警类型【0:偏航, 1:逆行, 2:违停, 3:超速】
+   * 告警类型 基础类型为【0:无告警, 1:偏航, 2逆行, 4:违停, 8:超速】 多种告警则数值累加，如3为偏航+逆行
    */
-  alarmType: string
+  type: string
   /**
    * 告警数量
    */

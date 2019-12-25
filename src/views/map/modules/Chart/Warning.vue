@@ -110,7 +110,8 @@ export default class ChartWarning extends Vue {
 
   //   初始化数据
   initData() {
-    const sortedData = sortOut(this.data, 'alarmType')
+    const data = this.data.filter(item => !!item.type)
+    const sortedData = sortOut(data, 'type')
     const _quantity = this.data.map(item => Number(item.quantity)) // 告警数量
     const _alertTime = this.data.map(item => item.alarmTime) // 告警时间
     const _maxQuantity = Math.max.apply(null, _quantity)
@@ -131,7 +132,7 @@ export default class ChartWarning extends Vue {
           return {
             value: v.quantity,
             alarmTime: v.alarmTime,
-            name: WARNGING.status[v.alarmType.toString()].label
+            name: WARNGING.status[v.type.toString()].label
           }
         })
       }

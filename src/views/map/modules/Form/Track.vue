@@ -34,7 +34,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
-import { CarLocationsBody } from '@/services'
+import { CarTrackBody } from '@/services'
 import { CarIdBody } from '@/services'
 @Component({
   name: 'TrackComponent'
@@ -43,7 +43,7 @@ export default class TrackComponent extends Vue {
   // 详情数据
   @Prop({ type: Object, default: () => {} }) readonly carDetail!: CarIdBody
 
-  form: CarLocationsBody = {
+  form: CarTrackBody = {
     carId: '',
     beginTime: '',
     endTime: ''
