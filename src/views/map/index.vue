@@ -247,7 +247,7 @@ export default class MapIndex extends Vue {
       method: 'POST',
       url: `v1/car/location`
     })
-    await this.pollingLocation()
+    // await this.pollingLocation()
   }
   // 控制轨迹的播放
   handleControlTrack(isPlaying) {
