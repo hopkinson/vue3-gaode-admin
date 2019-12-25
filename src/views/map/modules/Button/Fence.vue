@@ -1,14 +1,18 @@
 <template>
   <div class="fence">
     <!-- 查看围栏 -->
-    <button class="fence__button" @click="view">
+    <button
+      class="fence__button"
+      :class="{ 'is-active': isShowFence }"
+      @click="view"
+    >
       <span class="fence__button--captial">P</span>
       电子围栏
     </button>
     <!-- 新建围栏 -->
-    <button class="fence__button" @click="edit">
+    <!-- <button class="fence__button" @click="edit">
       新增围栏
-    </button>
+    </button> -->
   </div>
 </template>
 
@@ -16,7 +20,7 @@
 import axios from 'axios'
 import { Component, Vue, PropSync } from 'vue-property-decorator'
 import { MAP } from '@/config/dict'
-
+import { getFenceList } from '../../utils/webapi'
 @Component({
   name: 'ButtonFenceComponent'
 })
@@ -31,15 +35,8 @@ export default class ButtonFenceComponent extends Vue {
   async view() {
     this.isShowFence = !this.isShowFence
     if (this.isShowFence) {
-      const {
-        data: { rs_list }
-      } = await axios.get('https://restapi.amap.com/v4/geofence/meta', {
-        params: {
-          key: MAP.webapi
-        }
-      })
-      // this.address = formatted_address
-      this.$emit('update:fence', rs_list)
+      const list = await getFenceList()
+      this.$emit('update:fence', list)
     } else {
       this.$emit('update:fence', [])
     }
@@ -75,7 +72,8 @@ export default class ButtonFenceComponent extends Vue {
     & + .fence__button {
       margin-left: 4px;
     }
-    &:hover {
+    &:hover,
+    &.is-active {
       color: #fff;
       background-image: linear-gradient(
         0deg,

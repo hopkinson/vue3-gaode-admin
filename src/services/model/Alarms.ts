@@ -17,8 +17,8 @@ import * as models from './models'
  * @property `[statusCode]`
  * @property `[body]`
  */
-export interface CarLocations {
+export interface Alarms {
   now?: string
   statusCode?: number
-  body?: Array<Array<number>>
+  body?: models.AlarmsBody
 }

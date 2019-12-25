@@ -13,14 +13,10 @@
         <h6 :class="stateClass">{{ data.carNo }}</h6>
         <p>当前状态：{{ state }}</p>
         <p>隶属单位：{{ data.companyName || '无' }}</p>
-        <p v-if="data.location">
-          当前速度：{{ data.location.speed || 0 }}公里/小时
-        </p>
+        <p>当前速度：{{ data.speed || 0 }}公里/小时</p>
         <p>最后定位：{{ address }}</p>
-        <p v-if="data.location">
-          定位时间：{{
-            data.location.locateTime | formatDay('YYYY-MM-DD HH:mm:ss')
-          }}
+        <p>
+          定位时间：{{ data.locateTime | formatDay('YYYY-MM-DD HH:mm:ss') }}
         </p>
         <slot name="button"></slot>
       </template>
@@ -46,7 +42,7 @@
 <script lang="ts">
 import { Component, Vue, Prop, Model, Watch } from 'vue-property-decorator'
 import { TRAFFIC_LEGEND, WARNGING, MAP } from '@/config/dict'
-import { CarLocationBody, CarIdBodyLocation, AlarmsIdBody } from '@/services'
+import { CarLocationBody, AlarmsIdBody } from '@/services'
 import axios from 'axios'
 
 @Component({
@@ -84,13 +80,15 @@ export default class CarDetail extends Vue {
   // 获取状态
   get state() {
     let state = ''
-    const { location } = this.data
-    if (location && !this.realTime) {
-      state = TRAFFIC_LEGEND[location.runState.toString()].label
-      if (state === '异常') {
-        state = location.alarmType
-          ? WARNGING.status[location.alarmType.toString()].label
-          : '异常'
+    const { runState, alarmType, location } = this.data
+    if (location) {
+      if (!this.realTime) {
+        state = TRAFFIC_LEGEND[runState.toString()].label
+        if (state === '异常') {
+          state = alarmType
+            ? WARNGING.status[alarmType.toString()].label
+            : '异常'
+        }
       }
     }
     return state
@@ -114,7 +112,7 @@ export default class CarDetail extends Vue {
   public watchData(val) {
     const { location } = val
     if (location && !this.realTime) {
-      this.loadAddress(location.location)
+      this.loadAddress(location)
     }
   }
   @Watch('abnormalData', { deep: true })

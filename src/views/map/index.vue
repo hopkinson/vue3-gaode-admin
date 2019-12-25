@@ -15,7 +15,7 @@
       @search="handleSearchCar"
       @current-change="handleCurrentChange"
       @fetch-company="handleSearchCompany"
-      @play="loadCarDetail"
+      @play="filterLoadCarDetail"
       @change-filter="handleChangeFilter"
     ></search-car-status>
     <!-- 3. 左侧 -->
@@ -79,14 +79,13 @@
       </panel-chart>
       <!-- 4.2右侧-围栏按钮 -->
       <button-fence
-        v-if="false"
         @add="addFence"
         @close="closeFence"
         :fence.sync="fenceList"
       ></button-fence>
     </div>
 
-    <!-- 地图  -->
+    <!-- 地图 :loadPreTrack="loadPreMarkers" -->
     <map-home
       :track-markers.sync="trackMarkers"
       :speed="trackSpeed"
@@ -97,8 +96,8 @@
       :isEnd.sync="isEnd"
       :fenceList="fenceList"
       :passedLength="passedLength"
-      :loadPreTrack="loadPreMarkers"
       @stop-move="stopMoveTracker"
+      @add-fence="createFence"
       @on-passed-line="recordPassedLength"
       @load-car-detail="loadCarDetail"
       @play-track="handleShowTrack"
@@ -138,6 +137,7 @@ import SearchCarStatus from './modules/Search/CarStatus.vue'
 import Websocket from '@/plugins/websocket'
 import { warning, cars, districts, speed } from '@/mock/data.js'
 import { Getter } from 'vuex-class'
+import { addFence, getFenceList } from './utils/webapi'
 import {
   CompanyBody,
   CarsBodyRecords,
@@ -183,7 +183,17 @@ export default class MapIndex extends Vue {
   districts: any = []
   warning: any = []
   cars = {} // 车辆状态的信息
-  carDetail = {} // 汽车详情
+  carDetail: CarLocationBody = {
+    id: '',
+    terminalNo: '',
+    carNo: '',
+    runState: 0,
+    alarmType: '',
+    location: '',
+    speed: '',
+    direction: '',
+    locateTime: ''
+  } // 汽车详情
   mapCenter: Array<number | string> = [] // 点击车辆获取的位置
   trackMarkers: Array<Array<number>> = [] // 标记点 - 轨迹回放
   companyList: Array<CompanyBody> = [] // 所有单位信息
@@ -297,16 +307,7 @@ export default class MapIndex extends Vue {
       })
     }
   }
-  // 浏览电子围栏
-  viewFence(list) {}
-  // 新增电子围栏
-  addFence() {
-    this.map.initMouseTool()
-  }
-  // 关闭编辑电子围栏
-  closeFence() {
-    this.map.destroyMouseTool()
-  }
+
   // 加载预设
   async loadPreMarkers(val) {
     return await this.$ajax.ajax({
@@ -337,17 +338,30 @@ export default class MapIndex extends Vue {
       url: 'v1/car/company'
     })
   }
+
+  filterLoadCarDetail(item) {
+    const car = this.carList.filter(v => item.id === v.id)[0]
+    if (!car.location) {
+      this.$message({
+        message: '没有找到该车辆的实时位置',
+        type: 'warning'
+      })
+      return
+    }
+    this.loadCarDetail(car)
+  }
+
   // 加载汽车详情
   async loadCarDetail(item, { loadAbnormal = false } = {}) {
     const { runState, location } = item
     this.trackMarkers = []
     this.isPlaying = false
     if (!loadAbnormal) {
-      const data = await this.$ajax.ajax({
-        method: 'GET',
-        url: `v1/car/${item.id}`
-      })
-      this.carDetail = data
+      // const data = await this.$ajax.ajax({
+      //   method: 'GET',
+      //   url: `v1/car/${item.id}`
+      // })
+      this.carDetail = item
     } else {
       const data = await this.$ajax.ajax({
         method: 'GET',
@@ -355,26 +369,37 @@ export default class MapIndex extends Vue {
       })
       this.carDetail = {
         id: item.id || 0,
+        terminalNo: item.terminalNo || '',
         carNo: data.carNo,
-        terminalNo: item.terminalNo || 0,
-        companyId: '',
-        center: data.location.split(','),
-        companyName: data.companyName,
-        name: '',
-        typeId: '',
-        typeName: '',
-        model: '',
-        location: {
-          alarmType: data.type,
-          location: data.location,
-          speed: data.speed,
-          direction: data.direction,
-          locateTime: data.alarmTime,
-          runState: 3
-        }
+        alarmType: data.type,
+        location: data.location,
+        speed: data.speed,
+        direction: data.direction,
+        locateTime: data.alarmTime,
+        runState: 3
+        // center: data.location.split(','),
+        // companyName: data.companyName,
       }
     }
-    this.mapCenter = (this.carDetail as any).location.location.split(',')
+    this.mapCenter = this.carDetail.location.split(',')
+  }
+
+  // 新增电子围栏
+  addFence() {
+    this.map.initMouseTool()
+  }
+  // 关闭编辑电子围栏
+  closeFence() {
+    this.map.destroyMouseTool()
+  }
+
+  // 新建电子围栏
+  async createFence(points) {
+    const gid = await addFence(points)
+    if (gid) {
+      this.fenceList = await getFenceList()
+      this.map.destroyMouseTool()
+    }
   }
 
   // 监听 - 倍速

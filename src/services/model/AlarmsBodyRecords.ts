@@ -17,13 +17,13 @@ import * as models from './models'
  * @property `type` 告警类型 基础类型为【0:无告警, 1:偏航, 2逆行, 4:违停, 8:超速】 多种告警则数值累加，如3为偏航+逆行
  * @property `location` 火星坐标
  * @property `speed` 速度
- * @property `direction` 方位角
- * @property `alarmTime` 告警时的坐标定位时间
+ * @property `direction` 方向角
+ * @property `alarmTime` 告警时间
  * @property `carId` 车辆ID
  * @property `carNo` 车牌号码
  * @property `readState` 是否已读
  */
-export interface AlarmsIdBody {
+export interface AlarmsBodyRecords {
   /**
    * 告警ID
    */
@@ -31,7 +31,7 @@ export interface AlarmsIdBody {
   /**
    * 告警类型 基础类型为【0:无告警, 1:偏航, 2逆行, 4:违停, 8:超速】 多种告警则数值累加，如3为偏航+逆行
    */
-  type: string
+  type: number
   /**
    * 火星坐标
    */
@@ -41,11 +41,11 @@ export interface AlarmsIdBody {
    */
   speed: number
   /**
-   * 方位角
+   * 方向角
    */
   direction: number
   /**
-   * 告警时的坐标定位时间
+   * 告警时间
    */
   alarmTime: string
   /**

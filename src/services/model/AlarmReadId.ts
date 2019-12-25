@@ -13,21 +13,15 @@
 import * as models from './models'
 
 /**
- * @property `carId` 车辆ID
- * @property `beginTime` 开始时间
- * @property `endTime` 结束时间
+ * @property `[now]`
+ * @property `[statusCode]`
+ * @property `body` 未读告警数量
  */
-export interface CarLocationsBody {
+export interface AlarmReadId {
+  now?: string
+  statusCode?: number
   /**
-   * 车辆ID
+   * 未读告警数量
    */
-  carId: string
-  /**
-   * 开始时间
-   */
-  beginTime: string
-  /**
-   * 结束时间
-   */
-  endTime: string
+  body: number
 }
