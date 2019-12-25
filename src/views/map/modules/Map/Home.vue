@@ -13,11 +13,22 @@
       :plugin="plugin"
     >
       <!-- 多边形 - 围栏列表 -->
-      <!-- <el-amap-polygon
-        :path="polygon.path"
-        v-for="(polygon, index) in polygons"
-        :key="`polygon${index}`"
-      ></el-amap-polygon> -->
+      <template v-for="(polygon, index) in fenceList">
+        <el-amap-polygon
+          :path="fencepath(polygon.points)"
+          :key="`fencepolygon${index}`"
+          fillColor="rgb(55, 70, 95)"
+          strokeColor="rgb(0, 140, 255)"
+          strokeStyle="dashed"
+          :strokeWeight="2"
+          :fillOpacity="0.4"
+        ></el-amap-polygon>
+        <el-amap-marker
+          :key="`fenceMarker${index}`"
+          icon="/icon/parking.png"
+          :position="polygon.center | filterSplitArr(',')"
+        ></el-amap-marker>
+      </template>
       <!-- 信息窗体 - 详情 -->
       <el-amap-info-window
         :position="position"
@@ -40,15 +51,19 @@
         </panel-car-detail>
       </el-amap-info-window>
       <!-- 点坐标 -->
+
       <template v-if="!showTrack">
-        <el-amap-marker
-          v-for="(item, index) in markers"
-          :key="index"
-          :offset="[-26, -103]"
-          :position="item.location.location | filterPosition"
-          :events="markerEvent(item)"
-          :content="markerTemplate(item)"
-        ></el-amap-marker>
+        <template v-for="(item, index) in markers">
+          <el-amap-marker
+            :key="index"
+            v-if="item.location"
+            :visible="item.location"
+            :offset="[-26, -103]"
+            :position="item.location | filterSplitArr(',')"
+            :events="markerEvent(item)"
+            :content="markerTemplate(item)"
+          ></el-amap-marker>
+        </template>
       </template>
       <!-- 点坐标 - 用户动画播放 -->
       <el-amap-marker
@@ -78,7 +93,7 @@ import {
 } from 'vue-property-decorator'
 import { MAP } from '@/config/dict'
 import PanelCarDetail from '../Panel/CarDetail.vue'
-import { CarIdBody, CarIdBodyLocation } from '@/services'
+import { CarIdBody, CarLocationBody } from '@/services'
 import { TRAFFIC_LEGEND, WARNGING } from '@/config/dict'
 
 @Component({
@@ -87,8 +102,8 @@ import { TRAFFIC_LEGEND, WARNGING } from '@/config/dict'
     PanelCarDetail
   },
   filters: {
-    filterPosition(val) {
-      return val ? val.split(',') : []
+    filterSplitArr(val, sign) {
+      return val ? val.split(sign || ',') : []
     }
   }
 })
@@ -107,7 +122,7 @@ export default class MapHome extends Vue {
 
   //  坐标数组
   @PropSync('trackMarkers', { type: Array, default: () => [] })
-  getTrackMarkers!: Array<CarIdBodyLocation>
+  getTrackMarkers!: Array<CarLocationBody>
 
   // 折线&点 - 坐标（用于轨迹回放）
   @Prop({ type: Array, default: () => [] })
@@ -160,6 +175,7 @@ export default class MapHome extends Vue {
   mouseTool: any = {} //注册全局绘制围栏插件实例
   polyline: any = {}
   newPolyline: any = {}
+  // 地图事件
   events = {
     init: o => {
       o.setMapStyle(MAP.mapStyle)
@@ -193,6 +209,19 @@ export default class MapHome extends Vue {
       }, 1000)
     }
   }
+
+  polygonEvent = {
+    click: o => {
+      // console.log(o)
+    }
+  }
+
+  // 返回来的电子围栏的路径
+  fencepath(item) {
+    return item ? item.split(';').map(i => i.split(',')) : []
+  }
+
+  // 轨迹点坐标事件
   trackMarkerEvent(detail) {
     return {
       click: () => {
@@ -205,6 +234,7 @@ export default class MapHome extends Vue {
       }
     }
   }
+  // 点坐标事件
   markerEvent(item) {
     // 点击 静态的点坐标 - 显示车辆详情信息
     return {
@@ -212,9 +242,7 @@ export default class MapHome extends Vue {
         this.markerRefs.push(o)
       },
       click: () => {
-        const {
-          location: { location }
-        } = item
+        const { location } = item
         setTimeout(() => {
           this.position = location ? location.split(',') : []
           this.center = this.position
@@ -224,6 +252,7 @@ export default class MapHome extends Vue {
       }
     }
   }
+
   // 引入绘图插件  全局调用绘图插件
   initMouseTool() {
     this.mouseTool = new (AMap as any).MouseTool(this.map.$$getInstance())
@@ -238,10 +267,23 @@ export default class MapHome extends Vue {
     this.mouseTool.on('draw', e => {
       //每次只能传四个点，所以先清空
       this.fence = []
+      let fenceArr: any = []
       //画出来的坐标放在存放在数组里面
-      e.obj.getPath().forEach(({ lng, lat }) => {
-        this.fence.push([lng, lat])
+      e.obj.getPath().forEach(path => {
+        const { lng, lat } = path
+        fenceArr.push([lng, lat])
       })
+      this.$confirm('是否将绘制的范围添加到电子围栏里？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          this.$emit('add-fence', fenceArr)
+        })
+        .catch(() => {
+          this.destroyMouseTool()
+        })
     })
   }
   // 关闭绘图插件 清除你之前画的图像
@@ -253,20 +295,25 @@ export default class MapHome extends Vue {
   showToolPolygon() {}
 
   // 点坐标 - 模板
-  markerTemplate({ carNo, location: { runState, alarmType } }) {
-    return `
+  markerTemplate({ carNo, location, runState, alarmType }) {
+    let content = ''
+    if (location) {
+      const alarmTypeIcon = runState === 3 && !!alarmType
+      content = `
   <div class="project__map-marker">
-    <i class="sprite_ico sprite_ico_icon_${runState === 3 &&
-      !!alarmType &&
+    <i class="sprite_ico sprite_ico_${alarmTypeIcon &&
       WARNGING.status[alarmType.toString()].value}" style="display:${
-      runState === 3 ? 'none' : 'inline-block'
-    }"></i>
+        !alarmTypeIcon ? 'none' : 'inline-block'
+      }"></i>
     <p>${carNo}</p>
     <i class="sprite_ico sprite_ico_icon_${
       TRAFFIC_LEGEND[runState.toString()].value
     }"></i>
   </div>
   `
+    }
+
+    return content
   }
   // 轨迹回放
   trackPlay() {
@@ -340,7 +387,7 @@ export default class MapHome extends Vue {
   }
   // 监听 - 轨迹
   @Watch('getTrackMarkers', { deep: true })
-  public watchTrackMarkerts(val: Array<CarIdBodyLocation>) {
+  public watchTrackMarkerts(val: Array<CarLocationBody>) {
     this.showTrack = !!val && !!val.length // 如果有坐标，则显示轨迹
     if (val.length) {
       this.trackLocation = val.map(item => item.location.split(','))
@@ -366,19 +413,12 @@ export default class MapHome extends Vue {
   }
 
   // 监听 - 轨迹
-  @Watch('carDetail', { deep: true, immediate: true })
-  public async watchCarDetail(val: CarIdBody) {
+  @Watch('carDetail', { deep: true })
+  public async watchCarDetail(val: CarLocationBody) {
     if (Object.keys(val).length) {
       this.preMarkers = await this.loadPreTrack(val) // 加载预设轨迹
-      const { location } = val
-      if (!location) {
-        this.showInfo = false
-        return this.$message({
-          message: '找不到位置',
-          type: 'warning'
-        })
-      }
-      this.isAbnormal = !!location.alarmType // 异常
+      const { alarmType } = val
+      this.isAbnormal = !!alarmType // 异常
       setTimeout(() => {
         this.center = this.mapCenter
         this.position = this.center

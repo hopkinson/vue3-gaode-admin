@@ -22,7 +22,6 @@ import * as models from './models'
  * @property `typeId` 类型ID
  * @property `typeName` 类型名称
  * @property `model` 幸好
- * @property `[location]`
  */
 export interface CarIdBody {
   /**
@@ -61,5 +60,4 @@ export interface CarIdBody {
    * 幸好
    */
   model: string
-  location?: models.CarIdBodyLocation
 }

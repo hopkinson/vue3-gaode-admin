@@ -13,15 +13,11 @@
 import * as models from './models'
 
 /**
- * @property `carId` 车辆ID
  * @property `carNo` 车牌号码
  * @property `speed` 速度(千米)
+ * @property `locateTime` 定位时间(格式: HH:mm:ss)
  */
 export interface CarSpeedBody {
-  /**
-   * 车辆ID
-   */
-  carId: string
   /**
    * 车牌号码
    */
@@ -30,4 +26,8 @@ export interface CarSpeedBody {
    * 速度(千米)
    */
   speed: number
+  /**
+   * 定位时间(格式: HH:mm:ss)
+   */
+  locateTime: string
 }
