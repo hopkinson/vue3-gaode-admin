@@ -66,19 +66,6 @@
     "webpack-build-notifier": "^2.0.0",
     "webpack-spritesmith": "^1.0.2"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "commit-msg": "commitlint -e $HUSKY_GIT_PARAMS"
-    }
-  },
-  "lint-staged": {
-    "src/**/*.{ts,tsx,jsx,vue}": [
-      "prettier --write",
-      "tslint --fix",
-      "git add"
-    ]
-  },
   "scripts-info": {
     "service": "开发运行前拉取接口数据",
     "serve": "开发时候运行测试环境",

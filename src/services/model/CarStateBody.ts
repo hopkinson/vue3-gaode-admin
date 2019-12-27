@@ -16,7 +16,7 @@ import * as models from './models'
  * @property `totalQuantity` 车辆总数量
  * @property `runningQuantity` 行驶车辆数量
  * @property `stopQuantity` 停驶车辆数量
- * @property `abnormalQuantity` 异常车辆数量
+ * @property `abnormalQuantity` 警告车辆数量
  */
 export interface CarStateBody {
   /**
@@ -32,7 +32,7 @@ export interface CarStateBody {
    */
   stopQuantity: number
   /**
-   * 异常车辆数量
+   * 警告车辆数量
    */
   abnormalQuantity: number
 }

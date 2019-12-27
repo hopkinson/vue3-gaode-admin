@@ -45,7 +45,7 @@ export default class ChartWarning extends Vue {
       formatter: function({ data }) {
         return `
         <div class="project__echarts--tooltip-bar">
-            <span class="project__echarts--tooltip-car-text">${data}</span>
+            <span class="project__echarts--tooltip-car-text">${data.value}(${data.locateTime})</span>
         </div>`
       }
     },
@@ -105,12 +105,18 @@ export default class ChartWarning extends Vue {
   //   初始化数据
   initData() {
     const _carNo = this.data.map(item => item.carNo)
-    const _speed = this.data.map(item => Number(item.speed))
+    const _speedData = this.data.map(item => {
+      return {
+        value: Number(item.speed),
+        locateTime: item.locateTime
+      }
+    })
+    const _speed = _speedData.map(item => Number(item.value))
     const _maxSpeed = Math.max.apply(null, _speed)
     // 图表 - x轴
     this.option.xAxis.data = _carNo
     // 图表 - y轴
-    this.option.series[0].data = _speed
+    this.option.series[0].data = _speedData
     this.option.series[1].data = _speed.map(item => _maxSpeed)
 
     // 绘制图表

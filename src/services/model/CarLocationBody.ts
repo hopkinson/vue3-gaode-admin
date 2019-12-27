@@ -16,7 +16,7 @@ import * as models from './models'
  * @property `id` 车辆ID
  * @property `terminalNo` 终端编号
  * @property `carNo` 车牌号码
- * @property `runState` 车辆状态[1:行驶, 2:停驶, 3:异常]
+ * @property `runState` 车辆状态[1:行驶, 2:停驶, 3:警告]
  * @property `alarmType` 告警类型 基础类型为【0:无告警, 1:偏航, 2逆行, 4:违停, 8:超速】 多种告警则数值累加，如3为偏航+逆行
  * @property `location` 火星坐标(格式: 113.339, 23.1874)
  * @property `speed` 速度
@@ -37,7 +37,7 @@ export interface CarLocationBody {
    */
   carNo: string
   /**
-   * 车辆状态[1:行驶, 2:停驶, 3:异常]
+   * 车辆状态[1:行驶, 2:停驶, 3:警告]
    */
   runState: number
   /**

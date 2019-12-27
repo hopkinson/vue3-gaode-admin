@@ -1,12 +1,13 @@
 <template>
   <div class="map">
-    <!-- 1. 异常信息-->
+    <!-- 1. 警告信息-->
     <alert-abnormal
       :num="abnormalNum"
       @confirm="loadCarDetail($event, { abnormal: true })"
     ></alert-abnormal>
     <!-- 2. 搜索  -->
     <search-car-status
+      v-show="!showDrawer"
       v-if="!isFullScreen"
       class="map__chart--search"
       v-model="showSearch"
@@ -19,7 +20,7 @@
       @change-filter="handleChangeFilter"
     ></search-car-status>
     <!-- 3. 左侧 -->
-    <div class="map__chart--left" v-if="!isFullScreen">
+    <div class="map__chart--left" v-if="!isFullScreen" v-show="!showDrawer">
       <!-- 3.1 左侧-图表 -->
       <panel-chart
         title="告警统计"
@@ -55,7 +56,7 @@
       </div>
     </div>
     <!-- 4.右侧 -->
-    <div class="map__chart--right" v-if="!isFullScreen">
+    <div class="map__chart--right" v-if="!isFullScreen" v-show="!showDrawer">
       <!-- 4.1右侧-图表 -->
       <panel-chart
         title="车辆状态"
@@ -85,7 +86,7 @@
       ></button-fence>
     </div>
 
-    <!-- 地图 :loadPreTrack="loadPreMarkers" -->
+    <!-- 地图 :loadPreTrack="loadPreMarkers" @on-passed-line="recordPassedLength" -->
     <map-home
       :track-markers.sync="trackMarkers"
       :speed="trackSpeed"
@@ -93,12 +94,12 @@
       :markers="carList"
       :car-detail="carDetail"
       :isPlay="isPlaying"
+      :showDrawer="showDrawer"
       :isEnd.sync="isEnd"
       :fenceList="fenceList"
-      :passedLength="passedLength"
+      :passedLength.sync="passedLength"
       @stop-move="stopMoveTracker"
       @add-fence="createFence"
-      @on-passed-line="recordPassedLength"
       @load-car-detail="loadCarDetail"
       @play-track="handleShowTrack"
       ref="map"
@@ -108,7 +109,7 @@
       class="map__drawer"
       :show.sync="showDrawer"
       :speed.sync="trackSpeed"
-      v-model="totalPassedLength"
+      v-model="passedLength"
       :trackMarkersLength="trackMarkers.length"
       ref="drawer"
       :isEnd="isEnd"
@@ -177,7 +178,7 @@ export default class MapIndex extends Vue {
   // 图例 - 交通状态
   legends = TRAFFIC_LEGEND
   passedLength = 0 // 已经路过的长度
-  trackSpeed: number = 100 // 初始化速度
+  trackSpeed: number = 50 // 初始化速度
   // 列表 - 时速
   speed: any = []
   districts: any = []
@@ -202,7 +203,7 @@ export default class MapIndex extends Vue {
   interval: number = 0
   fenceList: Array<any> = [] //围栏列表
   totalPassedLength: number = 0 // 总共路过的轨迹
-  abnormalNum = 0 // 异常信息数量
+  abnormalNum = 0 // 警告信息数量
   websocket: any = null // websocket连接
   carParams = {
     pageNum: '',
@@ -289,10 +290,10 @@ export default class MapIndex extends Vue {
       pageNum
     })
   }
-  recordPassedLength({ passed, total }) {
-    this.passedLength = passed
-    this.totalPassedLength = total
-  }
+  // recordPassedLength({ passed, total }) {
+  //   this.passedLength = passed
+  //   this.totalPassedLength = total
+  // }
   // 返回实际轨迹
   async handleSearchTrack(data) {
     this.trackMarkers = await this.$ajax.ajax({
