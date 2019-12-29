@@ -10,7 +10,7 @@
     ></i>
     <i class="sprite_ico sprite_ico_stop track__stop" @click="stop"></i>
     <!-- 倍速 - 加速 -->
-    <i class="sprite_ico sprite_ico_track_forward" @click="addSpeed()"></i>
+    <i class="sprite_ico sprite_ico_track_forward" @click="addSpeed"></i>
     <!-- TODO -->
     <!-- <span class="track__time"
       >{{ trackMarkers.length }}/{{ passedLineLength }}</span
@@ -53,19 +53,13 @@ export default class DrawerTrackComponent extends Vue {
   @PropSync('isEnd', { type: Boolean, default: false }) end!: boolean
 
   slider: number = 0 // 获取已经经过点的长度(操作slider)
-  speedCount: number = 50 // 倍速
   // 加速
 
   @Throttle(1000)
   @Bind()
   addSpeed() {
     if (this.isplay) {
-      if (this.speeds < 500) {
-        this.speedCount += 50
-      } else {
-        this.speedCount = 50
-      }
-      this.$emit('update:speed', this.speeds + this.speedCount)
+      this.$emit('update:speed', this.speeds === 5 ? 5 : this.speeds + 1)
     }
   }
 
@@ -74,13 +68,7 @@ export default class DrawerTrackComponent extends Vue {
   @Bind()
   minusSpeed() {
     if (this.isplay) {
-      if (this.speeds > 200) {
-        this.speedCount -= 50
-      } else {
-        this.speedCount = 50
-        this.$emit('update:speed', 50)
-      }
-      this.$emit('update:speed', this.speeds - this.speedCount)
+      this.$emit('update:speed', this.speeds === 1 ? 1 : this.speeds - 1)
     }
   }
   // 播放/暂停

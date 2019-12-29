@@ -13,21 +13,16 @@
 import * as models from './models'
 
 /**
- * @property `[terminalNo]` 终端编号
- * @property `[alarmNumber]` 告警流水号
- * @property `[alarmStatus]` 告警状态
+ * @property `alarmType` 告警类型
+ * @property `quantity` 告警次数
  */
-export interface AlarmsBody {
+export interface AlarmsStatisticsAlarmQuantities {
   /**
-   * 终端编号
+   * 告警类型
    */
-  terminalNo?: string
+  alarmType: number
   /**
-   * 告警流水号
+   * 告警次数
    */
-  alarmNumber?: number
-  /**
-   * 告警状态
-   */
-  alarmStatus?: number
+  quantity: number
 }

@@ -13,12 +13,12 @@
 import * as models from './models'
 
 /**
- * @property `[requestId]`
  * @property `[now]`
  * @property `[statusCode]`
+ * @property `[body]`
  */
-export interface Alarms {
-  requestId?: string
+export interface AlarmsStatistics {
   now?: string
   statusCode?: number
+  body?: Array<models.AlarmsStatisticsBody>
 }

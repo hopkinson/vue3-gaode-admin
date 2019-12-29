@@ -14,20 +14,33 @@ import * as models from './models'
 
 /**
  * @property `id` 告警ID
+ * @property `alarmNumber` 告警流水号
+ * @property `alarmStatus` 告警开关
  * @property `type` 告警类型 基础类型为【0:无告警, 1:偏航, 2逆行, 4:违停, 8:超速】 多种告警则数值累加，如3为偏航+逆行
  * @property `location` 火星坐标
+ * @property `address` 坐标对应的地址
  * @property `speed` 速度
  * @property `direction` 方向角
  * @property `alarmTime` 告警时间
+ * @property `closeTime` 告警关闭时间
  * @property `carId` 车辆ID
  * @property `carNo` 车牌号码
+ * @property `companyName` 单位名称
  * @property `readState` 是否已读
  */
-export interface AlarmsBodyRecords {
+export interface AlarmsPageBodyRecords {
   /**
    * 告警ID
    */
   id: string
+  /**
+   * 告警流水号
+   */
+  alarmNumber: string
+  /**
+   * 告警开关
+   */
+  alarmStatus: boolean
   /**
    * 告警类型 基础类型为【0:无告警, 1:偏航, 2逆行, 4:违停, 8:超速】 多种告警则数值累加，如3为偏航+逆行
    */
@@ -36,6 +49,10 @@ export interface AlarmsBodyRecords {
    * 火星坐标
    */
   location: string
+  /**
+   * 坐标对应的地址
+   */
+  address: string
   /**
    * 速度
    */
@@ -49,6 +66,10 @@ export interface AlarmsBodyRecords {
    */
   alarmTime: string
   /**
+   * 告警关闭时间
+   */
+  closeTime: string
+  /**
    * 车辆ID
    */
   carId: string
@@ -56,6 +77,10 @@ export interface AlarmsBodyRecords {
    * 车牌号码
    */
   carNo: string
+  /**
+   * 单位名称
+   */
+  companyName: string
   /**
    * 是否已读
    */

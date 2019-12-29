@@ -5,9 +5,9 @@ import routes from '@/router/routes'
 import cookie from 'js-cookie'
 import { TOKEN, REFRESH_TOKEN } from '@/config/constant'
 const whiteList = ['/login']
-router.afterEach(to => {
-  document.title = to.meta.title
-})
+// router.afterEach(to => {
+//   document.title = to.meta.title
+// })
 router.beforeEach(async (to, from, next) => {
   /**
    * 1.有token情况

@@ -54,7 +54,7 @@
       font-size: 12px;
       padding: 5px 0 !important;
       border-bottom: 0 !important;
-      color:#fff;
+      color: #fff;
       font-size: 13px;
       & /deep/ .cell {
         line-height: 150%;
@@ -119,6 +119,41 @@
         color: #fff;
         font-size: 12px;
         margin-bottom: 8px;
+      }
+    }
+    &-markerLabel {
+      position: relative;
+      font-size: 0;
+      &__main {
+        color: #fff;
+        position: relative;
+        border-left: 1px solid #0f6980;
+        border-right: 1px solid #0f6980;
+        border-bottom: 1px solid #0f6980;
+        background: #020215;
+        padding: 0 10px 20px;
+        font-size: 12px;
+        max-width: 221px;
+        .is-danger {
+          color: #ee1013;
+          font-weight: bold;
+        }
+        h6 {
+          font-size: 14px;
+          color: rgb(0, 253, 255);
+          margin-bottom: 12px;
+        }
+        p {
+          margin-bottom: 12px;
+        }
+      }
+      &--close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 13px;
+        color: #0ccfdd;
+        cursor: pointer;
       }
     }
     &-cluserMarker {
@@ -186,5 +221,12 @@
   .amap-info-close,
   .amap-info-sharp {
     display: none;
+  }
+  .amap-marker-label {
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: 0;
+    line-height: 1;
   }
 }

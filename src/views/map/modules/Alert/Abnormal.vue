@@ -1,23 +1,23 @@
 <template>
   <div class="abnormal">
-    <!-- 异常 - 图标 -->
+    <!-- 警告 - 图标 -->
     <div class="abnormal__icon">
-      <!-- <template v-if="!!num">
+      <template v-if="!!num">
         <i
           class="sprite_ico sprite_ico_bar_notice abnormal__icon--item"
           @click="click"
         >
-          <span class="abnormal__icon--text">{{ num }}条异常信息</span>
+          <span class="abnormal__icon--text">{{ num }}条警告信息</span>
         </i>
       </template>
-      <i
+      <!-- <i
         class="sprite_ico sprite_ico_bar_notice abnormal__icon--item"
         @click="click"
       >
-        <span class="abnormal__icon--text">异常信息</span>
+        <span class="abnormal__icon--text">警告信息</span>
       </i> -->
     </div>
-    <!-- 异常 - 对话框 -->
+    <!-- 警告 - 对话框 -->
     <div class="abnormal__dialog" v-if="showDialog">
       <!-- 对话框 - 头部 -->
       <div class="sprite_ico sprite_ico_dialog__header">

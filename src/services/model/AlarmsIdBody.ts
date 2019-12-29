@@ -16,6 +16,7 @@ import * as models from './models'
  * @property `id` 告警ID
  * @property `type` 告警类型 基础类型为【0:无告警, 1:偏航, 2逆行, 4:违停, 8:超速】 多种告警则数值累加，如3为偏航+逆行
  * @property `location` 火星坐标
+ * @property `address` 坐标对应的地址
  * @property `speed` 速度
  * @property `direction` 方位角
  * @property `alarmTime` 告警时的坐标定位时间
@@ -36,6 +37,10 @@ export interface AlarmsIdBody {
    * 火星坐标
    */
   location: string
+  /**
+   * 坐标对应的地址
+   */
+  address: string
   /**
    * 速度
    */

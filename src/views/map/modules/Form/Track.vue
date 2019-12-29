@@ -47,6 +47,9 @@ export default class TrackComponent extends Vue {
     carId: '',
     beginTime: '',
     endTime: ''
+    // carId: '6',
+    // beginTime: '2019-12-26T08:00:00',
+    // endTime: '2019-12-26T10:00:00'
   }
 
   pickerOptions: any = {

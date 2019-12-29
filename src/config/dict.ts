@@ -34,7 +34,7 @@ export const TRAFFIC_LEGEND = {
   },
   3: {
     value: 'abnormal',
-    label: '异常',
+    label: '警告',
     code: 3,
     color: 'rgb(255, 47, 45)',
     gradientColor: [

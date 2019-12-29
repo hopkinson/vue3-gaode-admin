@@ -9,32 +9,15 @@
     </div>
     <div class="detail__main">
       <!-- 汽车具体信息 -->
-      <template v-if="!realTime">
-        <h6 :class="stateClass">{{ data.carNo }}</h6>
-        <p>当前状态：{{ state }}</p>
-        <p>隶属单位：{{ data.companyName || '无' }}</p>
-        <p>当前速度：{{ data.speed || 0 }}公里/小时</p>
-        <p>最后定位：{{ address }}</p>
-        <p>
-          定位时间：{{ data.locateTime | formatDay('YYYY-MM-DD HH:mm:ss') }}
-        </p>
-        <slot name="button"></slot>
-      </template>
-      <!-- 实时信息 -->
-      <template v-else>
-        <p>
-          经纬度：
-          {{ data.location }}
-        </p>
-        <p>
-          速度：
-          {{ data.speed }}公里/小时
-        </p>
-        <p>
-          定位时间：
-          {{ data.locateTime | formatDay('YYYY-MM-DD HH:mm:ss') }}
-        </p>
-      </template>
+      <h6>{{ data.carNo }}</h6>
+      <p>
+        当前状态：<span :class="stateClass">{{ state }}</span>
+      </p>
+      <p>隶属单位：{{ data.companyName || '无' }}</p>
+      <p>当前速度：{{ data.speed || 0 }}公里/小时</p>
+      <p>最后定位：{{ data.address }}</p>
+      <p>定位时间：{{ data.locateTime | formatDay('YYYY-MM-DD HH:mm:ss') }}</p>
+      <slot name="button"></slot>
     </div>
   </div>
 </template>
@@ -68,59 +51,27 @@ export default class CarDetail extends Vue {
 
   address = '' // 地址
 
-  // 是否显示异常信息
+  // 是否显示警告信息
   get isAbnormal() {
     return Object.keys(this.abnormalData).length
   }
 
   get stateClass() {
-    return this.state === '异常' ? ' is-danger' : ''
+    const { alarmType } = this.data
+    return alarmType ? ' is-danger' : ''
   }
 
   // 获取状态
   get state() {
     let state = ''
-    const { runState, alarmType, location } = this.data
-    if (location) {
-      if (!this.realTime) {
-        state = TRAFFIC_LEGEND[runState.toString()].label
-        if (state === '异常') {
-          state = alarmType
-            ? WARNGING.status[alarmType.toString()].label
-            : '异常'
-        }
-      }
+    const { runState, alarmType } = this.data
+    if (runState) {
+      state = TRAFFIC_LEGEND[runState.toString()].label
+    }
+    if (alarmType) {
+      state = WARNGING.status[alarmType.toString()].label
     }
     return state
-  }
-
-  async loadAddress(location) {
-    const {
-      data: {
-        regeocode: { formatted_address }
-      }
-    } = await axios.get('https://restapi.amap.com/v3/geocode/regeo', {
-      params: {
-        key: MAP.webapi,
-        location: location
-      }
-    })
-    this.address = formatted_address
-  }
-  // 监听 - params
-  @Watch('data', { deep: true })
-  public watchData(val) {
-    const { location } = val
-    if (location && !this.realTime) {
-      this.loadAddress(location)
-    }
-  }
-  @Watch('abnormalData', { deep: true })
-  public watchAbnormalData(val) {
-    const { location } = val
-    if (location) {
-      this.loadAddress(location)
-    }
   }
 }
 </script>
@@ -141,6 +92,7 @@ export default class CarDetail extends Vue {
     max-width: 221px;
     .is-danger {
       color: #ee1013;
+      font-weight: bold;
     }
     h6 {
       font-size: 14px;
