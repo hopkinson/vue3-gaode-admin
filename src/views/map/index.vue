@@ -326,14 +326,7 @@ export default class MapIndex extends Vue {
   }
   // 点击窗体的轨迹回放 - 显示底部抽屉
   handleShowTrack({ realTime }) {
-    if (realTime) {
-      this.showDrawer = true
-    } else {
-      this.showDrawer = false
-      setTimeout(() => {
-        this.showDrawer = true
-      }, 200)
-    }
+    this.showDrawer = true
   }
   // 所有单位信息
   async handleSearchCompany() {
