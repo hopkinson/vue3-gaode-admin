@@ -304,7 +304,7 @@ export default class MapIndex extends Vue {
       url: 'v1/car/track',
       data: data
     })
-    this.trackMarkers = tracks.slice(0, 30)
+    this.trackMarkers = tracks
     if (!this.trackMarkers.length) {
       this.$message({
         message: '没有任何轨迹',
