@@ -59,6 +59,7 @@ export default class ChartWarning extends Vue {
         fontSize: 24,
         lineHeight: 15,
         fontWeight: 'bold',
+        textAlign: 'center',
         color: ['#fff']
       },
       subtextStyle: {

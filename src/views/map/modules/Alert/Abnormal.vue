@@ -2,7 +2,7 @@
   <div class="abnormal">
     <!-- 警告 - 图标 -->
     <div class="abnormal__icon">
-      <!-- <template v-if="!!num">
+      <template v-if="!!num">
         <i
           class="sprite_ico sprite_ico_bar_notice abnormal__icon--item"
           @click="click"
@@ -10,7 +10,7 @@
           <span class="abnormal__icon--text">{{ num }}条警告信息</span>
         </i>
       </template>
-      <i
+      <!-- <i
         class="sprite_ico sprite_ico_bar_notice abnormal__icon--item"
         @click="click"
       >

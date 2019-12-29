@@ -9,37 +9,15 @@
     </div>
     <div class="detail__main">
       <!-- 汽车具体信息 -->
-      <template v-if="!realTime">
-        <h6>{{ data.carNo }}</h6>
-        <p>
-          当前状态：<span :class="stateClass">{{ state }}</span>
-        </p>
-        <p>隶属单位：{{ data.companyName || '无' }}</p>
-        <p>当前速度：{{ data.speed || 0 }}公里/小时</p>
-        <p>最后定位：{{ data.address }}</p>
-        <p>
-          定位时间：{{ data.locateTime | formatDay('YYYY-MM-DD HH:mm:ss') }}
-        </p>
-        <slot name="button"></slot>
-      </template>
-      <!-- 实时信息 -->
-      <template v-else>
-        <p>
-          当前状态：<span :class="stateClass">{{ state }}</span>
-        </p>
-        <p>
-          经纬度：
-          {{ data.location }}
-        </p>
-        <p>
-          速度：
-          {{ data.speed }}公里/小时
-        </p>
-        <p>
-          定位时间：
-          {{ data.locateTime | formatDay('YYYY-MM-DD HH:mm:ss') }}
-        </p>
-      </template>
+      <h6>{{ data.carNo }}</h6>
+      <p>
+        当前状态：<span :class="stateClass">{{ state }}</span>
+      </p>
+      <p>隶属单位：{{ data.companyName || '无' }}</p>
+      <p>当前速度：{{ data.speed || 0 }}公里/小时</p>
+      <p>最后定位：{{ data.address }}</p>
+      <p>定位时间：{{ data.locateTime | formatDay('YYYY-MM-DD HH:mm:ss') }}</p>
+      <slot name="button"></slot>
     </div>
   </div>
 </template>

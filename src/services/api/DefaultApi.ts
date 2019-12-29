@@ -27,27 +27,6 @@ export interface ParamsalarmReadIdPut {
   id: string
 }
 /**
- * @description alarmsGet参数
- * @property `[pageNum]` 页码
- * @property `[pageSize]` 页宽
- * @property `[carNo]` 车牌号码
- */
-export interface ParamsalarmsGet {
-  // queryParams
-  /**
-   * 页码
-   */
-  pageNum?: string
-  /**
-   * 页宽
-   */
-  pageSize?: string
-  /**
-   * 车牌号码
-   */
-  carNo?: string
-}
-/**
  * @description alarmsIdGet参数
  * @property `id` 告警ID
  */
@@ -58,6 +37,47 @@ export interface ParamsalarmsIdGet {
    */
   id: string
 }
+/**
+ * @description alarmsPagePost参数
+ * @property `[pageNum]` 页码
+ * @property `[pageSize]` 页宽
+ */
+export interface ParamsalarmsPagePost {
+  // queryParams
+  /**
+   * 页码
+   */
+  pageNum?: string
+  /**
+   * 页宽
+   */
+  pageSize?: string
+}
+/**
+ */
+export type ParamsBodyalarmsPagePost = models.AlarmsPageBody
+/**
+ */
+export type ParamsBodyalarmsPost = Array<models.AlarmsBody>
+/**
+ * @description alarmsStatisticsGet参数
+ * @property `beginDate` 起始统计日期(yyyy-MM-dd)
+ * @property `[endDate]` 结束统计日期(yyyy-MM-dd)
+ */
+export interface ParamsalarmsStatisticsGet {
+  // queryParams
+  /**
+   * 起始统计日期(yyyy-MM-dd)
+   */
+  beginDate: string
+  /**
+   * 结束统计日期(yyyy-MM-dd)
+   */
+  endDate?: string
+}
+/**
+ */
+export type ParamsBodyalarmsUnreadGet = Array<models.AlarmsBody>
 /**
  * @description carIdGet参数
  * @property `id` 车辆ID
@@ -196,31 +216,6 @@ export class DefaultApi {
   }
   /**
    * 
-   * @summary 返回告警信息分页列表
-   * @param params ParamsalarmsGet
-   
-   * @returns models.Alarms
-   */
-  public alarmsGet = (params: ParamsalarmsGet): AjaxPromise<models.Alarms> => {
-    const path = '/alarms'
-    const url = this.$basePath + path
-    const p: any = {}
-    p.query = {}
-    if ('pageNum' in params) p.query.pageNum = params.pageNum
-    if ('pageSize' in params) p.query.pageSize = params.pageSize
-    if ('carNo' in params) p.query.carNo = params.carNo
-    return ajax.ajax(
-      {
-        method: 'GET',
-        url,
-        ...p
-      },
-      path,
-      this.$basePath
-    )
-  }
-  /**
-   * 
    * @summary 返回指定主键ID的告警详情
    * @param params ParamsalarmsIdGet
    
@@ -237,6 +232,109 @@ export class DefaultApi {
       )
     const p: any = {}
     ajax.check(params.id, 'id')
+    return ajax.ajax(
+      {
+        method: 'GET',
+        url,
+        ...p
+      },
+      path,
+      this.$basePath
+    )
+  }
+  /**
+   *
+   * @summary 返回告警信息分页列表
+   * @param params ParamsalarmsPagePost
+   * @param data: ParamsBodyalarmsPagePost
+   * @returns models.AlarmsPage
+   */
+  public alarmsPagePost = (
+    params: ParamsalarmsPagePost,
+    data: ParamsBodyalarmsPagePost
+  ): AjaxPromise<models.AlarmsPage> => {
+    const path = '/alarms/page'
+    const url = this.$basePath + path
+    const p: any = {}
+    p.query = {}
+    if ('pageNum' in params) p.query.pageNum = params.pageNum
+    if ('pageSize' in params) p.query.pageSize = params.pageSize
+    p.data = data
+    return ajax.ajax(
+      {
+        method: 'POST',
+        url,
+        ...p
+      },
+      path,
+      this.$basePath
+    )
+  }
+  /**
+   * 
+   * @summary 接收并广播告警信息
+   
+   * @param data: ParamsBodyalarmsPost
+   * @returns models.Alarms
+   */
+  public alarmsPost = (
+    data: ParamsBodyalarmsPost
+  ): AjaxPromise<models.Alarms> => {
+    const path = '/alarms'
+    const url = this.$basePath + path
+    const p: any = {}
+    p.data = data
+    return ajax.ajax(
+      {
+        method: 'POST',
+        url,
+        ...p
+      },
+      path,
+      this.$basePath
+    )
+  }
+  /**
+   * 
+   * @summary 告警信息统计
+   * @param params ParamsalarmsStatisticsGet
+   
+   * @returns models.AlarmsStatistics
+   */
+  public alarmsStatisticsGet = (
+    params: ParamsalarmsStatisticsGet
+  ): AjaxPromise<models.AlarmsStatistics> => {
+    const path = '/alarms/statistics'
+    const url = this.$basePath + path
+    const p: any = {}
+    p.query = {}
+    if ('beginDate' in params) p.query.beginDate = params.beginDate
+    ajax.check(params.beginDate, 'beginDate')
+    if ('endDate' in params) p.query.endDate = params.endDate
+    return ajax.ajax(
+      {
+        method: 'GET',
+        url,
+        ...p
+      },
+      path,
+      this.$basePath
+    )
+  }
+  /**
+   * 
+   * @summary 返回未读告警数量
+   
+   * @param data: ParamsBodyalarmsUnreadGet
+   * @returns models.AlarmsUnread
+   */
+  public alarmsUnreadGet = (
+    data: ParamsBodyalarmsUnreadGet
+  ): AjaxPromise<models.AlarmsUnread> => {
+    const path = '/alarms/unread'
+    const url = this.$basePath + path
+    const p: any = {}
+    p.data = data
     return ajax.ajax(
       {
         method: 'GET',

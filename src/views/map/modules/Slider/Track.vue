@@ -10,7 +10,7 @@
     ></i>
     <i class="sprite_ico sprite_ico_stop track__stop" @click="stop"></i>
     <!-- 倍速 - 加速 -->
-    <i class="sprite_ico sprite_ico_track_forward" @click="addSpeed()"></i>
+    <i class="sprite_ico sprite_ico_track_forward" @click="addSpeed"></i>
     <!-- TODO -->
     <!-- <span class="track__time"
       >{{ trackMarkers.length }}/{{ passedLineLength }}</span
@@ -59,7 +59,7 @@ export default class DrawerTrackComponent extends Vue {
   @Bind()
   addSpeed() {
     if (this.isplay) {
-      this.$emit('update:speed', this.speeds <= 5 ? 5 : this.speeds++)
+      this.$emit('update:speed', this.speeds === 5 ? 5 : this.speeds + 1)
     }
   }
 
@@ -68,7 +68,7 @@ export default class DrawerTrackComponent extends Vue {
   @Bind()
   minusSpeed() {
     if (this.isplay) {
-      this.$emit('update:speed', this.speeds <= 1 ? 1 : this.speeds--)
+      this.$emit('update:speed', this.speeds === 1 ? 1 : this.speeds - 1)
     }
   }
   // 播放/暂停
