@@ -53,13 +53,13 @@ export default class ChartWarning extends Vue {
     title: {
       text: 0,
       subtext: '总车辆数',
-      left: '23%',
+      left: '28.5%',
       y: 'center',
+      textAlign: 'center',
       textStyle: {
         fontSize: 24,
         lineHeight: 15,
         fontWeight: 'bold',
-        textAlign: 'center',
         color: ['#fff']
       },
       subtextStyle: {
