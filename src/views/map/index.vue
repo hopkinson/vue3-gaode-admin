@@ -3,7 +3,7 @@
     <!-- 1. 警告信息-->
     <alert-abnormal
       :num="abnormalNum"
-      @confirm="loadCarDetail($event, { abnormal: true })"
+      v-model="showAlertAbnormal"
     ></alert-abnormal>
     <!-- 2. 搜索  -->
     <search-car-status
@@ -119,6 +119,7 @@
       @stop="stopTrack"
       @search-track="handleSearchTrack"
     ></drawer-track>
+    <drawer-abnormal></drawer-abnormal>
   </div>
 </template>
 
@@ -131,6 +132,7 @@ import ChartDistricts from './modules/Chart/Districts.vue'
 import ChartCars from './modules/Chart/Cars.vue'
 import ChartWarning from './modules/Chart/Warning.vue'
 import DrawerTrack from './modules/Drawer/Track.vue'
+import DrawerAbnormal from './modules/Drawer/Abnormal.vue'
 import ButtonFence from './modules/Button/Fence.vue'
 import MapHome from './modules/Map/Home.vue'
 import { TRAFFIC_LEGEND } from '@/config/dict'
@@ -157,6 +159,7 @@ import {
     ButtonFence,
     ChartWarning,
     AlertAbnormal,
+    DrawerAbnormal,
     SearchCarStatus,
     ChartDistricts,
     DrawerTrack
@@ -169,14 +172,12 @@ export default class MapIndex extends Vue {
   @Getter('app/isFullScreen') isFullScreen
   // 是否在播放轨迹回放
   isPlaying: boolean = false
-  // 是否停止播放
-  isEnd: boolean = false
-  // 是否显示抽屉
-  showDrawer: boolean = false
-  // 是否显示筛选
-  showSearch: boolean = false
-  // 图例 - 交通状态
-  legends = TRAFFIC_LEGEND
+
+  isEnd: boolean = false // 是否停止播放
+  showDrawer: boolean = false // 是否显示抽屉
+  showSearch: boolean = false // 是否显示筛选
+  showAlertAbnormal: boolean = false // 是否显示异常提示
+  legends = TRAFFIC_LEGEND // 图例 - 交通状态
   passedLength = 0 // 已经路过的长度
   trackSpeed: number = 1 // 初始化速度
   // 列表 - 时速
