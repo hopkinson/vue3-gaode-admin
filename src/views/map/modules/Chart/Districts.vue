@@ -96,7 +96,7 @@ export default class ChartWarning extends Vue {
     // 图表 - x轴
     this.option.series[0].data = _quantity
     // 绘制图表
-    const chart = this.$echarts.init(this.chart, { renderer: 'svg' })
+    const chart = this.$echarts.init(this.chart)
     chart.setOption(this.option)
   }
 

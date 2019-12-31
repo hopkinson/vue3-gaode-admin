@@ -154,7 +154,7 @@ export default class ChartWarning extends Vue {
       item => item.label
     )
     // 绘制图表
-    const chart = this.$echarts.init(this.chart, { renderer: 'svg' })
+    const chart = this.$echarts.init(this.chart)
     chart.setOption(this.option)
   }
 

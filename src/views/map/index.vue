@@ -1,9 +1,10 @@
 <template>
   <div class="map">
+    <!-- {{ passedLength }} -->
     <!-- 1. 警告信息-->
     <alert-abnormal
       :num="abnormalNum"
-      @confirm="loadCarDetail($event, { abnormal: true })"
+      v-model="showAlertAbnormal"
     ></alert-abnormal>
     <!-- 2. 搜索  -->
     <search-car-status
@@ -89,6 +90,7 @@
     <!-- 地图 :loadPreTrack="loadPreMarkers" @on-passed-line="recordPassedLength" -->
     <map-home
       :track-markers.sync="trackMarkers"
+      :slider-val="sliderTrack"
       :speed="trackSpeed"
       :map-center="mapCenter"
       :markers="carList"
@@ -118,7 +120,9 @@
       @play="handleControlTrack"
       @stop="stopTrack"
       @search-track="handleSearchTrack"
+      @change-slider="handleChangeSlider"
     ></drawer-track>
+    <drawer-abnormal></drawer-abnormal>
   </div>
 </template>
 
@@ -131,6 +135,7 @@ import ChartDistricts from './modules/Chart/Districts.vue'
 import ChartCars from './modules/Chart/Cars.vue'
 import ChartWarning from './modules/Chart/Warning.vue'
 import DrawerTrack from './modules/Drawer/Track.vue'
+import DrawerAbnormal from './modules/Drawer/Abnormal.vue'
 import ButtonFence from './modules/Button/Fence.vue'
 import MapHome from './modules/Map/Home.vue'
 import { TRAFFIC_LEGEND } from '@/config/dict'
@@ -157,6 +162,7 @@ import {
     ButtonFence,
     ChartWarning,
     AlertAbnormal,
+    DrawerAbnormal,
     SearchCarStatus,
     ChartDistricts,
     DrawerTrack
@@ -169,16 +175,15 @@ export default class MapIndex extends Vue {
   @Getter('app/isFullScreen') isFullScreen
   // 是否在播放轨迹回放
   isPlaying: boolean = false
-  // 是否停止播放
-  isEnd: boolean = false
-  // 是否显示抽屉
-  showDrawer: boolean = false
-  // 是否显示筛选
-  showSearch: boolean = false
-  // 图例 - 交通状态
-  legends = TRAFFIC_LEGEND
+
+  isEnd: boolean = false // 是否停止播放
+  showDrawer: boolean = false // 是否显示抽屉
+  showSearch: boolean = false // 是否显示筛选
+  showAlertAbnormal: boolean = false // 是否显示异常提示
+  legends = TRAFFIC_LEGEND // 图例 - 交通状态
   passedLength = 0 // 已经路过的长度
   trackSpeed: number = 1 // 初始化速度
+  sliderTrack: number = 0 // 滑块的值
   // 列表 - 时速
   speed: any = []
   districts: any = []
@@ -320,6 +325,12 @@ export default class MapIndex extends Vue {
       url: `v1/route/car/${val.id}`
     })
   }
+
+  handleChangeSlider(val) {
+    this.sliderTrack = val
+    this.passedLength = val
+  }
+
   stopMoveTracker() {
     this.isPlaying = false
     this.trackSpeed = 1
@@ -460,7 +471,7 @@ export default class MapIndex extends Vue {
   &__chart {
     &--search {
       position: fixed;
-      top: 148px;
+      top: 90px;
       z-index: 99;
       left: 30px;
     }
@@ -472,12 +483,12 @@ export default class MapIndex extends Vue {
       bottom: 0;
     }
     &--left {
-      top: 200px;
+      top: 150px;
       left: 30px;
     }
     &--right {
       right: 28px;
-      top: 250px;
+      top: 150px;
     }
     &--panel {
       margin-bottom: 20px;
@@ -504,7 +515,7 @@ export default class MapIndex extends Vue {
     font-size: 12px;
     &--position {
       position: fixed;
-      bottom: 50px;
+      bottom: 20px;
     }
     &--inner {
       margin-right: 20px;

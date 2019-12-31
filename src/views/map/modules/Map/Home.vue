@@ -68,10 +68,10 @@
       <!-- 点坐标 - 用户动画播放  -->
       <el-amap-marker
         ref="marker"
+        :offset="carDetail.alarmType ? [-26, -135] : [-30, -103]"
         :visible="showDrawer || showInfo"
         :events="trackMarkerEvent(carDetail)"
         :position="position"
-        :offset="carDetail.alarmType ? [-26, -135] : [-26, -103]"
         :label="markerLabelContent(realTimeDetail)"
         :content="
           Object.keys(carDetail).length ? markerTemplate(carDetail) : ''
@@ -97,7 +97,7 @@
       <!-- 轨迹 - 路过 -->
       <el-amap-polyline
         :path="havePassedLine"
-        strokeColor="#435a70"
+        strokeColor="#500018"
       ></el-amap-polyline>
     </el-amap>
   </section>
@@ -178,6 +178,10 @@ export default class MapHome extends Vue {
   @Prop({ type: Array, default: () => [] })
   public readonly fenceList!: Array<any>
 
+  // 围栏列表坐标
+  @Prop({ type: Number, default: 0 })
+  public readonly sliderVal!: number
+
   showInfo = false // 是否显示窗体信息
   showTrack = false // 是否显示轨迹
   realTime = false // 是否实时
@@ -232,9 +236,9 @@ export default class MapHome extends Vue {
     }
   }
   markerLabelContent(realTimeDetail) {
-    const type =
-      Object.keys(realTimeDetail).length &&
-      WARNGING.status[realTimeDetail.alarmType.toString()].label
+    const type = realTimeDetail.alarmType
+      ? WARNGING.status[String(realTimeDetail.alarmType)].label
+      : '无异常'
     const isWarning = !!realTimeDetail.alarmType
     return {
       content:
@@ -242,7 +246,6 @@ export default class MapHome extends Vue {
         this.showDrawer &&
         `
       <div class="project__map-markerLabel">
-        <div class="sprite_ico sprite_ico_popup_detail__header"></div>
         <div class="project__map-markerLabel__main">
             <p>
               当前状态：<span class="${
@@ -289,6 +292,8 @@ export default class MapHome extends Vue {
       moveend: () => {
         const isNotEuqal = this.getTrackMarkers.length !== this.countPassed + 1
         this.$emit('update:passedLength', this.countPassed + 1)
+        // console.log(this.countPassed + 1)
+        // console.log(this.getPassedLength)
         if (isNotEuqal) {
           this.moveToTracker()
         } else {
@@ -415,7 +420,7 @@ export default class MapHome extends Vue {
       )
       this.countPassed++
       this.realTimeDetail = this.getTrackMarkers[this.countPassed]
-      this.marker.$$getInstance().moveTo(_lnglat, speed * this.speed)
+      this.marker.$$getInstance().moveTo(_lnglat, speed * this.speed * 2.5)
     }
   }
 
@@ -428,13 +433,12 @@ export default class MapHome extends Vue {
   initLoadTrack() {
     this.abnormalTracks = this.normalTracks = []
     // 分是否警告去显示经纬度
-    this.getTrackMarkers.forEach(item => {
-      if (item.alarmType) {
-        this.abnormalTracks.push(item.location.split(',')) // 警告的经纬度数组
-      } else {
-        this.normalTracks.push(item.location.split(',')) // 无警告的经纬度数组
-      }
-    })
+    this.abnormalTracks = this.getTrackMarkers
+      .filter(item => !item.alarmType)
+      .map(item => item.location.split(','))
+    this.normalTracks = this.getTrackMarkers
+      .filter(item => item.alarmType)
+      .map(item => item.location.split(','))
     // 格式化数据
     this.trackLocation = this.getTrackMarkers.map(item =>
       item.location.split(',')
@@ -471,6 +475,15 @@ export default class MapHome extends Vue {
     if (val) {
       this.stopMove()
     }
+  }
+
+  // 滑块准备
+  @Watch('sliderVal', {})
+  public watchPassedLength(val) {
+    // this.marker.$$getInstance().pauseMove()
+    this.havePassedLine = this.trackLocation.slice(0, val)
+    this.countPassed = val
+    this.moveToTracker()
   }
 
   // 监听 - 是否显示抽屉
