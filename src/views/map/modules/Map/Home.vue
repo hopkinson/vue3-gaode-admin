@@ -97,7 +97,7 @@
       <!-- 轨迹 - 路过 -->
       <el-amap-polyline
         :path="havePassedLine"
-        strokeColor="#435a70"
+        strokeColor="#500018"
       ></el-amap-polyline>
     </el-amap>
   </section>
@@ -242,7 +242,6 @@ export default class MapHome extends Vue {
         this.showDrawer &&
         `
       <div class="project__map-markerLabel">
-        <div class="sprite_ico sprite_ico_popup_detail__header"></div>
         <div class="project__map-markerLabel__main">
             <p>
               当前状态：<span class="${
@@ -415,7 +414,7 @@ export default class MapHome extends Vue {
       )
       this.countPassed++
       this.realTimeDetail = this.getTrackMarkers[this.countPassed]
-      this.marker.$$getInstance().moveTo(_lnglat, speed * this.speed)
+      this.marker.$$getInstance().moveTo(_lnglat, speed * this.speed * 2)
     }
   }
 
@@ -471,6 +470,17 @@ export default class MapHome extends Vue {
     if (val) {
       this.stopMove()
     }
+  }
+
+  // 停止播放
+  @Watch('getPassedLength', {})
+  public watchPassedLength(val) {
+    this.$nextTick(() => {
+      this.marker.$$getInstance().pasueMove()
+      this.havePassedLine = this.trackLocation.slice(0, val)
+      this.countPassed = val
+      this.moveToTracker()
+    })
   }
 
   // 监听 - 是否显示抽屉

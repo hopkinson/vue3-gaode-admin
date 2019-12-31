@@ -20,8 +20,7 @@
       :max="trackMarkersLength"
       :show-tooltip="false"
       :value="value"
-      disabled
-      @input="input"
+      @change="input"
     ></el-slider>
   </div>
 </template>

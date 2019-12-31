@@ -1,5 +1,6 @@
 <template>
   <div class="map">
+    {{ passedLength }}
     <!-- 1. 警告信息-->
     <alert-abnormal
       :num="abnormalNum"

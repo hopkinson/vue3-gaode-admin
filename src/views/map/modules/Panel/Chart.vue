@@ -44,8 +44,8 @@ export default class PanelComponent extends Vue {
       small: 381
     }
     return {
-      width: `${SIZE[size]}px`,
-      height: `${height}px`
+      width: `${SIZE[size] / 191.7}rem`,
+      height: `${height / 191.7}rem`
     }
   }
   // 标题样式

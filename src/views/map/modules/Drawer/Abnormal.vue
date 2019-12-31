@@ -24,11 +24,6 @@ export default class DrawerTrack extends Vue {
   isShow!: boolean
 
   // 监听 - params
-  @Watch('isShow', {})
-  public watchValue(val: boolean) {
-    this.visible = val
-  }
-  // 监听 - params
   @Watch('visible', {})
   public watchVisible(val: boolean) {
     this.$emit('update:show', val)
