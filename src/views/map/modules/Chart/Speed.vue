@@ -120,7 +120,7 @@ export default class ChartWarning extends Vue {
     this.option.series[1].data = _speed.map(item => _maxSpeed)
 
     // 绘制图表
-    const chart = this.$echarts.init(this.chart, { renderer: 'svg' })
+    const chart = this.$echarts.init(this.chart)
 
     chart.setOption(this.option)
     // 每隔一个小时执行一次

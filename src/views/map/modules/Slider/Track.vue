@@ -12,15 +12,12 @@
     <!-- 倍速 - 加速 -->
     <i class="sprite_ico sprite_ico_track_forward" @click="addSpeed"></i>
     <!-- TODO -->
-    <!-- <span class="track__time"
-      >{{ trackMarkers.length }}/{{ passedLineLength }}</span
-    >-->
+    <!--   -->
     <el-slider
       class="track__slider"
-      :max="trackMarkersLength"
       :show-tooltip="false"
+      :max="trackMarkersLength"
       :value="value"
-      disabled
       @input="input"
     ></el-slider>
   </div>
@@ -91,6 +88,7 @@ export default class DrawerTrackComponent extends Vue {
   }
   input(val) {
     this.$emit('input', val)
+    this.$emit('change-slider', val)
   }
   // 监听 - 倍速
   // @Watch('isplay', {})
