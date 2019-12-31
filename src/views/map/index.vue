@@ -1,6 +1,6 @@
 <template>
   <div class="map">
-    {{ passedLength }}
+    <!-- {{ passedLength }} -->
     <!-- 1. 警告信息-->
     <alert-abnormal
       :num="abnormalNum"
@@ -90,6 +90,7 @@
     <!-- 地图 :loadPreTrack="loadPreMarkers" @on-passed-line="recordPassedLength" -->
     <map-home
       :track-markers.sync="trackMarkers"
+      :slider-val="sliderTrack"
       :speed="trackSpeed"
       :map-center="mapCenter"
       :markers="carList"
@@ -119,6 +120,7 @@
       @play="handleControlTrack"
       @stop="stopTrack"
       @search-track="handleSearchTrack"
+      @change-slider="handleChangeSlider"
     ></drawer-track>
     <drawer-abnormal></drawer-abnormal>
   </div>
@@ -181,6 +183,7 @@ export default class MapIndex extends Vue {
   legends = TRAFFIC_LEGEND // 图例 - 交通状态
   passedLength = 0 // 已经路过的长度
   trackSpeed: number = 1 // 初始化速度
+  sliderTrack: number = 0 // 滑块的值
   // 列表 - 时速
   speed: any = []
   districts: any = []
@@ -322,6 +325,12 @@ export default class MapIndex extends Vue {
       url: `v1/route/car/${val.id}`
     })
   }
+
+  handleChangeSlider(val) {
+    this.sliderTrack = val
+    this.passedLength = val
+  }
+
   stopMoveTracker() {
     this.isPlaying = false
     this.trackSpeed = 1
@@ -462,7 +471,7 @@ export default class MapIndex extends Vue {
   &__chart {
     &--search {
       position: fixed;
-      top: 148px;
+      top: 90px;
       z-index: 99;
       left: 30px;
     }
@@ -474,12 +483,12 @@ export default class MapIndex extends Vue {
       bottom: 0;
     }
     &--left {
-      top: 200px;
+      top: 150px;
       left: 30px;
     }
     &--right {
       right: 28px;
-      top: 250px;
+      top: 150px;
     }
     &--panel {
       margin-bottom: 20px;
@@ -506,7 +515,7 @@ export default class MapIndex extends Vue {
     font-size: 12px;
     &--position {
       position: fixed;
-      bottom: 50px;
+      bottom: 20px;
     }
     &--inner {
       margin-right: 20px;
