@@ -1,10 +1,10 @@
 <template>
   <div class="map">
     <!-- 1. 警告信息-->
-    <alert-abnormal
+    <!-- <alert-abnormal
       :num="abnormalNum"
       @click="showAbnormalList"
-    ></alert-abnormal>
+    ></alert-abnormal> -->
     <!-- 2. 搜索  -->
     <search-car-status
       v-show="showCharts"

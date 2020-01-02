@@ -65,7 +65,7 @@
           "
         ></el-amap-marker>
       </template>
-      <!-- 点坐标 - 用户动画播放  -->
+      <!-- 点坐标 - 用户轨迹播放  -->
       <el-amap-marker
         ref="marker"
         :offset="carDetail.alarmType ? [-26, -135] : [-30, -103]"
@@ -210,31 +210,33 @@ export default class MapHome extends Vue {
         getTileUrl: MAP.tileUrl,
         zIndex: 2
       })
-      googleLayer.setMap(o)
       const self = this
+      googleLayer.setMap(o)
       // 设置聚合坐标
       setTimeout(() => {
         let cluster = new (AMap as any).MarkerClusterer(o, self.markerRefs, {
-          gridSize: 60,
-          renderCluserMarker: context => {
-            const count = self.markers.length
-            let size = Math.round(
-              30 + Math.pow(context.count / count, 1 / 5) * 20
-            )
-            const result = `
+          gridSize: 10,
+          maxZoom: 20,
+          renderCluserMarker: self.renderCluserMarker
+        })
+      }, 1000)
+    }
+  }
+  // 聚合坐标
+  renderCluserMarker(context) {
+    const count = this.markers.length
+    let size = Math.round(30 + Math.pow(context.count / count, 1 / 5) * 20)
+    const result = `
             <div class="project__map-cluserMarker">
               <i class="sprite_ico sprite_ico_focus_car">
                 <div class="circle"></div>
                 <span>${context.count}</span>
               </i>
             </div>`
-            context.marker.setOffset(new AMap.Pixel(-size / 2, -size / 2))
-            context.marker.setContent(result)
-          }
-        })
-      }, 1000)
-    }
+    context.marker.setOffset(new AMap.Pixel(-size / 2, -size / 2))
+    context.marker.setContent(result)
   }
+
   markerLabelContent(realTimeDetail) {
     const type = realTimeDetail.alarmType
       ? WARNGING.status[String(realTimeDetail.alarmType)].label
@@ -292,8 +294,6 @@ export default class MapHome extends Vue {
       moveend: () => {
         const isNotEuqal = this.getTrackMarkers.length !== this.countPassed + 1
         this.$emit('update:passedLength', this.countPassed + 1)
-        // console.log(this.countPassed + 1)
-        // console.log(this.getPassedLength)
         if (isNotEuqal) {
           this.moveToTracker()
         } else {
@@ -527,7 +527,7 @@ export default class MapHome extends Vue {
   // 监听 - 轨迹
   @Watch('carDetail', { deep: true })
   public async watchCarDetail(val: CarLocationBody) {
-    if (Object.keys(val).length) {
+    if (val.id) {
       this.preMarkers = await this.loadPreTrack(val) // 加载预设轨迹
       const { alarmType } = val
       setTimeout(() => {

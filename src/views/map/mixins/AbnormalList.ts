@@ -12,7 +12,7 @@ export default class Table extends Vue {
     pageNum: '',
     pageSize: 10
   }
-  abnormalNum = 2 // 警告信息数量
+  abnormalNum = 0 // 警告信息数量
   websocket: any = null // websocket连接
 
   created() {
