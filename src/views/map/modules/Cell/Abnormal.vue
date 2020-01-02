@@ -12,7 +12,7 @@
       <div class="cell__main">
         <div class="cell__main--content">
           {{ item.carNo }}在{{ item.address
-          }}{{ item.type | filterDict(dict, 'label') }}
+          }}{{ dict[item.type] ? dict[item.type].label : '' }}
         </div>
         <div class="cell__main--desc">
           {{ item.alarmTime | formatDay('YYYY-MM-DD HH:mm:ss') }}

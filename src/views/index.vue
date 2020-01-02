@@ -1,17 +1,13 @@
 <template>
-  <layout :footer="false" :breadcrumb="false">
-    <router-view></router-view>
-  </layout>
+  <router-view></router-view>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import Layout from '@/layouts/default.vue'
+
 @Component({
   name: 'Login',
-  components: {
-    Layout
-  }
+  components: {}
 })
 export default class Login extends Vue {}
 </script>

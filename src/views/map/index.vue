@@ -1,142 +1,145 @@
 <template>
-  <div class="map">
-    <!-- 1. 警告信息-->
-    <alert-abnormal
-      :num="abnormalNum"
-      @click="showAbnormalList"
-    ></alert-abnormal>
-    <!-- 2. 搜索  -->
-    <search-car-status
-      v-show="showCharts"
-      v-if="!isFullScreen"
-      class="map__chart--search"
-      v-model="showSearch"
-      :table-data="searchCarBody"
-      :company-list="companyList"
-      @search="handleSearchCar"
-      @current-change="handleCurrentChange"
-      @fetch-company="handleSearchCompany"
-      @play="filterLoadCarDetail"
-      @change-filter="handleChangeFilter"
-    ></search-car-status>
-    <!-- 3. 左侧 -->
-    <div class="map__chart--left" v-if="!isFullScreen" v-show="showCharts">
-      <!-- 3.1 左侧-图表 -->
-      <panel-chart
-        title="告警统计"
-        unit="单位（次）"
-        :height="240"
-        size="big"
-        class="map__chart--panel"
-      >
-        <chart-warning
-          :data="warning"
-          class="map__chart--inner"
-        ></chart-warning>
-      </panel-chart>
-      <panel-chart
-        title="当天最高时速"
-        unit="速度（公里/小时）"
-        :height="200"
-        size="big"
-        class="map__chart--panel"
-      >
-        <chart-speed :data="speed" class="map__chart--inner"></chart-speed>
-      </panel-chart>
-      <!-- 3.2 左侧-图例 -->
-      <div class="map__legends map__legends--position">
-        <div
-          v-for="(item, index) in legends"
-          :key="index"
-          class="map__legends--inner"
+  <layout :footer="false" :breadcrumb="false">
+    <div class="map">
+      <!-- 1. 警告信息-->
+      <alert-abnormal
+        :num="abnormalNum"
+        @click="showAbnormalList"
+      ></alert-abnormal>
+      <!-- 2. 搜索  -->
+      <search-car-status
+        v-show="showCharts"
+        v-if="!isFullScreen"
+        class="map__chart--search"
+        v-model="showSearch"
+        :table-data="searchCarBody"
+        :company-list="companyList"
+        @search="handleSearchCar"
+        @current-change="handleCurrentChange"
+        @fetch-company="handleSearchCompany"
+        @play="filterLoadCarDetail"
+        @change-filter="handleChangeFilter"
+      ></search-car-status>
+      <!-- 3. 左侧 -->
+      <div class="map__chart--left" v-if="!isFullScreen" v-show="showCharts">
+        <!-- 3.1 左侧-图表 -->
+        <panel-chart
+          title="告警统计"
+          unit="单位（次）"
+          :height="240"
+          size="big"
+          class="map__chart--panel"
         >
-          <i class="sprite_ico" :class="[`sprite_ico_pic_${item.value}`]"></i>
-          <p>{{ item.label }}</p>
+          <chart-warning
+            :data="warning"
+            class="map__chart--inner"
+          ></chart-warning>
+        </panel-chart>
+        <panel-chart
+          title="当天最高时速"
+          unit="速度（公里/小时）"
+          :height="200"
+          size="big"
+          class="map__chart--panel"
+        >
+          <chart-speed :data="speed" class="map__chart--inner"></chart-speed>
+        </panel-chart>
+        <!-- 3.2 左侧-图例 -->
+        <div class="map__legends map__legends--position">
+          <div
+            v-for="(item, index) in legends"
+            :key="index"
+            class="map__legends--inner"
+          >
+            <i class="sprite_ico" :class="[`sprite_ico_pic_${item.value}`]"></i>
+            <p>{{ item.label }}</p>
+          </div>
         </div>
       </div>
-    </div>
-    <!-- 4.右侧 -->
-    <div class="map__chart--right" v-if="!isFullScreen" v-show="showCharts">
-      <!-- 4.1右侧-图表 -->
-      <panel-chart
-        title="车辆状态"
-        :height="194"
-        size="small"
-        class="map__chart--panel"
-      >
-        <chart-cars :data="cars"></chart-cars>
-      </panel-chart>
-      <panel-chart
-        title="车辆区域分布"
-        unit="单位（辆）"
-        size="small"
-        :height="212"
-      >
-        <span slot="link">
-          查看更多区域
-          <i class="el-icon-arrow-right"></i>
-        </span>
-        <chart-districts :data="districts"></chart-districts>
-      </panel-chart>
-      <!-- 4.2右侧-围栏按钮 -->
-      <button-fence
-        @add="addFence"
-        @close="closeFence"
-        :fence.sync="fenceList"
-      ></button-fence>
-    </div>
+      <!-- 4.右侧 -->
+      <div class="map__chart--right" v-if="!isFullScreen" v-show="showCharts">
+        <!-- 4.1右侧-图表 -->
+        <panel-chart
+          title="车辆状态"
+          :height="194"
+          size="small"
+          class="map__chart--panel"
+        >
+          <chart-cars :data="cars"></chart-cars>
+        </panel-chart>
+        <panel-chart
+          title="车辆区域分布"
+          unit="单位（辆）"
+          size="small"
+          :height="212"
+        >
+          <span slot="link">
+            查看更多区域
+            <i class="el-icon-arrow-right"></i>
+          </span>
+          <chart-districts :data="districts"></chart-districts>
+        </panel-chart>
+        <!-- 4.2右侧-围栏按钮 -->
+        <button-fence
+          @add="addFence"
+          @close="closeFence"
+          :fence.sync="fenceList"
+        ></button-fence>
+      </div>
 
-    <!-- 地图 :loadPreTrack="loadPreMarkers" @on-passed-line="recordPassedLength" -->
-    <map-home
-      :track-markers.sync="trackMarkers"
-      :slider-val="sliderTrack"
-      :speed="trackSpeed"
-      :markers="carList"
-      :car-detail="carDetail"
-      :isPlay="isPlaying"
-      :showDrawer="showTrackDrawer"
-      :isEnd.sync="isEnd"
-      :passedLength.sync="passedLength"
-      :fenceList="fenceList"
-      @stop-move="stopMoveTracker"
-      @add-fence="createFence"
-      @load-car-detail="loadCarDetail"
-      @play-track="handleShowTrack"
-      @close-info-window="closeInfoWindow"
-      ref="map"
-    ></map-home>
-    <!-- 底部 - 抽屉 -->
-    <drawer-track
-      class="map__drawer--track"
-      :show.sync="showTrackDrawer"
-      :speed.sync="trackSpeed"
-      :track-form="trackForm"
-      v-model="passedLength"
-      :trackMarkersLength="trackMarkers.length"
-      ref="drawer"
-      :isEnd="isEnd"
-      :isPlaying.sync="isPlaying"
-      :car-detail="carDetail"
-      @play="handleControlTrack"
-      @stop="stopTrack"
-      @search-track="handleSearchTrack"
-      @change-slider="handleChangeSlider"
-    ></drawer-track>
-    <!-- 右侧 - 抽屉 -->
-    <drawer-abnormal
-      class="map__drawer--abnormal"
-      :show.sync="showAbnormalDrawer"
-      :data="abnormalBody"
-      @more="goToQuery"
-      @current-change="abnormalCurrentChange"
-      @click="showAbnormalDetail"
-    ></drawer-abnormal>
-  </div>
+      <!-- 地图 :loadPreTrack="loadPreMarkers" @on-passed-line="recordPassedLength" -->
+      <map-home
+        :track-markers.sync="trackMarkers"
+        :slider-val="sliderTrack"
+        :speed="trackSpeed"
+        :markers="carList"
+        :car-detail="carDetail"
+        :isPlay="isPlaying"
+        :showDrawer="showTrackDrawer"
+        :isEnd.sync="isEnd"
+        :passedLength.sync="passedLength"
+        :fenceList="fenceList"
+        @stop-move="stopMoveTracker"
+        @add-fence="createFence"
+        @load-car-detail="loadCarDetail"
+        @play-track="handleShowTrack"
+        @close-info-window="closeInfoWindow"
+        ref="map"
+      ></map-home>
+      <!-- 底部 - 抽屉 -->
+      <drawer-track
+        class="map__drawer--track"
+        :show.sync="showTrackDrawer"
+        :speed.sync="trackSpeed"
+        :track-form="trackForm"
+        v-model="passedLength"
+        :trackMarkersLength="trackMarkers.length"
+        ref="drawer"
+        :isEnd="isEnd"
+        :isPlaying.sync="isPlaying"
+        :car-detail="carDetail"
+        @play="handleControlTrack"
+        @stop="stopTrack"
+        @search-track="handleSearchTrack"
+        @change-slider="handleChangeSlider"
+      ></drawer-track>
+      <!-- 右侧 - 抽屉 -->
+      <drawer-abnormal
+        class="map__drawer--abnormal"
+        :show.sync="showAbnormalDrawer"
+        :data="abnormalBody"
+        @more="goToQuery"
+        @current-change="abnormalCurrentChange"
+        @click="showAbnormalDetail"
+      ></drawer-abnormal>
+    </div>
+  </layout>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Ref, Watch, Mixins } from 'vue-property-decorator'
 import PanelChart from './modules/Panel/Chart.vue'
+import Layout from '@/layouts/default.vue'
 import ChartSpeed from './modules/Chart/Speed.vue'
 import AlertAbnormal from './modules/Alert/Abnormal.vue'
 import ChartDistricts from './modules/Chart/Districts.vue'
@@ -171,6 +174,7 @@ import {
     ChartCars,
     ButtonFence,
     ChartWarning,
+    Layout,
     AlertAbnormal,
     DrawerAbnormal,
     SearchCarStatus,
@@ -228,7 +232,7 @@ export default class MapIndex extends Mixins(
       url: 'v1/car/track',
       data: data
     })
-    this.trackMarkers = tracks
+    this.trackMarkers = tracks || []
     if (!this.trackMarkers.length) {
       this.$message({
         message: '没有任何轨迹',

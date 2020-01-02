@@ -217,10 +217,12 @@ export default class MapHome extends Mixins(
       ? WARNGING.status[String(realTimeDetail.alarmType)].label
       : '无异常'
     const isWarning = !!realTimeDetail.alarmType
+    // 显示内容的判断条件（不显示窗体内容&显示底部抽屉&有点坐标时候）
+    const showContent =
+      !this.showInfo && this.showDrawer && this.getTrackMarkers.length
     return {
       content:
-        !this.showInfo &&
-        this.showDrawer &&
+        showContent &&
         `
       <div class="project__map-markerLabel">
         <div class="project__map-markerLabel__main">
@@ -370,6 +372,9 @@ export default class MapHome extends Mixins(
       this.trackLocation = this.getTrackMarkers.map(item =>
         item.location.split(',')
       )
+      console.log('无异常数量', this.normalTracks.length)
+      console.log('异常数量', this.abnormalTracks.length)
+      console.log('坐标总数量', this.trackLocation.length)
       // 每走一个点 中心都发生改变
       setTimeout(() => {
         const { lng, lat } = this.polyline.$$getInstance().getPath()[0]
@@ -407,13 +412,13 @@ export default class MapHome extends Mixins(
     }
   }
 
-  // 滑块准备
-  @Watch('sliderVal', {})
-  public watchPassedLength(val) {
-    // this.havePassedLine = this.trackLocation.slice(0, val)
-    // this.countPassed = val
-    // this.moveToTracker()
-  }
+  // // 滑块准备
+  // @Watch('sliderVal', {})
+  // public watchPassedLength(val) {
+  //   // this.havePassedLine = this.trackLocation.slice(0, val)
+  //   // this.countPassed = val
+  //   // this.moveToTracker()
+  // }
 
   // 监听 - 是否显示抽屉
   @Watch('showDrawer', {})

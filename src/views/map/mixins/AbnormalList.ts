@@ -28,8 +28,8 @@ export default class Table extends Vue {
       endPoint: process.env.VUE_APP_WS_API
     })
     this.websocket.subscribes('/socket/topic/alarms', ({ body }) => {
-      // const result = JSON.parse(body)
-      // this.abnormalNum = result
+      const result = Number(body)
+      this.abnormalNum = result
     })
   }
 
