@@ -1,6 +1,5 @@
 <template>
   <div class="map">
-    {{ trackForm }}
     <!-- 1. 警告信息-->
     <alert-abnormal
       :num="abnormalNum"
