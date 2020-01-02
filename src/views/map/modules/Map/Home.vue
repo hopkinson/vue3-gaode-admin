@@ -431,23 +431,25 @@ export default class MapHome extends Vue {
 
   // 初始化轨迹移动
   initLoadTrack() {
-    this.abnormalTracks = this.normalTracks = []
-    // 分是否警告去显示经纬度
-    this.abnormalTracks = this.getTrackMarkers
-      .filter(item => !item.alarmType)
-      .map(item => item.location.split(','))
-    this.normalTracks = this.getTrackMarkers
-      .filter(item => item.alarmType)
-      .map(item => item.location.split(','))
-    // 格式化数据
-    this.trackLocation = this.getTrackMarkers.map(item =>
-      item.location.split(',')
-    )
-    // 每走一个点 中心都发生改变
-    setTimeout(() => {
-      const { lng, lat } = this.polyline.$$getInstance().getPath()[0]
-      this.position = this.center = [lng, lat]
-    }, 0)
+    if (this.getTrackMarkers.length) {
+      this.abnormalTracks = this.normalTracks = []
+      // 分是否警告去显示经纬度
+      this.abnormalTracks = this.getTrackMarkers
+        .filter(item => !item.alarmType)
+        .map(item => item.location.split(','))
+      this.normalTracks = this.getTrackMarkers
+        .filter(item => item.alarmType)
+        .map(item => item.location.split(','))
+      // 格式化数据
+      this.trackLocation = this.getTrackMarkers.map(item =>
+        item.location.split(',')
+      )
+      // 每走一个点 中心都发生改变
+      setTimeout(() => {
+        const { lng, lat } = this.polyline.$$getInstance().getPath()[0]
+        this.position = this.center = [lng, lat]
+      }, 0)
+    }
   }
   // 停止移动要把一切设为停止
   stopMove() {
@@ -457,7 +459,9 @@ export default class MapHome extends Vue {
     this.havePassedLine = [] // 清空已走过的轨迹
     this.countPassed = 1
     this.$emit('update:passedLength', 0)
-    this.showInfo = true
+    if (this.getTrackMarkers.length) {
+      this.showInfo = true
+    }
     this.initLoadTrack()
   }
 
@@ -500,6 +504,15 @@ export default class MapHome extends Vue {
       this.showInfo = false
     }
   }
+
+  // 监听 - 是否显示信息窗体
+  @Watch('showInfo', {})
+  public watchShowInfo(val: boolean) {
+    if (this.showDrawer && !this.realTime && !val) {
+      this.$emit('close-info-window')
+    }
+  }
+
   // 监听 - 轨迹
   @Watch('showTrack', {})
   public watchShowTrack(val: boolean) {

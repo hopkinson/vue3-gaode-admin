@@ -1,7 +1,7 @@
 <template>
-  <div class="abnormal" v-if="value">
+  <div class="abnormal">
     <!-- 警告 - 图标 -->
-    <div class="abnormal__icon" @click="click">
+    <div class="abnormal__icon" @click="$emit('click')">
       <!-- 有异常信息 -->
       <i
         class="sprite_ico sprite_ico_bar_notice abnormal__icon--item"
@@ -18,22 +18,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Model } from 'vue-property-decorator'
-import { WARNGING } from '@/config/dict'
+import { Component, Vue, Prop } from 'vue-property-decorator'
 @Component({
   name: 'ButtonAbnormal'
 })
 export default class ButtonAbnormal extends Vue {
   @Prop({ default: 0, type: Number }) public readonly num!: number
-
-  // v-model
-  @Model('input', { type: Boolean, default: false })
-  public readonly value!: boolean
-
-  click() {
-    this.$emit('click')
-    this.$emit('input', false)
-  }
 }
 </script>
 
@@ -47,14 +37,15 @@ export default class ButtonAbnormal extends Vue {
     top: 100px;
     right: 0;
     z-index: 99;
+    cursor: pointer;
     &--text {
       position: absolute;
-      top: 50%;
+      top: 45%;
       transform: translate(-50%, -50%);
-      left: 55%;
+      left: 58%;
+      letter-spacing: 1px;
       white-space: nowrap;
       color: #ff0000;
-      line-height: 1;
       font-size: 12px;
       font-weight: bold;
       font-style: normal;

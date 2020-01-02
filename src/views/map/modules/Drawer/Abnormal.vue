@@ -1,28 +1,56 @@
 <template>
   <el-drawer
-    :modal="false"
     :visible.sync="visible"
     :modal-append-to-body="false"
-    :wrapperClosable="false"
     direction="rtl"
-    size="auto"
-    title="11"
-    class="track__inner"
+    :modal="false"
+    :with-header="false"
+    size="40%"
+    title="异常信息"
+    class="abnormal__inner"
   >
+    <!-- 异常信息列表 -->
+    <div class="abnormal">
+      <!-- 标题 -->
+      <div class="abnormal__title">
+        <div class="abnormal__title--inner">异常信息</div>
+        <div class="abnormal__title--more" @click="$emit('more')" slot="title">
+          更多
+          <i class="el-icon-d-arrow-right"></i>
+        </div>
+        <i class="el-icon-close abnormal__title--close"></i>
+      </div>
+      <!-- 列表 -->
+      <cell-abnormal v-bind="$attrs" v-on="$listeners"></cell-abnormal>
+    </div>
   </el-drawer>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Model, Watch, PropSync } from 'vue-property-decorator'
+import CellAbnormal from '../Cell/Abnormal.vue'
 @Component({
   name: 'DrawerTrack',
-  components: {}
+  inheritAttrs: false,
+  components: {
+    CellAbnormal
+  }
 })
 export default class DrawerTrack extends Vue {
   // 是否正在播放 .sync
   @PropSync('show', { type: Boolean, default: false })
   isShow!: boolean
-
+  // 是否播放中
+  visible = false
+  // 关闭
+  close() {
+    this.visible = false
+  }
+  // 监听 - params
+  @Watch('isShow', {})
+  public watchValue(val: boolean) {
+    this.visible = val
+  }
   // 监听 - params
   @Watch('visible', {})
   public watchVisible(val: boolean) {
@@ -32,17 +60,39 @@ export default class DrawerTrack extends Vue {
 </script>
 
 <style lang="less" scoped>
-.track {
-  background: #000;
+.abnormal {
+  background: #020215;
   position: relative;
-  &__close {
-    position: absolute;
-    top: 20px;
-    right: 45px;
+  height: 100%;
+  padding: 0 30px 10px 14px;
+  border-left: 1px solid #205b83;
+  &__title {
+    height: 60px;
+    line-height: 60px;
+    padding-left: 18px;
     color: #fff;
-    font-size: 20px;
-    cursor: pointer;
-    z-index: 1;
+    font-weight: bold;
+    font-size: 18px;
+    border-bottom: 1px solid #2b2b3b;
+    position: relative;
+    &--more,
+    &--close {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      z-index: 1;
+      color: #fff;
+    }
+    &--more {
+      font-size: 13px;
+      right: 50px;
+    }
+    &--close {
+      right: 0;
+
+      font-size: 20px;
+    }
   }
   &__inner {
     & /deep/ .el-drawer__header {
@@ -50,30 +100,12 @@ export default class DrawerTrack extends Vue {
       padding: 0;
       background: #000;
     }
+    & /deep/ .el-drawer {
+      overflow: auto;
+    }
     & /deep/ .el-drawer__close-btn,
     & /deep/ span[role*='heading'] {
       font-size: 0;
-    }
-  }
-  &__item {
-    height: 60px;
-    display: flex;
-    align-items: center;
-    border-top: 1px solid #1a1a1b;
-    color: #fff;
-    position: relative;
-    &.is-form {
-      margin-left: 30px;
-    }
-    &.is-disabled:after {
-      opacity: 0.2;
-    }
-    & /deep/ .el-form-item__label {
-      color: #fff;
-    }
-    & /deep/ .el-form--inline .el-form-item {
-      margin-bottom: 0 !important;
-      margin-right: 40px;
     }
   }
 }
