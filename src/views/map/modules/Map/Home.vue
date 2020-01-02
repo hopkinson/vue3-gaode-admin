@@ -215,7 +215,7 @@ export default class MapHome extends Vue {
       // 设置聚合坐标
       setTimeout(() => {
         let cluster = new (AMap as any).MarkerClusterer(o, self.markerRefs, {
-          gridSize: 10,
+          gridSize: 1,
           maxZoom: 20,
           renderCluserMarker: self.renderCluserMarker
         })
