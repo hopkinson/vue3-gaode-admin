@@ -12,9 +12,16 @@ export default class Table extends Vue {
     pageNum: '',
     pageSize: 10
   }
+  // 轨迹表单
+  trackForm = {
+    carId: '',
+    beginTime: '',
+    endTime: ''
+  }
   abnormalNum = 0 // 警告信息数量
   websocket: any = null // websocket连接
-
+  showTrackDrawer: boolean = false // 是否显示底部抽屉（轨迹）
+  trackMarkers: Array<Array<number>> = [] // 标记点 - 轨迹回放
   created() {
     //订阅websocket消息
     this.websocket = new Websocket({
@@ -46,13 +53,28 @@ export default class Table extends Vue {
   }
   // 显示告警详情
   async showAbnormalDetail(detail) {
+    // 1. 将未读设为已读
     if (!detail.readState) {
       await this.$ajax.ajax({
         method: 'PUT',
         url: `v1/alarm/read/${detail.id}`
       })
     }
-    this.carDetail = detail
+    // 2. 设置汽车详情
+    this.carDetail = {
+      ...detail,
+      alarmType: detail.type,
+      runState: 3
+    }
+    // 3. 显示抽屉
+    this.showTrackDrawer = true
+    // 4. 设置抽屉时间
+    this.trackForm = {
+      carId: detail.carId,
+      beginTime: detail.alarmTime,
+      endTime: detail.closeTime
+    }
+    this.handleSearchTrack(this.trackForm)
   }
 
   // 改变当前页
@@ -60,6 +82,22 @@ export default class Table extends Vue {
     this.abnormalParams = Object.assign({}, this.abnormalParams, {
       pageNum
     })
+  }
+
+  // 返回实际轨迹
+  async handleSearchTrack(data) {
+    const tracks = await this.$ajax.ajax({
+      method: 'POST',
+      url: 'v1/car/track',
+      data: data
+    })
+    this.trackMarkers = tracks
+    if (!this.trackMarkers.length) {
+      this.$message({
+        message: '没有任何轨迹',
+        type: 'warning'
+      })
+    }
   }
 
   @Watch('abnormalParams', { deep: true })

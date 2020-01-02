@@ -5,7 +5,7 @@
     direction="rtl"
     :modal="false"
     :with-header="false"
-    size="40%"
+    size="414px"
     title="异常信息"
     class="abnormal__inner"
   >
@@ -18,7 +18,7 @@
           更多
           <i class="el-icon-d-arrow-right"></i>
         </div>
-        <i class="el-icon-close abnormal__title--close"></i>
+        <i class="el-icon-close abnormal__title--close" @click="close"></i>
       </div>
       <!-- 列表 -->
       <cell-abnormal v-bind="$attrs" v-on="$listeners"></cell-abnormal>

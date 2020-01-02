@@ -4,13 +4,16 @@
     <div class="abnormal__icon" @click="$emit('click')">
       <!-- 有异常信息 -->
       <i
-        class="sprite_ico sprite_ico_bar_notice abnormal__icon--item"
+        class="sprite_ico sprite_ico_bar_notice_abnormal abnormal__icon is-abnormal"
         v-if="!!num"
       >
         <span class="abnormal__icon--text">{{ num }}条警告信息</span>
       </i>
       <!-- 无异常 -->
-      <i v-else class="sprite_ico sprite_ico_bar_notice abnormal__icon--item">
+      <i
+        v-else
+        class="sprite_ico sprite_ico_bar_notice_normal abnormal__icon is-normal"
+      >
         <span class="abnormal__icon--text">警告信息</span>
       </i>
     </div>
@@ -38,17 +41,21 @@ export default class ButtonAbnormal extends Vue {
     right: 0;
     z-index: 99;
     cursor: pointer;
-    &--text {
-      position: absolute;
-      top: 45%;
-      transform: translate(-50%, -50%);
-      left: 58%;
-      letter-spacing: 1px;
-      white-space: nowrap;
+    font-size: 12px;
+    font-weight: bold;
+    font-style: normal;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    &.is-normal {
+      color: #fff;
+      right: -35px;
+    }
+    &.is-abnormal {
       color: #ff0000;
-      font-size: 12px;
-      font-weight: bold;
-      font-style: normal;
+    }
+    &--text {
+      padding-left: 38px;
+      line-height: 32px;
     }
   }
 }

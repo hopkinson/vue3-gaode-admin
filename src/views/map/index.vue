@@ -1,10 +1,10 @@
 <template>
   <div class="map">
     <!-- 1. 警告信息-->
-    <!-- <alert-abnormal
+    <alert-abnormal
       :num="abnormalNum"
       @click="showAbnormalList"
-    ></alert-abnormal> -->
+    ></alert-abnormal>
     <!-- 2. 搜索  -->
     <search-car-status
       v-show="showCharts"
@@ -91,7 +91,6 @@
       :track-markers.sync="trackMarkers"
       :slider-val="sliderTrack"
       :speed="trackSpeed"
-      :map-center="mapCenter"
       :markers="carList"
       :car-detail="carDetail"
       :isPlay="isPlaying"
@@ -111,6 +110,7 @@
       class="map__drawer--track"
       :show.sync="showTrackDrawer"
       :speed.sync="trackSpeed"
+      :track-form="trackForm"
       v-model="passedLength"
       :trackMarkersLength="trackMarkers.length"
       ref="drawer"
@@ -200,25 +200,8 @@ export default class MapIndex extends Mixins(
   trackSpeed: number = 1 // 初始化速度
   sliderTrack: number = 0 // 滑块的值
 
-  carDetail: CarLocationBody = {
-    id: '',
-    terminalNo: '',
-    carNo: '',
-    runState: 0,
-    alarmType: 0,
-    location: '',
-    speed: 0,
-    direction: 0,
-    locateTime: '',
-    name: '',
-    model: '',
-    typeId: '',
-    typeName: '',
-    companyId: '',
-    companyName: '',
-    address: ''
-  } // 汽车详情
-  mapCenter: Array<number | string> = [] // 点击车辆获取的位置
+  carDetail = {} // 汽车详情
+
   trackMarkers: Array<Array<number>> = [] // 标记点 - 轨迹回放
 
   // 显示图表的条件
@@ -232,6 +215,7 @@ export default class MapIndex extends Mixins(
     this.isPlaying = !this.isPlaying
     this.isEnd = false
   }
+
   // 停止轨迹的播放
   stopTrack() {
     this.isEnd = true
@@ -289,53 +273,15 @@ export default class MapIndex extends Mixins(
     this.trackMarkers = []
     this.isPlaying = false
     this.carDetail = item
-    this.mapCenter = this.carDetail.location.split(',')
-    // const data = await this.$ajax.ajax({
-    //   method: 'GET',
-    //   url: `v1/alarms/${item.id}`
-    // })
-    // this.carDetail = {
-    //   id: item.id || 0,
-    //   terminalNo: item.terminalNo || '',
-    //   carNo: data.carNo,
-    //   alarmType: data.type,
-    //   location: data.location,
-    //   speed: data.speed,
-    //   direction: data.direction,
-    //   locateTime: data.alarmTime,
-    //   runState: 3,
-    //   name: '',
-    //   model: '',
-    //   typeId: '',
-    //   typeName: '',
-    //   companyName: '',
-    //   companyId: '',
-    //   address: ''
-    // }
   }
 
   @Watch('showTrackDrawer', {})
   public watchShowTrackDrawer(val) {
     if (!val) {
       // 汽车详情清空
-      this.carDetail = {
-        id: '',
-        terminalNo: '',
-        carNo: '',
-        runState: 0,
-        alarmType: 0,
-        location: '',
-        speed: 0,
-        direction: 0,
-        locateTime: '',
-        name: '',
-        model: '',
-        typeId: '',
-        typeName: '',
-        companyId: '',
-        companyName: '',
-        address: ''
-      }
+      this.carDetail = Object.assign({}, this.carDetail, {
+        id: ''
+      })
     }
   }
 }

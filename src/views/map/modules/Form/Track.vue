@@ -42,6 +42,8 @@ import { CarIdBody } from '@/services'
 export default class TrackComponent extends Vue {
   // 详情数据
   @Prop({ type: Object, default: () => {} }) readonly carDetail!: CarIdBody
+  // 表单数据
+  @Prop({ type: Object, default: () => {} }) readonly trackForm
 
   form: CarTrackBody = {
     carId: '',
@@ -81,10 +83,16 @@ export default class TrackComponent extends Vue {
   onSubmit() {
     this.$emit('search-track', this.form)
   }
-
+  // 监听 - 倍速
+  @Watch('trackForm', { deep: true })
+  public async watchTrackForm(val: CarIdBody) {
+    this.$nextTick(() => {
+      this.form = Object.assign({}, this.form, val)
+    })
+  }
   // 监听 - 倍速
   @Watch('carDetail', { deep: true, immediate: true })
-  public async watchFormh(val: CarIdBody) {
+  public async watchForm(val: CarIdBody) {
     if (val) {
       this.form.carId = val.id
     }

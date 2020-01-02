@@ -68,7 +68,7 @@
       <!-- 点坐标 - 用户轨迹播放  -->
       <el-amap-marker
         ref="marker"
-        :offset="carDetail.alarmType ? [-26, -135] : [-30, -103]"
+        :offset="carDetail.alarmType ? [-26, -135] : [-27, -103]"
         :visible="showDrawer || showInfo"
         :events="trackMarkerEvent(carDetail)"
         :position="position"
@@ -110,13 +110,18 @@ import {
   Watch,
   Prop,
   Ref,
-  PropSync
+  PropSync,
+  Mixins
 } from 'vue-property-decorator'
 import { MAP } from '@/config/dict'
 import PanelCarDetail from '../Panel/CarDetail.vue'
 import { CarIdBody, CarLocationBody, CarSpeedBody } from '@/services'
 import { TRAFFIC_LEGEND, WARNGING } from '@/config/dict'
 import { formatDay } from '../../../../utils/filters'
+import MixinsFence from './mixins/Fence'
+import MixinsMouseTool from './mixins/MouseTool'
+import MixinsMarkerClusterer from './mixins/MarkerClusterer'
+import MixinsPreTrack from './mixins/PreTrack'
 @Component({
   name: 'MapHome',
   components: {
@@ -128,7 +133,12 @@ import { formatDay } from '../../../../utils/filters'
     }
   }
 })
-export default class MapHome extends Vue {
+export default class MapHome extends Mixins(
+  MixinsMouseTool,
+  MixinsFence,
+  MixinsMarkerClusterer,
+  MixinsPreTrack
+) {
   @Ref('marker') marker: any
   @Ref('map') map: any
   @Ref('polyline') polyline: any
@@ -138,7 +148,7 @@ export default class MapHome extends Vue {
   @Prop({ type: Boolean, default: false })
   isPlay!: boolean
 
-  // 是否正在播放 .sync
+  // 是否结束播放 .sync
   @Prop({ type: Boolean, default: false })
   isEnd!: boolean
 
@@ -162,26 +172,13 @@ export default class MapHome extends Vue {
   @Prop({ type: Number, default: 0 })
   public readonly speed!: number
 
-  //  点击详情显示地图中心
-  @Prop({ type: Array, default: [] })
-  public readonly mapCenter!: Array<number | string>
-
-  //  请求预设轨迹的接口
-  @Prop({ type: Function, default: () => {} })
-  public readonly loadPreTrack!: Function
-
   // 汽车详情
   @Prop({ type: Object, default: () => {} })
   public readonly carDetail!: CarIdBody
 
   // 围栏列表坐标
-  @Prop({ type: Array, default: () => [] })
-  public readonly fenceList!: Array<any>
-
-  // 围栏列表坐标
   @Prop({ type: Number, default: 0 })
   public readonly sliderVal!: number
-
   showInfo = false // 是否显示窗体信息
   showTrack = false // 是否显示轨迹
   realTime = false // 是否实时
@@ -190,16 +187,13 @@ export default class MapHome extends Vue {
   realTimeDetail: any = {} // 实时窗体详情
   center: Array<number | string> = MAP.center // 地图中心
   position: Array<number | string> = MAP.center // 地图中心
-  markerRefs: any = [] // 点聚合
-  fence: Array<Array<number>> = [] // 围栏坐标
-  preMarkers: Array<Array<number>> = [] // 预设轨迹
+
   havePassedLine: Array<Array<number | string>> = [] // 已经走过的轨迹
   trackLocation: Array<Array<number | string>> = [] //轨迹的坐标系数据
   //轨迹的坐标系（无警告）
   normalTracks: Array<Array<number | string>> = []
   //轨迹的坐标系（有警告）
   abnormalTracks: Array<Array<number | string>> = []
-  mouseTool: any = {} //注册全局绘制围栏插件实例
   countPassed: number = 0 // 累积经过了多少个点
   // 地图事件
   events = {
@@ -212,31 +206,12 @@ export default class MapHome extends Vue {
       })
       const self = this
       googleLayer.setMap(o)
+
       // 设置聚合坐标
-      setTimeout(() => {
-        let cluster = new (AMap as any).MarkerClusterer(o, self.markerRefs, {
-          gridSize: 1,
-          maxZoom: 20,
-          renderCluserMarker: self.renderCluserMarker
-        })
-      }, 1000)
+      this.initMarkerCluster(o)
     }
   }
-  // 聚合坐标
-  renderCluserMarker(context) {
-    const count = this.markers.length
-    let size = Math.round(30 + Math.pow(context.count / count, 1 / 5) * 20)
-    const result = `
-            <div class="project__map-cluserMarker">
-              <i class="sprite_ico sprite_ico_focus_car">
-                <div class="circle"></div>
-                <span>${context.count}</span>
-              </i>
-            </div>`
-    context.marker.setOffset(new AMap.Pixel(-size / 2, -size / 2))
-    context.marker.setContent(result)
-  }
-
+  // 点坐标的内容
   markerLabelContent(realTimeDetail) {
     const type = realTimeDetail.alarmType
       ? WARNGING.status[String(realTimeDetail.alarmType)].label
@@ -267,17 +242,6 @@ export default class MapHome extends Vue {
       </div>`,
       offset: [65, -55]
     }
-  }
-
-  polygonEvent = {
-    click: o => {
-      // console.log(o)
-    }
-  }
-
-  // 返回来的电子围栏的路径
-  fencepath(item) {
-    return item ? item.split(';').map(i => i.split(',')) : []
   }
 
   // 轨迹点坐标事件
@@ -320,45 +284,6 @@ export default class MapHome extends Vue {
         this.$emit('load-car-detail', item)
       }
     }
-  }
-
-  // 引入绘图插件  全局调用绘图插件
-  initMouseTool() {
-    this.mouseTool = new (AMap as any).MouseTool(this.map.$$getInstance())
-    this.mouseTool.polygon({
-      fillColor: 'rgb(55, 70, 95)',
-      strokeColor: 'rgb(0, 140, 255)',
-      strokeStyle: 'dashed',
-      strokeWeight: 2,
-      fillOpacity: 0.4
-    })
-    //监听draw事件可获取画好的覆盖物
-    this.mouseTool.on('draw', e => {
-      //每次只能传四个点，所以先清空
-      this.fence = []
-      let fenceArr: any = []
-      //画出来的坐标放在存放在数组里面
-      e.obj.getPath().forEach(path => {
-        const { lng, lat } = path
-        fenceArr.push([lng, lat])
-      })
-      this.$confirm('是否将绘制的范围添加到电子围栏里？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(() => {
-          this.$emit('add-fence', fenceArr)
-        })
-        .catch(() => {
-          this.destroyMouseTool()
-        })
-    })
-  }
-  // 关闭绘图插件 清除你之前画的图像
-  destroyMouseTool() {
-    this.mouseTool.close(true)
-    this.fence = []
   }
 
   // 点坐标 - 模板
@@ -408,6 +333,7 @@ export default class MapHome extends Vue {
       this.marker.$$getInstance().resumeMove()
     }
   }
+  // 轨迹移动
   moveToTracker() {
     const _nextPoint = this.getTrackMarkers[this.countPassed + 1]
     if (_nextPoint) {
@@ -432,13 +358,13 @@ export default class MapHome extends Vue {
   // 初始化轨迹移动
   initLoadTrack() {
     if (this.getTrackMarkers.length) {
-      this.abnormalTracks = this.normalTracks = []
+      this.abnormalTracks = this.normalTracks = [] // 清空
       // 分是否警告去显示经纬度
       this.abnormalTracks = this.getTrackMarkers
-        .filter(item => !item.alarmType)
+        .filter(item => item.alarmType)
         .map(item => item.location.split(','))
       this.normalTracks = this.getTrackMarkers
-        .filter(item => item.alarmType)
+        .filter(item => !item.alarmType)
         .map(item => item.location.split(','))
       // 格式化数据
       this.trackLocation = this.getTrackMarkers.map(item =>
@@ -454,15 +380,14 @@ export default class MapHome extends Vue {
   // 停止移动要把一切设为停止
   stopMove() {
     this.$emit('stop-move')
-    this.marker.$$getInstance().stopMove()
     this.realTime = false
     this.havePassedLine = [] // 清空已走过的轨迹
     this.countPassed = 1
     this.$emit('update:passedLength', 0)
-    if (this.getTrackMarkers.length) {
-      this.showInfo = true
-    }
-    this.initLoadTrack()
+    this.$nextTick(() => {
+      this.marker.$$getInstance().stopMove()
+      this.initLoadTrack()
+    })
   }
 
   // 监听 - 轨迹
@@ -473,6 +398,7 @@ export default class MapHome extends Vue {
       this.initLoadTrack()
     }
   }
+
   // 停止播放
   @Watch('isEnd', {})
   public watchIsEnd(val) {
@@ -484,7 +410,6 @@ export default class MapHome extends Vue {
   // 滑块准备
   @Watch('sliderVal', {})
   public watchPassedLength(val) {
-    // this.marker.$$getInstance().pauseMove()
     this.havePassedLine = this.trackLocation.slice(0, val)
     this.countPassed = val
     this.moveToTracker()
@@ -505,14 +430,6 @@ export default class MapHome extends Vue {
     }
   }
 
-  // 监听 - 是否显示信息窗体
-  @Watch('showInfo', {})
-  public watchShowInfo(val: boolean) {
-    if (this.showDrawer && !this.realTime && !val) {
-      this.$emit('close-info-window')
-    }
-  }
-
   // 监听 - 轨迹
   @Watch('showTrack', {})
   public watchShowTrack(val: boolean) {
@@ -526,17 +443,20 @@ export default class MapHome extends Vue {
 
   // 监听 - 轨迹
   @Watch('carDetail', { deep: true })
-  public async watchCarDetail(val: CarLocationBody) {
+  public async watchCarDetail(val) {
     if (val.id) {
-      this.preMarkers = await this.loadPreTrack(val) // 加载预设轨迹
+      this.initPreTrack(val)
       const { alarmType } = val
       setTimeout(() => {
-        this.center = this.mapCenter
+        // 1. 改变地图中心
+        this.center = val.location.split(',')
         this.position = this.center
+        // 2. 不是实时
         this.realTime = false
-        this.showInfo = true
-        this.map.$$getInstance().setZoom(19)
-      }, 350)
+        // 3. 显示信息窗体（分两种情况：）
+        // 3.1 如果有alarmNumber，则不显示；没有则显示
+        this.showInfo = !val.alarmNumber
+      }, 1)
     }
   }
 
