@@ -410,9 +410,9 @@ export default class MapHome extends Mixins(
   // 滑块准备
   @Watch('sliderVal', {})
   public watchPassedLength(val) {
-    this.havePassedLine = this.trackLocation.slice(0, val)
-    this.countPassed = val
-    this.moveToTracker()
+    // this.havePassedLine = this.trackLocation.slice(0, val)
+    // this.countPassed = val
+    // this.moveToTracker()
   }
 
   // 监听 - 是否显示抽屉

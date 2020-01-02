@@ -1,5 +1,6 @@
 <template>
   <div class="map">
+    {{ trackForm }}
     <!-- 1. 警告信息-->
     <alert-abnormal
       :num="abnormalNum"
@@ -282,6 +283,12 @@ export default class MapIndex extends Mixins(
       this.carDetail = Object.assign({}, this.carDetail, {
         id: ''
       })
+      // 轨迹表单也清空
+      this.trackForm = {
+        carId: '',
+        beginTime: '',
+        endTime: ''
+      }
     }
   }
 }

@@ -84,11 +84,13 @@ export default class TrackComponent extends Vue {
     this.$emit('search-track', this.form)
   }
   // 监听 - 倍速
-  @Watch('trackForm', { deep: true })
+  @Watch('trackForm', { deep: true, immediate: true })
   public async watchTrackForm(val: CarIdBody) {
-    this.$nextTick(() => {
-      this.form = Object.assign({}, this.form, val)
-    })
+    if (val) {
+      this.$nextTick(() => {
+        this.form = Object.assign({}, this.form, val)
+      })
+    }
   }
   // 监听 - 倍速
   @Watch('carDetail', { deep: true, immediate: true })
