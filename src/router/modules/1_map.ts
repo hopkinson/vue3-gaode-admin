@@ -21,13 +21,5 @@ export default {
       name: 'map_index',
       component: product.map_index
     }
-    // {
-    //   meta: {
-    //     title: '地图'
-    //   },
-    //   path: 'demo',
-    //   name: 'map_demo',
-    //   component: product.map_demo
-    // }
   ]
 }

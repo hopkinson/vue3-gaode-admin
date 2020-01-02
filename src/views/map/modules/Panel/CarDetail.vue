@@ -1,11 +1,11 @@
 <template>
   <div class="detail" v-if="value">
     <div class="sprite_ico sprite_ico_popup_detail__header">
-      <i
+      <!-- <i
         v-if="!realTime"
         class="iconfont icon-guanbi detail--close"
         @click="$emit('input', false)"
-      ></i>
+      ></i> -->
     </div>
     <div class="detail__main">
       <!-- 汽车具体信息 -->
@@ -16,7 +16,9 @@
       <p>隶属单位：{{ data.companyName || '无' }}</p>
       <p>当前速度：{{ data.speed || 0 }}公里/小时</p>
       <p>最后定位：{{ data.address }}</p>
-      <p>定位时间：{{ data.locateTime | formatDay('YYYY-MM-DD HH:mm:ss') }}</p>
+      <p v-show="data.locateTime">
+        定位时间：{{ data.locateTime | formatDay('YYYY-MM-DD HH:mm:ss') }}
+      </p>
       <slot name="button"></slot>
     </div>
   </div>

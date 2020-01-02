@@ -1,7 +1,10 @@
 <template>
   <div class="header__container">
     <!-- 1. 左边：标题 -->
-    <h1 class="header__title">{{ title }}</h1>
+    <h1 class="header__title">
+      <i class="sprite_ico sprite_ico_logo_car"></i>
+      <span class="header__title--inner"> {{ title }}</span>
+    </h1>
     <!-- 2. 中间：导航栏 -->
     <div class="header__content">
       <div class="header__menus">
@@ -70,6 +73,11 @@ export default class NavHeader extends Vue {
   }
   &__title {
     margin-right: 124px;
+    display: flex;
+    align-items: center;
+    &--inner {
+      padding-left: 16px;
+    }
   }
   &__footer {
     display: flex;

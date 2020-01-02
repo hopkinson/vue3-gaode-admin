@@ -48,9 +48,19 @@ export const TRAFFIC_LEGEND = {
 export const WARNGING = {
   // 状态
   status: {
+    0: {
+      label: '无告警',
+      value: 'normal',
+      color: 'rgb(179, 194, 237)'
+    },
     4: {
       label: '违停',
       value: 'weiting',
+      color: ' rgb(250, 82, 145)'
+    },
+    3: {
+      label: '偏航、逆行',
+      value: 'pianni',
       color: ' rgb(250, 82, 145)'
     },
     1: {

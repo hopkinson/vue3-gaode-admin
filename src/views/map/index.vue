@@ -1,134 +1,145 @@
 <template>
-  <div class="map">
-    <!-- {{ passedLength }} -->
-    <!-- 1. 警告信息-->
-    <alert-abnormal
-      :num="abnormalNum"
-      v-model="showAlertAbnormal"
-    ></alert-abnormal>
-    <!-- 2. 搜索  -->
-    <search-car-status
-      v-show="!showDrawer"
-      v-if="!isFullScreen"
-      class="map__chart--search"
-      v-model="showSearch"
-      :table-data="searchCarBody"
-      :company-list="companyList"
-      @search="handleSearchCar"
-      @current-change="handleCurrentChange"
-      @fetch-company="handleSearchCompany"
-      @play="filterLoadCarDetail"
-      @change-filter="handleChangeFilter"
-    ></search-car-status>
-    <!-- 3. 左侧 -->
-    <div class="map__chart--left" v-if="!isFullScreen" v-show="!showDrawer">
-      <!-- 3.1 左侧-图表 -->
-      <panel-chart
-        title="告警统计"
-        unit="单位（次）"
-        :height="240"
-        size="big"
-        class="map__chart--panel"
-      >
-        <chart-warning
-          :data="warning"
-          class="map__chart--inner"
-        ></chart-warning>
-      </panel-chart>
-      <panel-chart
-        title="当天最高时速"
-        unit="速度（公里/小时）"
-        :height="200"
-        size="big"
-        class="map__chart--panel"
-      >
-        <chart-speed :data="speed" class="map__chart--inner"></chart-speed>
-      </panel-chart>
-      <!-- 3.2 左侧-图例 -->
-      <div class="map__legends map__legends--position">
-        <div
-          v-for="(item, index) in legends"
-          :key="index"
-          class="map__legends--inner"
+  <layout :footer="false" :breadcrumb="false">
+    <div class="map">
+      <!-- 1. 警告信息-->
+      <alert-abnormal
+        :num="abnormalNum"
+        @click="showAbnormalList"
+      ></alert-abnormal>
+      <!-- 2. 搜索  -->
+      <search-car-status
+        v-show="showCharts"
+        v-if="!isFullScreen"
+        class="map__chart--search"
+        v-model="showSearch"
+        :table-data="searchCarBody"
+        :company-list="companyList"
+        @search="handleSearchCar"
+        @current-change="handleCurrentChange"
+        @fetch-company="handleSearchCompany"
+        @play="filterLoadCarDetail"
+        @change-filter="handleChangeFilter"
+      ></search-car-status>
+      <!-- 3. 左侧 -->
+      <div class="map__chart--left" v-if="!isFullScreen" v-show="showCharts">
+        <!-- 3.1 左侧-图表 -->
+        <panel-chart
+          title="告警统计"
+          unit="单位（次）"
+          :height="240"
+          size="big"
+          class="map__chart--panel"
         >
-          <i class="sprite_ico" :class="[`sprite_ico_pic_${item.value}`]"></i>
-          <p>{{ item.label }}</p>
+          <chart-warning
+            :data="warning"
+            class="map__chart--inner"
+          ></chart-warning>
+        </panel-chart>
+        <panel-chart
+          title="当天最高时速"
+          unit="速度（公里/小时）"
+          :height="200"
+          size="big"
+          class="map__chart--panel"
+        >
+          <chart-speed :data="speed" class="map__chart--inner"></chart-speed>
+        </panel-chart>
+        <!-- 3.2 左侧-图例 -->
+        <div class="map__legends map__legends--position">
+          <div
+            v-for="(item, index) in legends"
+            :key="index"
+            class="map__legends--inner"
+          >
+            <i class="sprite_ico" :class="[`sprite_ico_pic_${item.value}`]"></i>
+            <p>{{ item.label }}</p>
+          </div>
         </div>
       </div>
-    </div>
-    <!-- 4.右侧 -->
-    <div class="map__chart--right" v-if="!isFullScreen" v-show="!showDrawer">
-      <!-- 4.1右侧-图表 -->
-      <panel-chart
-        title="车辆状态"
-        :height="194"
-        size="small"
-        class="map__chart--panel"
-      >
-        <chart-cars :data="cars"></chart-cars>
-      </panel-chart>
-      <panel-chart
-        title="车辆区域分布"
-        unit="单位（辆）"
-        size="small"
-        :height="212"
-      >
-        <span slot="link">
-          查看更多区域
-          <i class="el-icon-arrow-right"></i>
-        </span>
-        <chart-districts :data="districts"></chart-districts>
-      </panel-chart>
-      <!-- 4.2右侧-围栏按钮 -->
-      <button-fence
-        @add="addFence"
-        @close="closeFence"
-        :fence.sync="fenceList"
-      ></button-fence>
-    </div>
+      <!-- 4.右侧 -->
+      <div class="map__chart--right" v-if="!isFullScreen" v-show="showCharts">
+        <!-- 4.1右侧-图表 -->
+        <panel-chart
+          title="车辆状态"
+          :height="194"
+          size="small"
+          class="map__chart--panel"
+        >
+          <chart-cars :data="cars"></chart-cars>
+        </panel-chart>
+        <panel-chart
+          title="车辆区域分布"
+          unit="单位（辆）"
+          size="small"
+          :height="212"
+        >
+          <span slot="link">
+            查看更多区域
+            <i class="el-icon-arrow-right"></i>
+          </span>
+          <chart-districts :data="districts"></chart-districts>
+        </panel-chart>
+        <!-- 4.2右侧-围栏按钮 -->
+        <button-fence
+          @add="addFence"
+          @close="closeFence"
+          :fence.sync="fenceList"
+        ></button-fence>
+      </div>
 
-    <!-- 地图 :loadPreTrack="loadPreMarkers" @on-passed-line="recordPassedLength" -->
-    <map-home
-      :track-markers.sync="trackMarkers"
-      :slider-val="sliderTrack"
-      :speed="trackSpeed"
-      :map-center="mapCenter"
-      :markers="carList"
-      :car-detail="carDetail"
-      :isPlay="isPlaying"
-      :showDrawer="showDrawer"
-      :isEnd.sync="isEnd"
-      :passedLength.sync="passedLength"
-      :fenceList="fenceList"
-      @stop-move="stopMoveTracker"
-      @add-fence="createFence"
-      @load-car-detail="loadCarDetail"
-      @play-track="handleShowTrack"
-      ref="map"
-    ></map-home>
-    <!-- 底部 - 抽屉 -->
-    <drawer-track
-      class="map__drawer"
-      :show.sync="showDrawer"
-      :speed.sync="trackSpeed"
-      v-model="passedLength"
-      :trackMarkersLength="trackMarkers.length"
-      ref="drawer"
-      :isEnd="isEnd"
-      :isPlaying.sync="isPlaying"
-      :car-detail="carDetail"
-      @play="handleControlTrack"
-      @stop="stopTrack"
-      @search-track="handleSearchTrack"
-      @change-slider="handleChangeSlider"
-    ></drawer-track>
-    <drawer-abnormal></drawer-abnormal>
-  </div>
+      <!-- 地图 :loadPreTrack="loadPreMarkers" @on-passed-line="recordPassedLength" -->
+      <map-home
+        :track-markers.sync="trackMarkers"
+        :slider-val="sliderTrack"
+        :speed="trackSpeed"
+        :markers="carList"
+        :car-detail="carDetail"
+        :isPlay="isPlaying"
+        :showDrawer="showTrackDrawer"
+        :isEnd.sync="isEnd"
+        :passedLength.sync="passedLength"
+        :fenceList="fenceList"
+        @stop-move="stopMoveTracker"
+        @add-fence="createFence"
+        @load-car-detail="loadCarDetail"
+        @play-track="handleShowTrack"
+        @close-info-window="closeInfoWindow"
+        ref="map"
+      ></map-home>
+      <!-- 底部 - 抽屉 -->
+      <drawer-track
+        class="map__drawer--track"
+        :show.sync="showTrackDrawer"
+        :speed.sync="trackSpeed"
+        :track-form="trackForm"
+        v-model="passedLength"
+        :trackMarkersLength="trackMarkers.length"
+        ref="drawer"
+        :isEnd="isEnd"
+        :isPlaying.sync="isPlaying"
+        :car-detail="carDetail"
+        @play="handleControlTrack"
+        @stop="stopTrack"
+        @search-track="handleSearchTrack"
+        @change-slider="handleChangeSlider"
+      ></drawer-track>
+      <!-- 右侧 - 抽屉 -->
+      <drawer-abnormal
+        class="map__drawer--abnormal"
+        :show.sync="showAbnormalDrawer"
+        :data="abnormalBody"
+        @more="goToQuery"
+        @current-change="abnormalCurrentChange"
+        @click="showAbnormalDetail"
+      ></drawer-abnormal>
+    </div>
+  </layout>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Ref, Watch } from 'vue-property-decorator'
+import { Component, Vue, Ref, Watch, Mixins } from 'vue-property-decorator'
 import PanelChart from './modules/Panel/Chart.vue'
+import Layout from '@/layouts/default.vue'
 import ChartSpeed from './modules/Chart/Speed.vue'
 import AlertAbnormal from './modules/Alert/Abnormal.vue'
 import ChartDistricts from './modules/Chart/Districts.vue'
@@ -140,10 +151,12 @@ import ButtonFence from './modules/Button/Fence.vue'
 import MapHome from './modules/Map/Home.vue'
 import { TRAFFIC_LEGEND } from '@/config/dict'
 import SearchCarStatus from './modules/Search/CarStatus.vue'
-import Websocket from '@/plugins/websocket'
-import { warning, cars, districts, speed } from '@/mock/data.js'
 import { Getter } from 'vuex-class'
-import { addFence, getFenceList } from './utils/webapi'
+import MixinsAbnormalList from './mixins/AbnormalList'
+import MixinsFence from './mixins/Fence'
+import MixinsChart from './mixins/Chart'
+import MixinsCars from './mixins/Cars'
+import MixinsSearchCar from './mixins/SearchCar'
 import {
   CompanyBody,
   CarsBodyRecords,
@@ -161,6 +174,7 @@ import {
     ChartCars,
     ButtonFence,
     ChartWarning,
+    Layout,
     AlertAbnormal,
     DrawerAbnormal,
     SearchCarStatus,
@@ -168,7 +182,13 @@ import {
     DrawerTrack
   }
 })
-export default class MapIndex extends Vue {
+export default class MapIndex extends Mixins(
+  MixinsAbnormalList,
+  MixinsChart,
+  MixinsCars,
+  MixinsSearchCar,
+  MixinsFence
+) {
   @Ref('drawer') drawer: any
   @Ref('map') map: any
 
@@ -177,129 +197,32 @@ export default class MapIndex extends Vue {
   isPlaying: boolean = false
 
   isEnd: boolean = false // 是否停止播放
-  showDrawer: boolean = false // 是否显示抽屉
-  showSearch: boolean = false // 是否显示筛选
-  showAlertAbnormal: boolean = false // 是否显示异常提示
+  showTrackDrawer: boolean = false // 是否显示底部抽屉（轨迹）
+
   legends = TRAFFIC_LEGEND // 图例 - 交通状态
   passedLength = 0 // 已经路过的长度
   trackSpeed: number = 1 // 初始化速度
   sliderTrack: number = 0 // 滑块的值
-  // 列表 - 时速
-  speed: any = []
-  districts: any = []
-  warning: any = []
-  cars = {} // 车辆状态的信息
-  carDetail: CarLocationBody = {
-    id: '',
-    terminalNo: '',
-    carNo: '',
-    runState: 0,
-    alarmType: 0,
-    location: '',
-    speed: 0,
-    direction: 0,
-    locateTime: '',
-    name: '',
-    model: '',
-    typeId: '',
-    typeName: '',
-    companyId: '',
-    companyName: '',
-    address: ''
-  } // 汽车详情
-  mapCenter: Array<number | string> = [] // 点击车辆获取的位置
+
+  carDetail = {} // 汽车详情
+
   trackMarkers: Array<Array<number>> = [] // 标记点 - 轨迹回放
-  companyList: Array<CompanyBody> = [] // 所有单位信息
-  searchCarBody = {} // 搜索的车辆列表
-  carList: Array<CarLocationBody> = [] // 所有车辆的列表
-  interval: number = 0
-  fenceList: Array<any> = [] //围栏列表
-  abnormalNum = 0 // 警告信息数量
-  websocket: any = null // websocket连接
-  carParams = {
-    pageNum: '',
-    pageNo: 10,
-    companyId: '',
-    carNo: ''
-  }
-  async created() {
-    this.pollingLocation()
-    setInterval(() => {
-      this.pollingLocation()
-    }, 30000)
-    //订阅websocket消息
-    this.websocket = new Websocket({
-      endPoint: process.env.VUE_APP_WS_API
-    })
-    this.websocket.subscribes('/socket/topic/alarms', ({ body }) => {
-      const result = JSON.parse(body)
-      this.abnormalNum = result
-    })
-    // 车辆状态
-    this.cars = await this.$ajax.ajax({
-      method: 'GET',
-      url: 'v1/car/state'
-    })
-    // 最高时速
-    this.speed = await this.$ajax.ajax({
-      method: 'GET',
-      url: 'v1/car/speed'
-    })
 
-    // 地区分布
-    this.districts = await this.$ajax.ajax({
-      method: 'GET',
-      url: 'v1/car/distribution'
-    })
+  // 显示图表的条件
+  get showCharts() {
+    return !this.showTrackDrawer && !this.showAbnormalDrawer
+  }
 
-    // 车辆 - 告警统计
-    this.warning = await this.$ajax.ajax({
-      method: 'GET',
-      url: 'v1/alarms/collect'
-    })
-  }
-  beforeDestroy() {
-    clearInterval(this.interval)
-    this.interval = 0
-    this.websocket.disconnect()
-  }
-  // 长轮询 - 返回车辆实时位置信息
-  async pollingLocation() {
-    this.carList = await this.$ajax.ajax({
-      method: 'POST',
-      url: `v1/car/location`
-    })
-    // await this.pollingLocation()
-  }
   // 控制轨迹的播放
   handleControlTrack(isPlaying) {
     this.isPlaying ? this.map.pauseTracker() : this.map.moveTracker()
     this.isPlaying = !this.isPlaying
     this.isEnd = false
   }
+
   // 停止轨迹的播放
   stopTrack() {
     this.isEnd = true
-  }
-  // 搜索汽车
-  handleSearchCar(carNo) {
-    this.carParams = Object.assign({}, this.carParams, {
-      carNo,
-      pageNum: 0
-    })
-  }
-  // 改变搜索条件
-  handleChangeFilter(form) {
-    this.carParams = Object.assign({}, this.carParams, {
-      ...form,
-      pageNum: 0
-    })
-  }
-  // 改变当前页
-  handleCurrentChange(pageNum) {
-    this.carParams = Object.assign({}, this.carParams, {
-      pageNum
-    })
   }
 
   // 返回实际轨迹
@@ -309,7 +232,7 @@ export default class MapIndex extends Vue {
       url: 'v1/car/track',
       data: data
     })
-    this.trackMarkers = tracks
+    this.trackMarkers = tracks || []
     if (!this.trackMarkers.length) {
       this.$message({
         message: '没有任何轨迹',
@@ -317,36 +240,25 @@ export default class MapIndex extends Vue {
       })
     }
   }
-
-  // 加载预设
-  async loadPreMarkers(val) {
-    return await this.$ajax.ajax({
-      method: 'GET',
-      url: `v1/route/car/${val.id}`
-    })
+  closeInfoWindow() {
+    this.showTrackDrawer = false
   }
-
+  // 滑块发生改变时
   handleChangeSlider(val) {
     this.sliderTrack = val
     this.passedLength = val
   }
-
+  // 停止移动轨迹
   stopMoveTracker() {
     this.isPlaying = false
     this.trackSpeed = 1
   }
   // 点击窗体的轨迹回放 - 显示底部抽屉
   handleShowTrack({ realTime }) {
-    this.showDrawer = true
-  }
-  // 所有单位信息
-  async handleSearchCompany() {
-    return await this.$ajax.ajax({
-      method: 'GET',
-      url: 'v1/car/company'
-    })
+    this.showTrackDrawer = true
   }
 
+  // 点击车辆 => 根据实时车辆信息过滤
   filterLoadCarDetail(item) {
     const car = this.carList.filter(v => item.id === v.id)[0]
     if (!car.location) {
@@ -360,107 +272,27 @@ export default class MapIndex extends Vue {
   }
 
   // 加载汽车详情
-  async loadCarDetail(item, { loadAbnormal = false } = {}) {
+  async loadCarDetail(item) {
     const { runState, location } = item
     this.trackMarkers = []
     this.isPlaying = false
-    if (!loadAbnormal) {
-      // const data = await this.$ajax.ajax({
-      //   method: 'GET',
-      //   url: `v1/car/${item.id}`
-      // })
-      this.carDetail = item
-    } else {
-      const data = await this.$ajax.ajax({
-        method: 'GET',
-        url: `v1/alarms/${item.id}`
+    this.carDetail = item
+  }
+
+  @Watch('showTrackDrawer', {})
+  public watchShowTrackDrawer(val) {
+    if (!val) {
+      // 汽车详情清空
+      this.carDetail = Object.assign({}, this.carDetail, {
+        id: ''
       })
-      this.carDetail = {
-        id: item.id || 0,
-        terminalNo: item.terminalNo || '',
-        carNo: data.carNo,
-        alarmType: data.type,
-        location: data.location,
-        speed: data.speed,
-        direction: data.direction,
-        locateTime: data.alarmTime,
-        runState: 3,
-        name: '',
-        model: '',
-        typeId: '',
-        typeName: '',
-        companyName: '',
-        companyId: '',
-        address: ''
+      // 轨迹表单也清空
+      this.trackForm = {
+        carId: '',
+        beginTime: '',
+        endTime: ''
       }
     }
-    this.mapCenter = this.carDetail.location.split(',')
-  }
-
-  // 新增电子围栏
-  addFence() {
-    this.map.initMouseTool()
-  }
-  // 关闭编辑电子围栏
-  closeFence() {
-    this.map.destroyMouseTool()
-  }
-
-  // 新建电子围栏
-  async createFence(points) {
-    const gid = await addFence(points)
-    if (gid) {
-      this.fenceList = await getFenceList()
-      this.map.destroyMouseTool()
-    }
-  }
-
-  // 监听 - 倍速
-  @Watch('showSearch', {})
-  public async watchShowSearch(val: boolean) {
-    if (val && !this.companyList.length) {
-      // 所有单位信息
-      this.companyList = await this.$ajax.ajax({
-        method: 'GET',
-        url: 'v1/company'
-      })
-      this.carParams.pageNum = '0'
-    }
-  }
-  @Watch('showDrawer', {})
-  public watchShowDrawer(val) {
-    if (!val) {
-      this.carDetail = {
-        id: '',
-        terminalNo: '',
-        carNo: '',
-        runState: 0,
-        alarmType: 0,
-        location: '',
-        speed: 0,
-        direction: 0,
-        locateTime: '',
-        name: '',
-        model: '',
-        typeId: '',
-        typeName: '',
-        companyId: '',
-        companyName: '',
-        address: ''
-      } // 汽车详情
-    }
-  }
-
-  @Watch('carParams', { deep: true })
-  public async watchCarParams(val) {
-    // 车辆列表
-    const carBody = await this.$ajax.ajax({
-      method: 'POST',
-      url: 'v1/cars',
-      query: val,
-      data: val
-    })
-    this.searchCarBody = carBody
   }
 }
 </script>
@@ -500,12 +332,26 @@ export default class MapIndex extends Vue {
     }
   }
   &__drawer {
-    position: static !important;
-    & /deep/ .el-drawer__container {
-      position: fixed;
-      top: auto;
-      height: auto;
-      z-index: 2000;
+    &--track {
+      position: static !important;
+      & /deep/ .el-drawer__container {
+        position: fixed;
+        top: auto;
+        height: auto;
+        z-index: 2000;
+      }
+    }
+    &--abnormal {
+      position: static !important;
+      & /deep/ .el-drawer {
+        background: #020215;
+      }
+      & /deep/ .el-drawer__container {
+        position: fixed;
+        top: 60px;
+        height: auto;
+        z-index: 2000;
+      }
     }
   }
   &__legends {

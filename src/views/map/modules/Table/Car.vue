@@ -57,7 +57,7 @@
         >
       </el-table-column>
     </el-table>
-    <!-- 分页  :current-page.sync="currentPage3"-->
+    <!-- 分页 -->
     <el-pagination
       class="table__pagination"
       @current-change="handleCurrentChange"
