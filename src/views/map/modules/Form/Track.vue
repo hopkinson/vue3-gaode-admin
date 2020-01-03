@@ -96,7 +96,11 @@ export default class TrackComponent extends Vue {
   @Watch('carDetail', { deep: true, immediate: true })
   public async watchForm(val: CarIdBody) {
     if (val) {
-      this.form.carId = val.id
+      this.$nextTick(() => {
+        this.form = Object.assign({}, this.form, {
+          carId: val.id
+        })
+      })
     }
   }
 }

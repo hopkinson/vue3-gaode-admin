@@ -15,7 +15,7 @@ export default {
   children: [
     {
       meta: {
-        title: '查询统计'
+        // title: '查询统计'
       },
       path: 'index',
       name: 'query_index',

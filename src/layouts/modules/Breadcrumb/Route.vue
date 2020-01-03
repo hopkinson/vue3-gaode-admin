@@ -23,7 +23,7 @@ export default class BreadcrumbRoutes extends Vue {
   public handleChangeRoute(val: Route) {
     if (val) {
       const { matched } = val
-      this.paths = matched
+      this.paths = matched.filter(item => item.meta.title)
     }
   }
 }
