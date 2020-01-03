@@ -40,7 +40,6 @@
         <panel-car-detail
           v-model="showInfo"
           :data="carDetail"
-          :realTime="realTime"
           v-bind="$attrs"
           v-on="$listeners"
         >
@@ -69,31 +68,27 @@
       <el-amap-marker
         ref="marker"
         :offset="carDetail.alarmType ? [-26, -135] : [-27, -103]"
-        :visible="showDrawer || showInfo"
+        :visible="showTrackMarker"
         :events="trackMarkerEvent(carDetail)"
         :position="position"
         :label="markerLabelContent(realTimeDetail)"
-        :content="
-          Object.keys(carDetail).length ? markerTemplate(carDetail) : ''
-        "
+        :content="trackMarkerContent"
       ></el-amap-marker>
       <!-- 轨迹 -->
       <!-- 轨迹 - 无异常 -->
       <el-amap-polyline
-        :path="normalTracks"
+        :path="trackLocation"
+        ref="polyline"
         strokeColor="#fff000"
       ></el-amap-polyline>
       <!-- 轨迹 - 异常 -->
       <el-amap-polyline
-        :path="abnormalTracks"
+        :path="item"
+        :key="index"
+        v-for="(item, index) in abnormalTracks"
         strokeColor="#ff010b"
       ></el-amap-polyline>
       <!-- 轨迹 - 所有 -->
-      <el-amap-polyline
-        :path="trackLocation"
-        ref="polyline"
-        strokeColor="transparent"
-      ></el-amap-polyline>
       <!-- 轨迹 - 路过 -->
       <el-amap-polyline
         :path="havePassedLine"
@@ -149,8 +144,8 @@ export default class MapHome extends Mixins(
   isPlay!: boolean
 
   // 是否结束播放 .sync
-  @Prop({ type: Boolean, default: false })
-  isEnd!: boolean
+  @PropSync('isEnd', { type: Boolean, default: false })
+  getIsEnd!: boolean
 
   //  坐标数组
   @PropSync('trackMarkers', { type: Array, default: () => [] })
@@ -179,9 +174,13 @@ export default class MapHome extends Mixins(
   // 围栏列表坐标
   @Prop({ type: Number, default: 0 })
   public readonly sliderVal!: number
+
+  //  异常的坐标
+  @Prop({ type: Array, default: () => [] })
+  public readonly abnormalTracks!: Array<Array<Array<number>>>
+
   showInfo = false // 是否显示窗体信息
   showTrack = false // 是否显示轨迹
-  realTime = false // 是否实时
   zoom: number = MAP.zoom // 初始化缩放大小
   zooms: Array<number> = MAP.zooms // 缩放比例
   realTimeDetail: any = {} // 实时窗体详情
@@ -190,10 +189,6 @@ export default class MapHome extends Mixins(
 
   havePassedLine: Array<Array<number | string>> = [] // 已经走过的轨迹
   trackLocation: Array<Array<number | string>> = [] //轨迹的坐标系数据
-  //轨迹的坐标系（无警告）
-  normalTracks: Array<Array<number | string>> = []
-  //轨迹的坐标系（有警告）
-  abnormalTracks: Array<Array<number | string>> = []
   countPassed: number = 0 // 累积经过了多少个点
   // 地图事件
   events = {
@@ -211,12 +206,22 @@ export default class MapHome extends Mixins(
       this.initMarkerCluster(o)
     }
   }
+
+  // 显示点坐标的条件：
+  // 有抽屉 和 显示信息窗体的时候
+  get showTrackMarker() {
+    return this.showDrawer || this.showInfo
+  }
+  get trackMarkerContent() {
+    const { carDetail } = this
+    return Object.keys(carDetail).length ? this.markerTemplate(carDetail) : ''
+  }
+
   // 点坐标的内容
   markerLabelContent(realTimeDetail) {
-    const type = realTimeDetail.alarmType
-      ? WARNGING.status[String(realTimeDetail.alarmType)].label
-      : '无异常'
-    const isWarning = !!realTimeDetail.alarmType
+    const { alarmType } = realTimeDetail
+    const type = alarmType ? WARNGING.status[String(alarmType)].label : '无异常'
+    const isWarning = !!alarmType
     // 显示内容的判断条件（不显示窗体内容&显示底部抽屉&有点坐标时候）
     const showContent =
       !this.showInfo && this.showDrawer && this.getTrackMarkers.length
@@ -250,21 +255,18 @@ export default class MapHome extends Mixins(
   trackMarkerEvent() {
     return {
       click: () => {
-        if (!this.realTime) {
-          setTimeout(() => {
-            this.realTime = false
-            this.showInfo = true
-          }, 200)
-        }
+        setTimeout(() => {
+          this.showInfo = true // 点击某个点坐标 => 显示信息窗体
+        }, 200)
       },
       moveend: () => {
         const isNotEuqal = this.getTrackMarkers.length !== this.countPassed + 1
-        this.$emit('update:passedLength', this.countPassed + 1)
+        this.$emit('update:isEnd', !isNotEuqal)
+        this.$emit('update:passedLength', this.countPassed + 1) // 每移动一格加一
         if (isNotEuqal) {
           this.moveToTracker()
         } else {
-          this.realTime = false
-          this.showInfo = true
+          this.showInfo = true // 再次显示信息窗体
         }
       }
     }
@@ -273,9 +275,6 @@ export default class MapHome extends Mixins(
   markerEvent(item) {
     // 点击 静态的点坐标 - 显示车辆详情信息
     return {
-      init: o => {
-        this.markerRefs.push(o)
-      },
       click: () => {
         const { location } = item
         setTimeout(() => {
@@ -283,16 +282,14 @@ export default class MapHome extends Mixins(
           this.center = this.position
           this.showInfo = !this.showInfo
         }, 200)
-        this.$emit('load-car-detail', item)
+        this.$emit('load-car-detail', item) // 加载车辆信息详情
       }
     }
   }
 
   // 点坐标 - 模板
-  markerTemplate(
-    { carNo, location, runState, alarmType },
-    { show = true } = {}
-  ) {
+  markerTemplate(carDetail, { show = true } = {}) {
+    const { carNo, location, runState, alarmType } = carDetail
     let content = ''
     if (location && show) {
       const alarmTypeIcon = runState === 3 && !!alarmType
@@ -314,15 +311,16 @@ export default class MapHome extends Mixins(
   }
   // 轨迹回放
   trackPlay() {
-    this.$emit('play-track', { realTime: this.realTime, data: this.carDetail })
+    this.$emit('play-track', { data: this.carDetail })
   }
 
-  // 轨迹 - 开始移动
+  // 轨迹 - 开始播放
   moveTracker() {
-    if (!this.realTime) {
+    if (this.getIsEnd) {
       this.moveToTracker()
-      this.realTime = true
+      // 隐藏信息窗体
       this.showInfo = false
+      // 监听 点坐标正在移动中
       this.marker.$$getInstance().on('moving', e => {
         this.havePassedLine.push(e.passedPath[e.passedPath.length - 1])
         setTimeout(() => {
@@ -359,79 +357,64 @@ export default class MapHome extends Mixins(
 
   // 初始化轨迹移动
   initLoadTrack() {
-    if (this.getTrackMarkers.length) {
-      this.abnormalTracks = this.normalTracks = [] // 清空
-      // 分是否警告去显示经纬度
-      this.abnormalTracks = this.getTrackMarkers
-        .filter(item => item.alarmType)
-        .map(item => item.location.split(','))
-      this.normalTracks = this.getTrackMarkers
-        .filter(item => !item.alarmType)
-        .map(item => item.location.split(','))
-      // 格式化数据
-      this.trackLocation = this.getTrackMarkers.map(item =>
-        item.location.split(',')
-      )
-      console.log('无异常数量', this.normalTracks.length)
-      console.log('异常数量', this.abnormalTracks.length)
-      console.log('坐标总数量', this.trackLocation.length)
-      // 每走一个点 中心都发生改变
-      setTimeout(() => {
-        const { lng, lat } = this.polyline.$$getInstance().getPath()[0]
+    this.showTrack = !!this.getTrackMarkers.length // 如果有坐标，则显示轨迹
+    // 格式化数据
+    this.trackLocation = this.getTrackMarkers.map(item =>
+      item.location.split(',')
+    )
+    // 每走一个点 中心都发生改变
+    setTimeout(() => {
+      const { lng, lat } = this.polyline.$$getInstance().getPath()[0]
+      if (lng && lat) {
         this.position = this.center = [lng, lat]
-      }, 0)
-    }
+      }
+    }, 0)
   }
+
   // 停止移动要把一切设为停止
-  stopMove() {
-    this.$emit('stop-move')
-    this.realTime = false
+  stopMove({ reload = true } = {}) {
+    this.$emit('stop-move') // 停止移动
     this.havePassedLine = [] // 清空已走过的轨迹
-    this.countPassed = 1
+    this.countPassed = 1 // 计数器设默认为1
     this.$emit('update:passedLength', 0)
     this.$nextTick(() => {
       this.marker.$$getInstance().stopMove()
-      this.initLoadTrack()
+      reload && this.initLoadTrack() // 初始化路径
     })
   }
 
   // 监听 - 轨迹
   @Watch('getTrackMarkers', { deep: true })
   public watchTrackMarkerts(val: Array<CarLocationBody>) {
-    this.showTrack = !!val && !!val.length // 如果有坐标，则显示轨迹
-    if (val.length) {
-      this.initLoadTrack()
-    }
+    this.initLoadTrack()
   }
 
   // 停止播放
-  @Watch('isEnd', {})
+  @Watch('getIsEnd', {})
   public watchIsEnd(val) {
     if (val) {
-      this.stopMove()
+      this.stopMove({ reload: !!this.showDrawer })
     }
   }
-
-  // // 滑块准备
-  // @Watch('sliderVal', {})
-  // public watchPassedLength(val) {
-  //   // this.havePassedLine = this.trackLocation.slice(0, val)
-  //   // this.countPassed = val
-  //   // this.moveToTracker()
-  // }
+  @Watch('sliderVal', {})
+  public watchSliderVal(val) {
+    this.countPassed = val
+    this.$nextTick(() => {
+      this.marker.$$getInstance().stopMove()
+      this.moveToTracker()
+    })
+  }
 
   // 监听 - 是否显示抽屉
   @Watch('showDrawer', {})
   public watchshowDrawer(val: boolean) {
     if (!val) {
-      this.havePassedLine = [] // 已经走过的轨迹
-      this.trackLocation = [] //轨迹的总坐标系
+      this.showTrack = false // 不显示轨迹
+      this.showInfo = false // 不显示信息窗体
+      this.$emit('update:isEnd', true) // 停止的状态
       this.$nextTick(() => {
-        this.normalTracks = [] // 轨迹的坐标系（无警告）
-        this.abnormalTracks = [] // 轨迹的坐标系（有警告）
+        this.trackLocation = [] //轨迹的总坐标系清空
       })
-      this.stopMove()
-      this.showInfo = false
     }
   }
 
@@ -439,10 +422,9 @@ export default class MapHome extends Mixins(
   @Watch('showTrack', {})
   public watchShowTrack(val: boolean) {
     if (val) {
+      // 1. 显示
       this.realTimeDetail = this.getTrackMarkers[0] // 实时信息
       this.showInfo = false // 把汽车详情隐藏
-    } else {
-      this.realTime = false
     }
   }
 
@@ -450,26 +432,16 @@ export default class MapHome extends Mixins(
   @Watch('carDetail', { deep: true })
   public async watchCarDetail(val) {
     if (val.id) {
-      this.initPreTrack(val)
+      this.initPreTrack(val) // 加载预设路线
       const { alarmType } = val
       setTimeout(() => {
         // 1. 改变地图中心
         this.center = val.location.split(',')
         this.position = this.center
-        // 2. 不是实时
-        this.realTime = false
         // 3. 显示信息窗体（分两种情况：）
         // 3.1 如果有alarmNumber，则不显示；没有则显示
         this.showInfo = !val.alarmNumber
       }, 1)
-    }
-  }
-
-  // 监听 - 是否实时播放
-  @Watch('realTime', {})
-  public watchRealTime(val: number) {
-    if (!val) {
-      this.stopMove()
     }
   }
 }

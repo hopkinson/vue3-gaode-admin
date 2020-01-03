@@ -22,7 +22,7 @@ export default class Table extends Vue {
   websocket: any = null // websocket连接
   showTrackDrawer: boolean = false // 是否显示底部抽屉（轨迹）
   trackMarkers: Array<Array<number>> = [] // 标记点 - 轨迹回放
-  created() {
+  async created() {
     //订阅websocket消息
     this.websocket = new Websocket({
       endPoint: process.env.VUE_APP_WS_API
@@ -31,6 +31,14 @@ export default class Table extends Vue {
       const result = Number(body)
       this.abnormalNum = result
     })
+    const { alarmId } = this.$route.query
+    if (alarmId) {
+      const detail = await this.$ajax.ajax({
+        method: 'GET',
+        url: `v1/alarms/${alarmId}`
+      })
+      this.showAbnormalDetail(detail)
+    }
   }
 
   beforeDestroy() {
@@ -106,6 +114,7 @@ export default class Table extends Vue {
     this.abnormalBody = await this.$ajax.ajax({
       method: 'POST',
       url: 'v1/alarms/page',
+      query: val,
       data: val
     })
   }

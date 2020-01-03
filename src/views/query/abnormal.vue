@@ -1,9 +1,10 @@
 <template>
-  <div class="abnormal">
+  <div class="abnormal" v-loading="loading">
     <table-abnormal
       :data="data"
       v-model="params"
-      @fetch="hanldeFetchData"
+      @fetch="handleFetchData"
+      @view="viewData"
       title="异常统计"
     >
       <form-search v-model="params" @search="data = {}" />
@@ -17,7 +18,7 @@ import FormSearch from './modules/Form/Abnormal.vue'
 import { Component, Vue, Watch } from 'vue-property-decorator'
 
 @Component({
-  name: 'BaseInfoComponent',
+  name: 'AbnormalComponent',
   components: {
     TableAbnormal,
     FormSearch
@@ -46,7 +47,7 @@ export default class BaseInfoComponent extends Vue {
   }
 
   // 请求数据
-  async hanldeFetchData() {
+  async handleFetchData() {
     this.loading = true
     // 警告列表
     this.data = await this.$ajax.ajax({
@@ -56,6 +57,25 @@ export default class BaseInfoComponent extends Vue {
       query: this.params
     })
     this.loading = false
+  }
+  async viewData(item) {
+    this.loading = true
+    // 1. 将未读设为已读
+    if (!item.readState) {
+      await this.$ajax.ajax({
+        method: 'PUT',
+        url: `v1/alarm/read/${item.id}`
+      })
+    }
+    setTimeout(() => {
+      this.loading = false
+      this.$router.push({
+        path: '/map',
+        query: {
+          alarmId: item.id
+        }
+      })
+    }, 500)
   }
 }
 </script>

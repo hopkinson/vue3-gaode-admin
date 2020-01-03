@@ -1,18 +1,5 @@
 <template>
   <el-form :inline="true" :model="form" size="small">
-    <el-form-item label="车牌号码：">
-      <el-input v-model="form.carNo" clearable></el-input>
-    </el-form-item>
-    <el-form-item label="类型：">
-      <el-select v-model="form.type" clearable>
-        <el-option
-          :key="index"
-          :label="item.label"
-          :value="item.value"
-          v-for="(item, index) in dict"
-        ></el-option>
-      </el-select>
-    </el-form-item>
     <el-form-item label="时间范围：">
       <el-date-picker
         v-model="dateRange"
@@ -48,8 +35,6 @@ import { WARNGING } from '@/config/dict'
 export default class FormSearch extends Vue {
   // 搜索的表单
   form = {
-    carNo: '',
-    type: '',
     endDate: '',
     beginDate: ''
   }

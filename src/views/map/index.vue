@@ -90,6 +90,7 @@
       <!-- 地图 :loadPreTrack="loadPreMarkers" @on-passed-line="recordPassedLength" -->
       <map-home
         :track-markers.sync="trackMarkers"
+        :abnormal-tracks="abnormalTracks"
         :slider-val="sliderTrack"
         :speed="trackSpeed"
         :markers="carList"
@@ -196,7 +197,7 @@ export default class MapIndex extends Mixins(
   // 是否在播放轨迹回放
   isPlaying: boolean = false
 
-  isEnd: boolean = false // 是否停止播放
+  isEnd: boolean = true // 是否停止播放的状态
   showTrackDrawer: boolean = false // 是否显示底部抽屉（轨迹）
 
   legends = TRAFFIC_LEGEND // 图例 - 交通状态
@@ -207,6 +208,7 @@ export default class MapIndex extends Mixins(
   carDetail = {} // 汽车详情
 
   trackMarkers: Array<Array<number>> = [] // 标记点 - 轨迹回放
+  abnormalTracks: Array<Array<Array<number>>> = [] // 异常的坐标
 
   // 显示图表的条件
   get showCharts() {

@@ -19,6 +19,7 @@
       :max="trackMarkersLength"
       :value="value"
       @input="input"
+      @change="change"
     ></el-slider>
   </div>
 </template>
@@ -88,6 +89,8 @@ export default class DrawerTrackComponent extends Vue {
   }
   input(val) {
     this.$emit('input', val)
+  }
+  change(val) {
     this.$emit('change-slider', val)
   }
   // 监听 - 倍速

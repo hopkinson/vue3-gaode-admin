@@ -1,5 +1,5 @@
 <template>
-  <table-query v-bind="$attrs" v-on="$listeners" :show-selection="selection">
+  <table-query v-bind="$attrs" v-on="$listeners">
     <!-- 条件查询 -->
     <template slot="query">
       <slot></slot>

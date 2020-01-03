@@ -46,12 +46,12 @@ export default class TrackComponent extends Vue {
   @Prop({ type: Object, default: () => {} }) readonly trackForm
 
   form: CarTrackBody = {
-    carId: '',
-    beginTime: '',
-    endTime: ''
-    // carId: '6',
-    // beginTime: '2019-12-31T15:00:00',
-    // endTime: '2019-12-31T17:00:00'
+    // carId: '',
+    // beginTime: '',
+    // endTime: ''
+    carId: '6',
+    beginTime: '2019-12-31T15:00:00',
+    endTime: '2019-12-31T17:00:00'
   }
 
   pickerOptions: any = {
@@ -84,14 +84,14 @@ export default class TrackComponent extends Vue {
     this.$emit('search-track', this.form)
   }
   // 监听 - 倍速
-  @Watch('trackForm', { deep: true, immediate: true })
-  public async watchTrackForm(val: CarIdBody) {
-    if (val) {
-      this.$nextTick(() => {
-        this.form = Object.assign({}, this.form, val)
-      })
-    }
-  }
+  // @Watch('trackForm', { deep: true, immediate: true })
+  // public async watchTrackForm(val: CarIdBody) {
+  //   if (val) {
+  //     this.$nextTick(() => {
+  //       this.form = Object.assign({}, this.form, val)
+  //     })
+  //   }
+  // }
   // 监听 - 倍速
   @Watch('carDetail', { deep: true, immediate: true })
   public async watchForm(val: CarIdBody) {
