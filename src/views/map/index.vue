@@ -95,7 +95,7 @@
         :speed="trackSpeed"
         :markers="carList"
         :car-detail="carDetail"
-        :isPlay="isPlaying"
+        :isPlay.sync="isPlaying"
         :showDrawer="showTrackDrawer"
         :isEnd.sync="isEnd"
         :passedLength.sync="passedLength"
@@ -240,6 +240,16 @@ export default class MapIndex extends Mixins(
         message: '没有任何轨迹',
         type: 'warning'
       })
+    } else {
+      // 返回异常部分
+      const _abnormalTrack = await this.$ajax.ajax({
+        method: 'POST',
+        url: 'v1/car/track/alarm',
+        data: data
+      })
+      if (_abnormalTrack) {
+        this.abnormalTracks = _abnormalTrack
+      }
     }
   }
   closeInfoWindow() {

@@ -16,7 +16,7 @@
     <el-slider
       class="track__slider"
       :show-tooltip="false"
-      :max="trackMarkersLength"
+      :max="trackMarkersLength - 1"
       :value="value"
       @input="input"
       @change="change"

@@ -71,6 +71,7 @@
         :visible="showTrackMarker"
         :events="trackMarkerEvent(carDetail)"
         :position="position"
+        v-if="showMarker"
         :label="markerLabelContent(realTimeDetail)"
         :content="trackMarkerContent"
       ></el-amap-marker>
@@ -84,13 +85,14 @@
       <!-- 轨迹 - 异常 -->
       <el-amap-polyline
         :path="item"
-        :key="index"
+        :key="`polyline${index}`"
         v-for="(item, index) in abnormalTracks"
         strokeColor="#ff010b"
       ></el-amap-polyline>
       <!-- 轨迹 - 所有 -->
       <!-- 轨迹 - 路过 -->
       <el-amap-polyline
+        :z-index="52"
         :path="havePassedLine"
         strokeColor="#500018"
       ></el-amap-polyline>
@@ -140,8 +142,8 @@ export default class MapHome extends Mixins(
   @Ref('passedPolyline') passedPolyline: any
 
   // 是否正在播放 .sync
-  @Prop({ type: Boolean, default: false })
-  isPlay!: boolean
+  @PropSync('isPlay', { type: Boolean, default: false })
+  getIsPlay!: boolean
 
   // 是否结束播放 .sync
   @PropSync('isEnd', { type: Boolean, default: false })
@@ -178,15 +180,15 @@ export default class MapHome extends Mixins(
   //  异常的坐标
   @Prop({ type: Array, default: () => [] })
   public readonly abnormalTracks!: Array<Array<Array<number>>>
-
+  _isPlaying = false // 是否播放中（内部使用）
   showInfo = false // 是否显示窗体信息
   showTrack = false // 是否显示轨迹
+  showMarker = true // 是否显示点坐标
   zoom: number = MAP.zoom // 初始化缩放大小
   zooms: Array<number> = MAP.zooms // 缩放比例
   realTimeDetail: any = {} // 实时窗体详情
   center: Array<number | string> = MAP.center // 地图中心
   position: Array<number | string> = MAP.center // 地图中心
-
   havePassedLine: Array<Array<number | string>> = [] // 已经走过的轨迹
   trackLocation: Array<Array<number | string>> = [] //轨迹的坐标系数据
   countPassed: number = 0 // 累积经过了多少个点
@@ -260,11 +262,10 @@ export default class MapHome extends Mixins(
         }, 200)
       },
       moveend: () => {
-        const isNotEuqal = this.getTrackMarkers.length !== this.countPassed + 1
+        const isNotEuqal = this.getTrackMarkers.length - 1 !== this.countPassed
         this.$emit('update:isEnd', !isNotEuqal)
-        this.$emit('update:passedLength', this.countPassed + 1) // 每移动一格加一
         if (isNotEuqal) {
-          this.moveToTracker()
+          this._isPlaying && this.moveToTracker()
         } else {
           this.showInfo = true // 再次显示信息窗体
         }
@@ -318,20 +319,19 @@ export default class MapHome extends Mixins(
   moveTracker() {
     if (this.getIsEnd) {
       this.moveToTracker()
+      this.movingTracker()
+      this._isPlaying = true
       // 隐藏信息窗体
       this.showInfo = false
-      // 监听 点坐标正在移动中
-      this.marker.$$getInstance().on('moving', e => {
-        this.havePassedLine.push(e.passedPath[e.passedPath.length - 1])
-        setTimeout(() => {
-          const accro = e.passedPath[e.passedPath.length - 1]
-          this.position = [accro.lng, accro.lat]
-          this.center = this.position
-        }, 0)
-      })
     } else {
       this.marker.$$getInstance().resumeMove()
     }
+  }
+  // 监听 点坐标正在移动中
+  movingTracker() {
+    this.marker.$$getInstance().on('moving', e => {
+      this.havePassedLine.push(e.passedPath[e.passedPath.length - 1])
+    })
   }
   // 轨迹移动
   moveToTracker() {
@@ -345,13 +345,18 @@ export default class MapHome extends Mixins(
         Number(_location[1])
       )
       this.countPassed++
+      this.$emit('update:passedLength', this.countPassed) // 每移动一格加一
       this.realTimeDetail = this.getTrackMarkers[this.countPassed]
-      this.marker.$$getInstance().moveTo(_lnglat, speed * this.speed * 2.5)
+      this.$nextTick(() => {
+        this.map.$$getInstance().setFitView()
+      })
+      this.marker.$$getInstance().moveTo(_lnglat, speed * this.speed * 2)
     }
   }
 
   // 轨迹 - 停止移动
   pauseTracker() {
+    this._isPlaying = false
     this.marker.$$getInstance().pauseMove()
   }
 
@@ -375,8 +380,9 @@ export default class MapHome extends Mixins(
   stopMove({ reload = true } = {}) {
     this.$emit('stop-move') // 停止移动
     this.havePassedLine = [] // 清空已走过的轨迹
-    this.countPassed = 1 // 计数器设默认为1
+    this.countPassed = 0 // 计数器设默认为1
     this.$emit('update:passedLength', 0)
+    this._isPlaying = false
     this.$nextTick(() => {
       this.marker.$$getInstance().stopMove()
       reload && this.initLoadTrack() // 初始化路径
@@ -396,13 +402,24 @@ export default class MapHome extends Mixins(
       this.stopMove({ reload: !!this.showDrawer })
     }
   }
+
+  // 手动滑
   @Watch('sliderVal', {})
   public watchSliderVal(val) {
+    this.marker.$$getInstance().stopMove()
+    this.showMarker = false
     this.countPassed = val
-    this.$nextTick(() => {
-      this.marker.$$getInstance().stopMove()
+    this.havePassedLine = this.trackLocation.slice(0, val + 1)
+    const { location } = this.getTrackMarkers[val]
+    this.center = location.split(',')
+    this.position = this.center
+    setTimeout(() => {
+      this.showMarker = true
+    }, 100)
+    setTimeout(() => {
       this.moveToTracker()
-    })
+      this.movingTracker()
+    }, 500)
   }
 
   // 监听 - 是否显示抽屉

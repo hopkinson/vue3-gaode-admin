@@ -3,6 +3,7 @@ import store from '@/store'
 import router from '@/router'
 import routes from '@/router/routes'
 import cookie from 'js-cookie'
+import { Notification } from 'element-ui'
 import { TOKEN, REFRESH_TOKEN } from '@/config/constant'
 const whiteList = ['/login']
 // router.afterEach(to => {
@@ -35,7 +36,6 @@ router.beforeEach(async (to, from, next) => {
                 redirect: '/404'
               })
             )
-
             next({
               ...to,
               replace: true
@@ -55,7 +55,16 @@ router.beforeEach(async (to, from, next) => {
             next()
           }
         } else {
-          next()
+          if (to.meta.allow) {
+            next()
+          } else {
+            next(false)
+            Notification({
+              title: '提示',
+              message: '该功能尚未开放！',
+              type: 'warning'
+            })
+          }
         }
       }
     }

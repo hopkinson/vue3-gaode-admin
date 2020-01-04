@@ -2,7 +2,6 @@
   <div class="statistics" v-loading="loading">
     <table-statistics
       :data="data"
-      :showPagination="false"
       v-model="params"
       @fetch="handleFetchData"
       title="违法行为统计"
@@ -37,6 +36,7 @@ export default class StatisticsComponent extends Vue {
 
   params = {
     pageNum: '',
+    pageSize: 10,
     beginDate: formatDay(`${YEAR}-${MONTH}-1`, 'YYYY-MM-DD'),
     endDate: ''
   }
@@ -51,15 +51,11 @@ export default class StatisticsComponent extends Vue {
   async handleFetchData() {
     this.loading = true
     // 警告列表
-    const records = await this.$ajax.ajax({
+    this.data = await this.$ajax.ajax({
       method: 'GET',
       url: 'v1/alarms/statistics',
       data: this.params,
       query: this.params
-    })
-    this.data = Object.assign({}, this.data, {
-      records,
-      total: records.length
     })
     this.loading = false
   }

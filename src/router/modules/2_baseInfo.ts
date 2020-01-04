@@ -7,13 +7,13 @@ const product = {
 export default {
   path: '/baseInfo',
   meta: {
-    title: '基础资料管理',
-    roles: ['admin']
+    title: '基础资料管理'
   },
   children: [
     {
       meta: {
-        title: '基础资料'
+        title: '基础资料',
+        allow: false
       },
       path: 'index',
       name: 'baseInfo_index',

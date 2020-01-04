@@ -9,13 +9,13 @@ const product = {
 export default {
   path: '/map',
   meta: {
-    title: '首页',
-    roles: ['admin']
+    title: '首页'
   },
   children: [
     {
       meta: {
-        title: '地图'
+        title: '地图',
+        allow: true
       },
       path: 'index',
       name: 'map_index',
