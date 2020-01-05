@@ -44,7 +44,6 @@ export default class ButtonAbnormal extends Vue {
     font-size: 12px;
     font-weight: bold;
     font-style: normal;
-    letter-spacing: 1px;
     white-space: nowrap;
     &.is-normal {
       color: #fff;
@@ -54,7 +53,7 @@ export default class ButtonAbnormal extends Vue {
       color: #ff0000;
     }
     &--text {
-      padding-left: 38px;
+      padding-left: 34px;
       line-height: 32px;
     }
   }

@@ -23,27 +23,33 @@
       <!-- 3. 左侧 -->
       <div class="map__chart--left" v-if="!isFullScreen" v-show="showCharts">
         <!-- 3.1 左侧-图表 -->
-        <panel-chart
-          title="告警统计"
-          unit="单位（次）"
-          :height="240"
-          size="big"
-          class="map__chart--panel"
-        >
-          <chart-warning
-            :data="warning"
-            class="map__chart--inner"
-          ></chart-warning>
-        </panel-chart>
-        <panel-chart
-          title="当天最高时速"
-          unit="速度（公里/小时）"
-          :height="200"
-          size="big"
-          class="map__chart--panel"
-        >
-          <chart-speed :data="speed" class="map__chart--inner"></chart-speed>
-        </panel-chart>
+        <transition name="el-fade-in-linear">
+          <panel-chart
+            v-if="warning.length"
+            title="告警统计"
+            unit="单位（次）"
+            :height="240"
+            size="big"
+            class="map__chart--panel"
+          >
+            <chart-warning
+              :data="warning"
+              class="map__chart--inner"
+            ></chart-warning>
+          </panel-chart>
+        </transition>
+        <transition name="el-fade-in-linear">
+          <panel-chart
+            v-if="speed.length"
+            title="当天最高时速"
+            unit="速度（公里/小时）"
+            :height="200"
+            size="big"
+            class="map__chart--panel"
+          >
+            <chart-speed :data="speed" class="map__chart--inner"></chart-speed>
+          </panel-chart>
+        </transition>
         <!-- 3.2 左侧-图例 -->
         <div class="map__legends map__legends--position">
           <div
@@ -59,26 +65,33 @@
       <!-- 4.右侧 -->
       <div class="map__chart--right" v-if="!isFullScreen" v-show="showCharts">
         <!-- 4.1右侧-图表 -->
-        <panel-chart
-          title="车辆状态"
-          :height="194"
-          size="small"
-          class="map__chart--panel"
-        >
-          <chart-cars :data="cars"></chart-cars>
-        </panel-chart>
-        <panel-chart
-          title="车辆区域分布"
-          unit="单位（辆）"
-          size="small"
-          :height="212"
-        >
-          <span slot="link">
-            查看更多区域
-            <i class="el-icon-arrow-right"></i>
-          </span>
-          <chart-districts :data="districts"></chart-districts>
-        </panel-chart>
+        <transition name="el-fade-in-linear">
+          <panel-chart
+            title="车辆状态"
+            :height="194"
+            v-if="Object.keys(cars).length"
+            size="small"
+            class="map__chart--panel"
+          >
+            <chart-cars :data="cars"></chart-cars>
+          </panel-chart>
+        </transition>
+        <transition name="el-fade-in-linear">
+          <panel-chart
+            title="车辆区域分布"
+            unit="单位（辆）"
+            size="small"
+            v-if="districts.length"
+            :height="212"
+          >
+            <!-- <span slot="link">
+              查看更多区域
+              <i class="el-icon-arrow-right"></i>
+            </span> -->
+            <chart-districts :data="districts"></chart-districts>
+          </panel-chart>
+        </transition>
+
         <!-- 4.2右侧-围栏按钮 -->
         <button-fence
           @add="addFence"

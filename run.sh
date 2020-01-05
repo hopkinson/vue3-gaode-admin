@@ -4,7 +4,7 @@ curl -X POST \
   -H 'Postman-Token: e5293a82-1075-40ad-bbfb-c37bbb2fd3fc' \
   -H 'cache-control: no-cache' \
   -d '[{
- "terminalNo": "19022810212",
- "alarmStatus": 0,
- "alarmNumber": 100
+"terminalNo": "19022810230",
+ "alarmNumber": 1011,
+ "alarmStatus": 1
 }]'

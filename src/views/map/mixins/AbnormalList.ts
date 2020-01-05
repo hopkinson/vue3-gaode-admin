@@ -27,7 +27,7 @@ export default class Table extends Vue {
     this.websocket = new Websocket({
       endPoint: process.env.VUE_APP_WS_API
     })
-    this.websocket.subscribes('/socket/topic/alarms', ({ body }) => {
+    this.websocket.subscribes('/socket/topic/alarms/quantity', ({ body }) => {
       const result = Number(body)
       this.abnormalNum = result
     })
@@ -67,6 +67,7 @@ export default class Table extends Vue {
         method: 'PUT',
         url: `v1/alarm/read/${detail.id}`
       })
+      detail.readState = true
     }
     // 2. 设置汽车详情
     this.carDetail = {

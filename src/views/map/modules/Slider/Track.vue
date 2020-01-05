@@ -12,12 +12,12 @@
     <!-- 倍速 - 加速 -->
     <i class="sprite_ico sprite_ico_track_forward" @click="addSpeed"></i>
     <!-- TODO -->
-    <!--   -->
     <el-slider
       class="track__slider"
       :show-tooltip="false"
-      :max="trackMarkersLength - 1"
+      :max="trackLength"
       :value="value"
+      :disabled="!trackMarkersLength"
       @input="input"
       @change="change"
     ></el-slider>
@@ -52,6 +52,9 @@ export default class DrawerTrackComponent extends Vue {
 
   slider: number = 0 // 获取已经经过点的长度(操作slider)
   // 加速
+  get trackLength() {
+    return this.trackMarkersLength ? this.trackMarkersLength - 1 : 0
+  }
 
   @Throttle(1000)
   @Bind()

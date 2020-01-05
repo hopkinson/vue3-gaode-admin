@@ -25,11 +25,11 @@
       @selection-change="selectionChange"
       row-key="id"
     >
-      <el-table-column
+      <!-- <el-table-column
         type="selection"
         width="25"
         reserve-selection
-      ></el-table-column>
+      ></el-table-column> -->
       <el-table-column label="状态" align="center" width="50px">
         <span
           class="project__car-status"
@@ -106,6 +106,8 @@ export default class TableList extends Vue {
   playTrack(row) {
     this.$emit('play', row)
   }
+
+  selectionChange(val) {}
 }
 </script>
 <style lang="less" scoped>

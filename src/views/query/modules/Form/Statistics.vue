@@ -3,11 +3,12 @@
     <el-form-item label="时间范围：">
       <el-date-picker
         v-model="dateRange"
-        type="datetimerange"
+        type="daterange"
         range-separator="至"
+        clearable
         value-format="yyyy-MM-dd"
-        start-placeholder="开始时间"
-        end-placeholder="结束时间"
+        start-placeholder="开始日期"
+        end-placeholder="结束日期"
       >
       </el-date-picker>
     </el-form-item>
@@ -47,8 +48,13 @@ export default class FormSearch extends Vue {
     return [this.form.beginDate, this.form.endDate]
   }
   set dateRange(val) {
-    this.form.beginDate = val[0]
-    this.form.endDate = val[1]
+    if (val) {
+      this.form.beginDate = val[0]
+      this.form.endDate = val[1]
+    } else {
+      this.form.beginDate = ''
+      this.form.endDate = ''
+    }
   }
 
   // v-model

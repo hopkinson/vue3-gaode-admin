@@ -3,7 +3,7 @@ import { CarLocationBody } from '@/services'
 @Component
 export default class Table extends Vue {
   markerRefs: any = [] // 点聚合
-
+  markerCluster: any = {}
   // 折线&点 - 坐标（用于轨迹回放）
   @Prop({ type: Array, default: () => [] })
   public readonly markers!: Array<any>
@@ -11,11 +11,16 @@ export default class Table extends Vue {
   initMarkerCluster(map) {
     const self = this
     setTimeout(() => {
-      let cluster = new (AMap as any).MarkerClusterer(map, self.markerRefs, {
-        gridSize: 1,
-        maxZoom: 20,
-        renderCluserMarker: self.renderCluserMarker
-      })
+      self.markerCluster = new (AMap as any).MarkerClusterer(
+        map,
+        self.markerRefs,
+        {
+          gridSize: 20,
+          maxZoom: 16,
+          averageCenter: true,
+          renderCluserMarker: this.renderCluserMarker
+        }
+      )
     }, 1000)
   }
   // 聚合坐标
