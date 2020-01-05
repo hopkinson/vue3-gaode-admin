@@ -36,6 +36,8 @@
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator'
 import { CarTrackBody } from '@/services'
 import { CarIdBody } from '@/services'
+import dayjs from 'dayjs'
+const HOUR_GAP = 2
 @Component({
   name: 'TrackComponent'
 })
@@ -46,34 +48,18 @@ export default class TrackComponent extends Vue {
   @Prop({ type: Object, default: () => {} }) readonly trackForm
 
   form: CarTrackBody = {
-    // carId: '',
-    // beginTime: '',
-    // endTime: ''
-    carId: '6',
-    beginTime: '2019-12-31T15:00:00',
-    endTime: '2019-12-31T17:00:00'
+    carId: '',
+    beginTime: '',
+    endTime: ''
+    // carId: '6',
+    // beginTime: '2019-12-31T15:00:00',
+    // endTime: '2019-12-31T17:00:00'
   }
 
   pickerOptions: any = {
     disabledDate(time) {
       return time.getTime() > Date.now()
-    },
-    shortcuts: [
-      {
-        text: '今天',
-        onClick(picker) {
-          picker.$emit('pick', new Date())
-        }
-      },
-      {
-        text: '昨天',
-        onClick(picker) {
-          const date = new Date()
-          date.setTime(date.getTime() - 3600 * 1000 * 24)
-          picker.$emit('pick', date)
-        }
-      }
-    ]
+    }
   }
   // 能否查询 ：每个值都不能为空
   get canSearch() {
@@ -83,18 +69,45 @@ export default class TrackComponent extends Vue {
   onSubmit() {
     this.$emit('search-track', this.form)
   }
+
+  overTwoHour(callback) {
+    const _beginDate = dayjs(this.form.beginTime)
+    const _endDate = dayjs(this.form.endTime)
+    if (_endDate.diff(_beginDate, 'hour') > HOUR_GAP) {
+      this.form.endTime = _beginDate
+        .add(2, 'hour')
+        .format('YYYY-MM-DDTHH:mm:ss')
+      typeof callback === 'function' && callback()
+    }
+  }
+
   // 监听 - 倍速
-  // @Watch('trackForm', { deep: true, immediate: true })
-  // public async watchTrackForm(val: CarIdBody) {
-  //   if (val) {
-  //     this.$nextTick(() => {
-  //       this.form = Object.assign({}, this.form, val)
-  //     })
-  //   }
-  // }
+  @Watch('trackForm', { deep: true, immediate: true })
+  public async watchTrackForm(val: CarTrackBody) {
+    if (val) {
+      this.$nextTick(() => {
+        this.form = Object.assign({}, this.form, val)
+      })
+    }
+  }
   // 监听 - 倍速
+  @Watch('form', { deep: true, immediate: true })
+  public async waform(val: any) {
+    if (val) {
+      this.$nextTick(() => {
+        this.overTwoHour(() => {
+          this.$message({
+            message: '开始时间和结束时间不能超过2小时',
+            type: 'info'
+          })
+        })
+        // this.form = Object.assign({}, this.form, val)
+      })
+    }
+  }
+  // 监听 - 详情
   @Watch('carDetail', { deep: true, immediate: true })
-  public async watchForm(val: CarIdBody) {
+  public async watchCardDetail(val: CarIdBody) {
     if (val) {
       this.$nextTick(() => {
         this.form = Object.assign({}, this.form, {

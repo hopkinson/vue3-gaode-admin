@@ -60,10 +60,11 @@ setTimeout(() => {
     plugin: [
       'AMap.ToolBar',
       'AMap.MapType',
-      'AMap.PolyEditor',
+      // 'AMap.PolyEditor',
       'AMap.MarkerClusterer',
       'AMap.InfoWindow',
       'AMap.Scale',
+      'AMap.GraspRoad',
       'AMap.OverView',
       'AMap.MouseTool'
     ],

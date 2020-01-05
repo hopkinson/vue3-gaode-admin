@@ -16,15 +16,15 @@ import * as models from '../model/models'
 /* tslint:disable:no-unused-variable member-ordering object-literal-shorthand */
 
 /**
- * @description alarmReadIdPut参数
- * @property `id` 告警ID
+ * @description alarmReadAlarmNumberPut参数
+ * @property `alarmNumber` 告警流水号
  */
-export interface ParamsalarmReadIdPut {
+export interface ParamsalarmReadAlarmNumberPut {
   // pathParams
   /**
-   * 告警ID
+   * 告警流水号
    */
-  id: string
+  alarmNumber: string
 }
 /**
  * @description alarmsIdGet参数
@@ -63,6 +63,8 @@ export type ParamsBodyalarmsPost = Array<models.AlarmsBody>
  * @description alarmsStatisticsGet参数
  * @property `beginDate` 起始统计日期(yyyy-MM-dd)
  * @property `[endDate]` 结束统计日期(yyyy-MM-dd)
+ * @property `[pageNum]` 页码
+ * @property `[pageSize]` 页宽
  */
 export interface ParamsalarmsStatisticsGet {
   // queryParams
@@ -74,6 +76,14 @@ export interface ParamsalarmsStatisticsGet {
    * 结束统计日期(yyyy-MM-dd)
    */
   endDate?: string
+  /**
+   * 页码
+   */
+  pageNum?: string
+  /**
+   * 页宽
+   */
+  pageSize?: string
 }
 /**
  */
@@ -92,6 +102,9 @@ export interface ParamscarIdGet {
 /**
  */
 export type ParamsBodycarLocationPost = any
+/**
+ */
+export type ParamsBodycarTrackAlarmPost = models.CarTrackAlarmBody
 /**
  */
 export type ParamsBodycarTrackPost = models.CarTrackBody
@@ -167,22 +180,22 @@ export class DefaultApi {
 
   /**
    * 
-   * @summary 将指定ID的告警设为已读
-   * @param params ParamsalarmReadIdPut
+   * @summary 将指定告警流水号的告警设为已读
+   * @param params ParamsalarmReadAlarmNumberPut
    
-   * @returns models.AlarmReadId
+   * @returns models.AlarmReadAlarmNumber
    */
-  public alarmReadIdPut = (
-    params: ParamsalarmReadIdPut
-  ): AjaxPromise<models.AlarmReadId> => {
-    const path = '/alarm/read/{id}'
+  public alarmReadAlarmNumberPut = (
+    params: ParamsalarmReadAlarmNumberPut
+  ): AjaxPromise<models.AlarmReadAlarmNumber> => {
+    const path = '/alarm/read/{alarmNumber}'
     const url =
       this.$basePath +
       path.replace(/\{([^}]+)\}/g, (all, param) =>
         param in params ? params[param] : param
       )
     const p: any = {}
-    ajax.check(params.id, 'id')
+    ajax.check(params.alarmNumber, 'alarmNumber')
     return ajax.ajax(
       {
         method: 'PUT',
@@ -296,7 +309,7 @@ export class DefaultApi {
   }
   /**
    * 
-   * @summary 告警信息统计
+   * @summary 告警统计分页接口
    * @param params ParamsalarmsStatisticsGet
    
    * @returns models.AlarmsStatistics
@@ -311,6 +324,8 @@ export class DefaultApi {
     if ('beginDate' in params) p.query.beginDate = params.beginDate
     ajax.check(params.beginDate, 'beginDate')
     if ('endDate' in params) p.query.endDate = params.endDate
+    if ('pageNum' in params) p.query.pageNum = params.pageNum
+    if ('pageSize' in params) p.query.pageSize = params.pageSize
     return ajax.ajax(
       {
         method: 'GET',
@@ -451,6 +466,30 @@ export class DefaultApi {
     return ajax.ajax(
       {
         method: 'GET',
+        url,
+        ...p
+      },
+      path,
+      this.$basePath
+    )
+  }
+  /**
+   * 
+   * @summary 返回车辆行驶轨迹的异常部分
+   
+   * @param data: ParamsBodycarTrackAlarmPost
+   * @returns models.CarTrackAlarm
+   */
+  public carTrackAlarmPost = (
+    data: ParamsBodycarTrackAlarmPost
+  ): AjaxPromise<models.CarTrackAlarm> => {
+    const path = '/car/track/alarm'
+    const url = this.$basePath + path
+    const p: any = {}
+    p.data = data
+    return ajax.ajax(
+      {
+        method: 'POST',
         url,
         ...p
       },

@@ -349,7 +349,7 @@ export default class MapHome extends Mixins(
       this.$nextTick(() => {
         this.map.$$getInstance().setFitView()
       })
-      this.marker.$$getInstance().moveTo(_lnglat, speed * this.speed * 2)
+      this.marker.$$getInstance().moveTo(_lnglat, speed * this.speed * 3)
     }
   }
 
@@ -429,6 +429,8 @@ export default class MapHome extends Mixins(
         this.trackLocation = [] //轨迹的总坐标系清空
       })
       this.markerCluster.addMarkers(this.markerRefs)
+    } else {
+      this.markerCluster.clearMarkers()
     }
   }
 
@@ -439,6 +441,7 @@ export default class MapHome extends Mixins(
       // 1. 显示
       this.realTimeDetail = this.getTrackMarkers[0] // 实时信息
       this.showInfo = false // 把汽车详情隐藏
+      this.markerCluster.clearMarkers()
     } else {
       this.markerCluster.addMarkers(this.markerRefs)
     }
@@ -446,9 +449,10 @@ export default class MapHome extends Mixins(
 
   @Watch('showInfo')
   public watchShowInfo(val: boolean) {
-    if (!val) {
+    !val &&
+      !this.getIsPlay &&
+      !this.showDrawer &&
       this.markerCluster.addMarkers(this.markerRefs)
-    }
   }
   // 监听 - 轨迹
   @Watch('carDetail', { deep: true })

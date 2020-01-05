@@ -13,31 +13,20 @@
 import * as models from './models'
 
 /**
- * @property `companyName` 单位名称
- * @property `carNo` 车牌号码
- * @property `beginDate` 起始统计日期(yyyy-MM-dd)
- * @property `endDate` 结束统计日期(yyyy-MM-dd)
- * @property `alarmQuantities` 告警数量
+ * @property `[records]`
+ * @property `[total]`
+ * @property `[size]`
+ * @property `[current]`
+ * @property `[orders]`
+ * @property `[searchCount]`
+ * @property `[pages]`
  */
 export interface AlarmsStatisticsBody {
-  /**
-   * 单位名称
-   */
-  companyName: string
-  /**
-   * 车牌号码
-   */
-  carNo: string
-  /**
-   * 起始统计日期(yyyy-MM-dd)
-   */
-  beginDate: string
-  /**
-   * 结束统计日期(yyyy-MM-dd)
-   */
-  endDate: string
-  /**
-   * 告警数量
-   */
-  alarmQuantities: Array<models.AlarmsStatisticsAlarmQuantities>
+  records?: Array<models.AlarmsStatisticsBodyRecords>
+  total?: number
+  size?: number
+  current?: number
+  orders?: Array<string>
+  searchCount?: boolean
+  pages?: number
 }

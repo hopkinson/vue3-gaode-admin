@@ -65,7 +65,7 @@ export default class Table extends Vue {
     if (!detail.readState) {
       await this.$ajax.ajax({
         method: 'PUT',
-        url: `v1/alarm/read/${detail.id}`
+        url: `v1/alarm/read/${detail.alarmNumber}`
       })
       detail.readState = true
     }
