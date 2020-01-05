@@ -298,6 +298,7 @@ export default class MapIndex extends Mixins(
       this.carDetail = Object.assign({}, this.carDetail, {
         id: ''
       })
+      this.abnormalTracks = [] // 异常坐标清空
       // 轨迹表单也清空
       this.trackForm = {
         carId: '',

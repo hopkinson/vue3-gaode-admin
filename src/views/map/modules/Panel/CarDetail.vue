@@ -1,11 +1,11 @@
 <template>
   <div class="detail" v-if="value">
     <div class="sprite_ico sprite_ico_popup_detail__header">
-      <!-- <i
+      <i
         v-if="!realTime"
         class="iconfont icon-guanbi detail--close"
         @click="$emit('input', false)"
-      ></i> -->
+      ></i>
     </div>
     <div class="detail__main">
       <!-- 汽车具体信息 -->

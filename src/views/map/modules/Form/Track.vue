@@ -46,12 +46,12 @@ export default class TrackComponent extends Vue {
   @Prop({ type: Object, default: () => {} }) readonly trackForm
 
   form: CarTrackBody = {
-    carId: '',
-    beginTime: '',
-    endTime: ''
-    // carId: '6',
-    // beginTime: '2019-12-31T15:00:00',
-    // endTime: '2019-12-31T17:00:00'
+    // carId: '',
+    // beginTime: '',
+    // endTime: ''
+    carId: '6',
+    beginTime: '2019-12-31T15:00:00',
+    endTime: '2019-12-31T17:00:00'
   }
 
   pickerOptions: any = {

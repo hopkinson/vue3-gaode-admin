@@ -180,7 +180,6 @@ export default class MapHome extends Mixins(
   //  异常的坐标
   @Prop({ type: Array, default: () => [] })
   public readonly abnormalTracks!: Array<Array<Array<number>>>
-  _isPlaying = false // 是否播放中（内部使用）
   showInfo = false // 是否显示窗体信息
   showTrack = false // 是否显示轨迹
   showMarker = true // 是否显示点坐标
@@ -256,6 +255,9 @@ export default class MapHome extends Mixins(
   // 轨迹点坐标事件
   trackMarkerEvent() {
     return {
+      init: o => {
+        this.markerRefs.push(o)
+      },
       click: () => {
         setTimeout(() => {
           this.showInfo = true // 点击某个点坐标 => 显示信息窗体
@@ -265,7 +267,7 @@ export default class MapHome extends Mixins(
         const isNotEuqal = this.getTrackMarkers.length - 1 !== this.countPassed
         this.$emit('update:isEnd', !isNotEuqal)
         if (isNotEuqal) {
-          this._isPlaying && this.moveToTracker()
+          !this.sliderVal && this.moveToTracker()
         } else {
           this.showInfo = true // 再次显示信息窗体
         }
@@ -320,7 +322,6 @@ export default class MapHome extends Mixins(
     if (this.getIsEnd) {
       this.moveToTracker()
       this.movingTracker()
-      this._isPlaying = true
       // 隐藏信息窗体
       this.showInfo = false
     } else {
@@ -356,7 +357,6 @@ export default class MapHome extends Mixins(
 
   // 轨迹 - 停止移动
   pauseTracker() {
-    this._isPlaying = false
     this.marker.$$getInstance().pauseMove()
   }
 
@@ -382,7 +382,6 @@ export default class MapHome extends Mixins(
     this.havePassedLine = [] // 清空已走过的轨迹
     this.countPassed = 0 // 计数器设默认为1
     this.$emit('update:passedLength', 0)
-    this._isPlaying = false
     this.$nextTick(() => {
       this.marker.$$getInstance().stopMove()
       reload && this.initLoadTrack() // 初始化路径
@@ -407,7 +406,9 @@ export default class MapHome extends Mixins(
   @Watch('sliderVal', {})
   public watchSliderVal(val) {
     this.marker.$$getInstance().stopMove()
-    this.showMarker = false
+    this.$nextTick(() => {
+      this.showMarker = false
+    })
     this.countPassed = val
     this.havePassedLine = this.trackLocation.slice(0, val + 1)
     const { location } = this.getTrackMarkers[val]
@@ -415,11 +416,13 @@ export default class MapHome extends Mixins(
     this.position = this.center
     setTimeout(() => {
       this.showMarker = true
-    }, 100)
+    }, 400)
     setTimeout(() => {
-      this.moveToTracker()
-      this.movingTracker()
-    }, 500)
+      if (this.getIsPlay) {
+        this.moveToTracker()
+        this.movingTracker()
+      }
+    }, 600)
   }
 
   // 监听 - 是否显示抽屉
