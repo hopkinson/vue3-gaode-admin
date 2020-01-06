@@ -4,8 +4,8 @@
       ref="map"
       class="maphome__inner"
       vid="amap-vue"
-      resizeEnable
-      expandZoomRange
+      :resizeEnable="true"
+      :expandZoomRange="true"
       :zoom="zoom"
       :zooms="zooms"
       :events="events"
@@ -194,6 +194,7 @@ export default class MapHome extends Mixins(
   // 地图事件
   events = {
     init: o => {
+      o.setZoom
       o.setMapStyle(MAP.mapStyle)
       // 设置高精度图层
       const googleLayer = new AMap.TileLayer({
@@ -264,7 +265,7 @@ export default class MapHome extends Mixins(
         if (isNotEuqal) {
           this.moveToTracker()
         } else {
-          this.showInfo = true // 再次显示信息窗体
+          // this.showInfo = true // 再次显示信息窗体
         }
       }
     }
@@ -428,9 +429,9 @@ export default class MapHome extends Mixins(
       this.$nextTick(() => {
         this.trackLocation = [] //轨迹的总坐标系清空
       })
-      this.markerCluster.addMarkers(this.markerRefs)
+      this.marker && this.markerCluster.addMarkers(this.markerRefs)
     } else {
-      this.markerCluster.clearMarkers()
+      this.marker && this.markerCluster.clearMarkers()
     }
   }
 
@@ -441,9 +442,9 @@ export default class MapHome extends Mixins(
       // 1. 显示
       this.realTimeDetail = this.getTrackMarkers[0] // 实时信息
       this.showInfo = false // 把汽车详情隐藏
-      this.markerCluster.clearMarkers()
+      this.marker && this.markerCluster.clearMarkers()
     } else {
-      this.markerCluster.addMarkers(this.markerRefs)
+      this.marker && this.markerCluster.addMarkers(this.markerRefs)
     }
   }
 
@@ -452,6 +453,7 @@ export default class MapHome extends Mixins(
     !val &&
       !this.getIsPlay &&
       !this.showDrawer &&
+      this.marker &&
       this.markerCluster.addMarkers(this.markerRefs)
   }
   // 监听 - 轨迹
@@ -465,7 +467,7 @@ export default class MapHome extends Mixins(
         this.center = val.location.split(',')
         this.position = this.center
         // this.markerRefs = []
-        this.markerCluster.clearMarkers()
+        this.marker && this.markerCluster.clearMarkers()
         this.map.$$getInstance().setZoom(MAP.zoom)
         // 3. 显示信息窗体（分两种情况：）
         // 3.1 如果有alarmNumber，则不显示；没有则显示

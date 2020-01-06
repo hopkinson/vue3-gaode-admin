@@ -219,7 +219,7 @@ export default class MapIndex extends Mixins(
   trackSpeed: number = 1 // 初始化速度
   sliderTrack: number = 0 // 滑块的值
 
-  carDetail = {} // 汽车详情
+  carDetail: any = {} // 汽车详情
 
   trackMarkers: Array<Array<number>> = [] // 标记点 - 轨迹回放
   abnormalTracks: Array<Array<Array<number>>> = [] // 异常的坐标
@@ -227,6 +227,12 @@ export default class MapIndex extends Mixins(
   // 显示图表的条件
   get showCharts() {
     return !this.showTrackDrawer && !this.showAbnormalDrawer
+  }
+
+  beforeCreate() {
+    if (this.$route.query.alarmId) {
+      window.location.href = window.location.origin + this.$route.path
+    }
   }
 
   // 控制轨迹的播放

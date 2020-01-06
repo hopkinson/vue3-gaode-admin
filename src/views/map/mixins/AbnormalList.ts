@@ -39,6 +39,10 @@ export default class Table extends Vue {
       })
       this.showAbnormalDetail(detail)
     }
+    this.abnormalNum = await this.$ajax.ajax({
+      method: 'GET',
+      url: `v1/alarms/unread`
+    })
   }
 
   beforeDestroy() {
@@ -65,15 +69,25 @@ export default class Table extends Vue {
     if (!detail.readState) {
       await this.$ajax.ajax({
         method: 'PUT',
-        url: `v1/alarm/read/${detail.alarmNumber}`
+        url: `v1/alarm/read`,
+        data: {
+          carId: detail.carId,
+          alarmNumber: detail.alarmNumber
+        }
       })
       detail.readState = true
+      // 返回未读数量
+      this.abnormalNum = await this.$ajax.ajax({
+        method: 'GET',
+        url: `v1/alarms/unread`
+      })
     }
     // 2. 设置汽车详情
     this.carDetail = {
       ...detail,
       alarmType: detail.type,
-      runState: 3
+      runState: 3,
+      id: detail.carId
     }
     // 3. 显示抽屉
     this.showTrackDrawer = true

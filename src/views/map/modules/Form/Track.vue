@@ -86,6 +86,11 @@ export default class TrackComponent extends Vue {
   public async watchTrackForm(val: CarTrackBody) {
     if (val) {
       this.$nextTick(() => {
+        if (!val.endTime) {
+          val.endTime = dayjs(val.beginTime)
+            .add(2, 'hour')
+            .format('YYYY-MM-DDTHH:mm:ss')
+        }
         this.form = Object.assign({}, this.form, val)
       })
     }

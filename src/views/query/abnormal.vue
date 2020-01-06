@@ -64,7 +64,11 @@ export default class BaseInfoComponent extends Vue {
     if (!item.readState) {
       await this.$ajax.ajax({
         method: 'PUT',
-        url: `v1/alarm/read/${item.alarmNumber}`
+        url: `v1/alarm/read`,
+        data: {
+          carId: item.carId,
+          alarmNumber: item.alarmNumber
+        }
       })
     }
     setTimeout(() => {
