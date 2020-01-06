@@ -1,5 +1,5 @@
 <template>
-  <layout aside> </layout>
+  <layout aside breadcrumb router></layout>
 </template>
 
 <script lang="ts">

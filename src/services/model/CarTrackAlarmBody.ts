@@ -13,16 +13,21 @@
 import * as models from './models'
 
 /**
- * @property `alarmType` 告警类型
- * @property `quantity` 告警次数
+ * @property `carId` 车辆ID
+ * @property `beginTime` 开始时间
+ * @property `endTime` 结束时间
  */
-export interface AlarmsStatisticsAlarmQuantities {
+export interface CarTrackAlarmBody {
   /**
-   * 告警类型
+   * 车辆ID
    */
-  alarmType: number
+  carId: string
   /**
-   * 告警次数
+   * 开始时间
    */
-  quantity: number
+  beginTime: string
+  /**
+   * 结束时间
+   */
+  endTime: string
 }

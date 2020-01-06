@@ -40,12 +40,18 @@
       </el-button>
     </div>
     <!-- 筛选（具体信息显示） -->
-    <panel-select v-if="value" class="status__panel">
-      <!-- 筛选-条件 -->
-      <form-car v-bind="$attrs" v-on="$listeners"></form-car>
-      <!-- 筛选-表格展示 -->
-      <table-car v-bind="$attrs" v-on="$listeners"></table-car>
-    </panel-select>
+    <el-collapse-transition>
+      <panel-select v-if="value" class="status__panel">
+        <!-- 筛选-条件 -->
+        <form-car v-bind="$attrs" v-on="$listeners"></form-car>
+        <!-- 筛选-表格展示 -->
+        <table-car
+          v-bind="$attrs"
+          v-on="$listeners"
+          class="status__table"
+        ></table-car>
+      </panel-select>
+    </el-collapse-transition>
   </div>
 </template>
 
@@ -125,6 +131,9 @@ export default class SearchCarStatus extends Vue {
         border-radius: 0;
       }
     }
+  }
+  &__table {
+    min-height: 400px;
   }
   &__button {
     &--text {

@@ -7,13 +7,13 @@ const product = {
 export default {
   path: '/setting',
   meta: {
-    title: '系统设置',
-    roles: ['admin']
+    title: '系统设置'
   },
   children: [
     {
       meta: {
-        title: '系统设置'
+        title: '系统设置',
+        allow: false
       },
       path: 'index',
       name: 'setting_index',

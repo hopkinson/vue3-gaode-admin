@@ -20,5 +20,5 @@ import * as models from './models'
 export interface AlarmsStatistics {
   now?: string
   statusCode?: number
-  body?: Array<models.AlarmsStatisticsBody>
+  body?: models.AlarmsStatisticsBody
 }

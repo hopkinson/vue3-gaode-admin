@@ -22,14 +22,26 @@ export default class Table extends Vue {
   websocket: any = null // websocket连接
   showTrackDrawer: boolean = false // 是否显示底部抽屉（轨迹）
   trackMarkers: Array<Array<number>> = [] // 标记点 - 轨迹回放
-  created() {
+  async created() {
     //订阅websocket消息
     this.websocket = new Websocket({
       endPoint: process.env.VUE_APP_WS_API
     })
-    this.websocket.subscribes('/socket/topic/alarms', ({ body }) => {
+    this.websocket.subscribes('/socket/topic/alarms/quantity', ({ body }) => {
       const result = Number(body)
       this.abnormalNum = result
+    })
+    const { alarmId } = this.$route.query
+    if (alarmId) {
+      const detail = await this.$ajax.ajax({
+        method: 'GET',
+        url: `v1/alarms/${alarmId}`
+      })
+      this.showAbnormalDetail(detail)
+    }
+    this.abnormalNum = await this.$ajax.ajax({
+      method: 'GET',
+      url: `v1/alarms/unread`
     })
   }
 
@@ -57,14 +69,25 @@ export default class Table extends Vue {
     if (!detail.readState) {
       await this.$ajax.ajax({
         method: 'PUT',
-        url: `v1/alarm/read/${detail.id}`
+        url: `v1/alarm/read`,
+        data: {
+          carId: detail.carId,
+          alarmNumber: detail.alarmNumber
+        }
+      })
+      detail.readState = true
+      // 返回未读数量
+      this.abnormalNum = await this.$ajax.ajax({
+        method: 'GET',
+        url: `v1/alarms/unread`
       })
     }
     // 2. 设置汽车详情
     this.carDetail = {
       ...detail,
       alarmType: detail.type,
-      runState: 3
+      runState: 3,
+      id: detail.carId
     }
     // 3. 显示抽屉
     this.showTrackDrawer = true
@@ -106,6 +129,7 @@ export default class Table extends Vue {
     this.abnormalBody = await this.$ajax.ajax({
       method: 'POST',
       url: 'v1/alarms/page',
+      query: val,
       data: val
     })
   }

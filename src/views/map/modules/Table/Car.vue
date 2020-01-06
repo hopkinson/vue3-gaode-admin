@@ -13,7 +13,7 @@
       车辆总计：
       <strong>{{ tableData.total || 0 }}辆</strong>
     </div>
-    <!-- @selection-change="selectionChange" -->
+    <!---->
     <el-table
       ref="table"
       class="table"
@@ -22,22 +22,22 @@
       align="center"
       header-cell-class-name="project__table--header"
       cell-class-name="project__table--row"
+      @selection-change="selectionChange"
+      row-key="id"
     >
       <!-- <el-table-column
         type="selection"
-        width="55"
-        :reserve-selection="reserveSelection"
-        :selectable="selectable"
-        v-if="showSelection"
-      ></el-table-column>-->
-      <el-table-column label="状态" width="60px">
+        width="25"
+        reserve-selection
+      ></el-table-column> -->
+      <el-table-column label="状态" align="center" width="50px">
         <span
           class="project__car-status"
           :class="scope.row.runState | filterClass"
           slot-scope="scope"
         ></span>
       </el-table-column>
-      <el-table-column label="单位">
+      <el-table-column label="单位" header-align="center">
         <el-tooltip
           slot-scope="scope"
           effect="dark"
@@ -47,8 +47,12 @@
           <span class="table__text--single">{{ scope.row.companyName }}</span>
         </el-tooltip>
       </el-table-column>
-      <el-table-column label="车牌号" prop="carNo"></el-table-column>
-      <el-table-column label="操作">
+      <el-table-column
+        label="车牌号"
+        align="center"
+        prop="carNo"
+      ></el-table-column>
+      <el-table-column label="操作" align="center">
         <span
           class="table__btn--track"
           @click="playTrack(scope.row)"
@@ -102,12 +106,17 @@ export default class TableList extends Vue {
   playTrack(row) {
     this.$emit('play', row)
   }
+
+  selectionChange(val) {}
 }
 </script>
 <style lang="less" scoped>
 .table {
   &::before {
     content: none;
+  }
+  & /deep/ .el-table-column--selection .cell {
+    padding: 0;
   }
   & /deep/ .el-table__empty-block {
     background: #020214;

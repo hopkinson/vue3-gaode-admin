@@ -1,5 +1,5 @@
 <template>
-  <layout :footer="false" :breadcrumb="false">
+  <layout :footer="false" :breadcrumb="false" gap="0">
     <div class="map">
       <!-- 1. 警告信息-->
       <alert-abnormal
@@ -23,6 +23,7 @@
       <!-- 3. 左侧 -->
       <div class="map__chart--left" v-if="!isFullScreen" v-show="showCharts">
         <!-- 3.1 左侧-图表 -->
+
         <panel-chart
           title="告警统计"
           unit="单位（次）"
@@ -35,6 +36,7 @@
             class="map__chart--inner"
           ></chart-warning>
         </panel-chart>
+
         <panel-chart
           title="当天最高时速"
           unit="速度（公里/小时）"
@@ -44,6 +46,7 @@
         >
           <chart-speed :data="speed" class="map__chart--inner"></chart-speed>
         </panel-chart>
+
         <!-- 3.2 左侧-图例 -->
         <div class="map__legends map__legends--position">
           <div
@@ -59,6 +62,7 @@
       <!-- 4.右侧 -->
       <div class="map__chart--right" v-if="!isFullScreen" v-show="showCharts">
         <!-- 4.1右侧-图表 -->
+
         <panel-chart
           title="车辆状态"
           :height="194"
@@ -67,18 +71,20 @@
         >
           <chart-cars :data="cars"></chart-cars>
         </panel-chart>
+
         <panel-chart
           title="车辆区域分布"
           unit="单位（辆）"
           size="small"
           :height="212"
         >
-          <span slot="link">
-            查看更多区域
-            <i class="el-icon-arrow-right"></i>
-          </span>
+          <!-- <span slot="link">
+              查看更多区域
+              <i class="el-icon-arrow-right"></i>
+            </span> -->
           <chart-districts :data="districts"></chart-districts>
         </panel-chart>
+
         <!-- 4.2右侧-围栏按钮 -->
         <button-fence
           @add="addFence"
@@ -90,11 +96,12 @@
       <!-- 地图 :loadPreTrack="loadPreMarkers" @on-passed-line="recordPassedLength" -->
       <map-home
         :track-markers.sync="trackMarkers"
+        :abnormal-tracks="abnormalTracks"
         :slider-val="sliderTrack"
         :speed="trackSpeed"
         :markers="carList"
         :car-detail="carDetail"
-        :isPlay="isPlaying"
+        :isPlay.sync="isPlaying"
         :showDrawer="showTrackDrawer"
         :isEnd.sync="isEnd"
         :passedLength.sync="passedLength"
@@ -196,7 +203,7 @@ export default class MapIndex extends Mixins(
   // 是否在播放轨迹回放
   isPlaying: boolean = false
 
-  isEnd: boolean = false // 是否停止播放
+  isEnd: boolean = true // 是否停止播放的状态
   showTrackDrawer: boolean = false // 是否显示底部抽屉（轨迹）
 
   legends = TRAFFIC_LEGEND // 图例 - 交通状态
@@ -204,9 +211,10 @@ export default class MapIndex extends Mixins(
   trackSpeed: number = 1 // 初始化速度
   sliderTrack: number = 0 // 滑块的值
 
-  carDetail = {} // 汽车详情
+  carDetail: any = {} // 汽车详情
 
   trackMarkers: Array<Array<number>> = [] // 标记点 - 轨迹回放
+  abnormalTracks: Array<Array<Array<number>>> = [] // 异常的坐标
 
   // 显示图表的条件
   get showCharts() {
@@ -238,6 +246,16 @@ export default class MapIndex extends Mixins(
         message: '没有任何轨迹',
         type: 'warning'
       })
+    } else {
+      // 返回异常部分
+      const _abnormalTrack = await this.$ajax.ajax({
+        method: 'POST',
+        url: 'v1/car/track/alarm',
+        data: data
+      })
+      if (_abnormalTrack) {
+        this.abnormalTracks = _abnormalTrack
+      }
     }
   }
   closeInfoWindow() {
@@ -286,6 +304,7 @@ export default class MapIndex extends Mixins(
       this.carDetail = Object.assign({}, this.carDetail, {
         id: ''
       })
+      this.abnormalTracks = [] // 异常坐标清空
       // 轨迹表单也清空
       this.trackForm = {
         carId: '',

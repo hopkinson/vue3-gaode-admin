@@ -1,5 +1,11 @@
 <template>
-  <layout-defalut :nav="false" :router="false" :footer="false" :logout="false">
+  <layout-defalut
+    :nav="false"
+    :router="false"
+    :footer="false"
+    :logout="false"
+    gap="0"
+  >
     <div class="login">
       <div class="login--inner">
         <!-- 表单 -->

@@ -1,11 +1,11 @@
 <template>
   <div class="detail" v-if="value">
     <div class="sprite_ico sprite_ico_popup_detail__header">
-      <!-- <i
-        v-if="!realTime"
+      <i
+        v-if="!showDrawer"
         class="iconfont icon-guanbi detail--close"
         @click="$emit('input', false)"
-      ></i> -->
+      ></i>
     </div>
     <div class="detail__main">
       <!-- 汽车具体信息 -->
@@ -49,7 +49,7 @@ export default class CarDetail extends Vue {
 
   // 是否实时数据
   @Prop({ default: false, type: Boolean })
-  public readonly realTime!: boolean
+  public readonly showDrawer!: boolean
 
   address = '' // 地址
 

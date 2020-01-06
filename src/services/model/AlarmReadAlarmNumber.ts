@@ -17,7 +17,7 @@ import * as models from './models'
  * @property `[statusCode]`
  * @property `body` 未读告警数量
  */
-export interface AlarmReadId {
+export interface AlarmReadAlarmNumber {
   now?: string
   statusCode?: number
   /**

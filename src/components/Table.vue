@@ -9,6 +9,7 @@
     <div class="table__header">
       <div class="table__header--left">
         <!-- @slot 查询条件 -->
+        <p>{{ title }}</p>
         <slot name="query"></slot>
       </div>
       <div class="table__header--right">
@@ -90,7 +91,7 @@ export default class Table extends Vue {
   select: Array<any> = []
   loading: boolean = false
 
-  // v-model: 传参数（查列表）
+  // v-model: 传参数params（查列表）
   @Model('input', { type: Object, default: () => ({}) })
   public readonly value!: object
 
@@ -98,9 +99,13 @@ export default class Table extends Vue {
   @Prop({ type: Function, default: () => ({}) })
   public readonly selectable!: Function
 
-  // 标题
+  // 删除的标题
   @Prop({ type: String, default: '此操作将删除数据, 是否继续?' })
   readonly delTip!: string
+
+  // 标题
+  @Prop({ type: String, default: '' }) readonly title!: string
+
   // 列表数据
   @Prop({ type: Object, default: () => ({}) }) readonly data!: object
 
@@ -224,7 +229,7 @@ export default class Table extends Vue {
 </script>
 <style lang="less" scoped>
 .table {
-  padding: 20px 50px;
+  padding: 30px 40px;
   background: #fff;
   &__page {
     text-align: center;
@@ -234,9 +239,21 @@ export default class Table extends Vue {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 15px;
+
     &--right {
       margin-bottom: 18px;
+    }
+    &--left {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      justify-content: space-between;
+      p {
+        font-size: 22px;
+        color: rgb(51, 51, 51);
+        font-weight: bold;
+        margin-bottom: 18px;
+      }
     }
   }
   &--inner {

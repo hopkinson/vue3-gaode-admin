@@ -60,14 +60,15 @@ setTimeout(() => {
     plugin: [
       'AMap.ToolBar',
       'AMap.MapType',
-      'AMap.PolyEditor',
+      // 'AMap.PolyEditor',
       'AMap.MarkerClusterer',
       'AMap.InfoWindow',
       'AMap.Scale',
+      'AMap.GraspRoad',
       'AMap.OverView',
       'AMap.MouseTool'
     ],
-    v: '1.4.6'
+    v: '1.4.11'
   })
 }, 0)
 // websocket

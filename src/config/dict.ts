@@ -51,31 +51,31 @@ export const WARNGING = {
     0: {
       label: '无告警',
       value: 'normal',
+      code: 0,
       color: 'rgb(179, 194, 237)'
     },
     4: {
       label: '违停',
       value: 'weiting',
-      color: ' rgb(250, 82, 145)'
-    },
-    3: {
-      label: '偏航、逆行',
-      value: 'pianni',
+      code: 4,
       color: ' rgb(250, 82, 145)'
     },
     1: {
       label: '偏航',
       value: 'pianhang',
+      code: 1,
       color: 'rgb(49, 217, 164)'
     },
     8: {
       label: '超速',
       value: 'chaosu',
+      code: 8,
       color: 'rgb(143, 131, 255)'
     },
     2: {
       value: 'nixing',
       label: '逆行',
+      code: 2,
       color: 'rgb(252, 155, 3)'
     }
   }

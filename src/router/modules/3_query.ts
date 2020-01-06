@@ -9,13 +9,12 @@ const product = {
 export default {
   path: '/query',
   meta: {
-    title: '查询统计',
-    roles: ['admin']
+    title: '查询统计'
   },
   children: [
     {
       meta: {
-        title: '查询统计'
+        // title: '查询统计'
       },
       path: 'index',
       name: 'query_index',
@@ -25,6 +24,7 @@ export default {
         {
           meta: {
             title: '告警列表',
+            allow: true,
             icon: 'aside_icon_abnormal'
           },
           path: 'abnormal',
@@ -34,6 +34,7 @@ export default {
         {
           meta: {
             title: '违法行为统计',
+            allow: true,
             icon: 'aside_icon_analayisis'
           },
           path: 'statistics',
