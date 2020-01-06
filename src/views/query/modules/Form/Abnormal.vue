@@ -1,9 +1,9 @@
 <template>
-  <el-form :inline="true" :model="form" size="small">
-    <el-form-item label="车牌号码：">
+  <el-form :inline="true" :model="form" size="small" class="form">
+    <el-form-item label="车牌号码">
       <el-input v-model="form.carNo" clearable></el-input>
     </el-form-item>
-    <el-form-item label="类型：">
+    <el-form-item label="告警类型">
       <el-select v-model="form.type" clearable>
         <el-option
           :key="index"
@@ -13,11 +13,12 @@
         ></el-option>
       </el-select>
     </el-form-item>
-    <el-form-item label="时间范围：">
+    <el-form-item label="时间">
       <el-date-picker
+        class="form__date"
         v-model="dateRange"
         type="daterange"
-        range-separator="至"
+        range-separator="-"
         clearable
         value-format="yyyy-MM-dd"
         start-placeholder="开始日期"
@@ -26,7 +27,9 @@
       </el-date-picker>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="handleSearch">查询</el-button>
+      <el-button type="primary" @click="handleSearch" class="form__button"
+        >查询</el-button
+      >
     </el-form-item>
   </el-form>
 </template>
@@ -90,3 +93,6 @@ export default class FormSearch extends Vue {
   }
 }
 </script>
+<style lang="less" scoped>
+@import url('./style.less');
+</style>

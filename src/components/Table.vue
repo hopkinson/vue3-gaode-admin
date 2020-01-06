@@ -29,7 +29,7 @@
     <el-table
       ref="table"
       :data="data[listKey]"
-      :stripe="stripe"
+      :header-cell-style="headerCellStyle"
       :highlight-current-row="highlightCurrentRow"
       class="table--inner"
       :row-key="rowKey"
@@ -108,6 +108,9 @@ export default class Table extends Vue {
 
   // 列表数据
   @Prop({ type: Object, default: () => ({}) }) readonly data!: object
+
+  // 列表数据
+  @Prop({ type: Object, default: () => ({}) }) readonly headerCellStyle
 
   // 显示批量删除
   @Prop({ type: Boolean, default: false }) readonly delSection!: boolean
