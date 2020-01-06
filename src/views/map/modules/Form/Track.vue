@@ -86,7 +86,7 @@ export default class TrackComponent extends Vue {
   public async watchTrackForm(val: CarTrackBody) {
     if (val) {
       this.$nextTick(() => {
-        if (!val.endTime) {
+        if (!val.endTime && val.beginTime) {
           val.endTime = dayjs(val.beginTime)
             .add(2, 'hour')
             .format('YYYY-MM-DDTHH:mm:ss')

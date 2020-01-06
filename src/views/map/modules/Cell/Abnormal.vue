@@ -11,7 +11,9 @@
       </div>
       <div class="cell__main">
         <div class="cell__main--content">
-          {{ item.carNo }}在{{ item.address
+          【{{ dict[item.type] ? dict[item.type].label : '' }}】{{
+            item.carNo
+          }}在{{ item.address
           }}{{ dict[item.type] ? dict[item.type].label : '' }}
         </div>
         <div class="cell__main--desc">

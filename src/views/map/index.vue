@@ -32,7 +32,6 @@
           class="map__chart--panel"
         >
           <chart-warning
-            v-if="warning.length"
             :data="warning"
             class="map__chart--inner"
           ></chart-warning>
@@ -45,11 +44,7 @@
           size="big"
           class="map__chart--panel"
         >
-          <chart-speed
-            :data="speed"
-            v-if="speed.length"
-            class="map__chart--inner"
-          ></chart-speed>
+          <chart-speed :data="speed" class="map__chart--inner"></chart-speed>
         </panel-chart>
 
         <!-- 3.2 左侧-图例 -->
@@ -74,7 +69,7 @@
           size="small"
           class="map__chart--panel"
         >
-          <chart-cars :data="cars" v-if="Object.keys(cars).length"></chart-cars>
+          <chart-cars :data="cars"></chart-cars>
         </panel-chart>
 
         <panel-chart
@@ -87,10 +82,7 @@
               查看更多区域
               <i class="el-icon-arrow-right"></i>
             </span> -->
-          <chart-districts
-            :data="districts"
-            v-if="districts.length"
-          ></chart-districts>
+          <chart-districts :data="districts"></chart-districts>
         </panel-chart>
 
         <!-- 4.2右侧-围栏按钮 -->
@@ -227,12 +219,6 @@ export default class MapIndex extends Mixins(
   // 显示图表的条件
   get showCharts() {
     return !this.showTrackDrawer && !this.showAbnormalDrawer
-  }
-
-  beforeCreate() {
-    if (this.$route.query.alarmId) {
-      window.location.href = window.location.origin + this.$route.path
-    }
   }
 
   // 控制轨迹的播放

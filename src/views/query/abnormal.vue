@@ -41,8 +41,10 @@ export default class BaseInfoComponent extends Vue {
   }
 
   created() {
+    const { type } = this.$route.query
     this.params = Object.assign({}, this.params, {
-      pageNum: 0
+      pageNum: 0,
+      type: type
     })
   }
 
@@ -76,7 +78,8 @@ export default class BaseInfoComponent extends Vue {
       this.$router.push({
         path: '/map',
         query: {
-          alarmId: item.id
+          alarmId: item.id,
+          type: item.type
         }
       })
     }, 500)

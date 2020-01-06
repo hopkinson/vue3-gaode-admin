@@ -40,7 +40,6 @@
         <panel-car-detail
           v-model="showInfo"
           :data="carDetail"
-          :showDrawer="showDrawer"
           v-bind="$attrs"
           v-on="$listeners"
         >
@@ -348,7 +347,8 @@ export default class MapHome extends Mixins(
       this.$emit('update:passedLength', this.countPassed) // 每移动一格加一
       this.realTimeDetail = this.getTrackMarkers[this.countPassed]
       this.$nextTick(() => {
-        this.map.$$getInstance().setFitView()
+        this.center = _location
+        // this.map.$$getInstance().setFitView()
       })
       this.marker.$$getInstance().moveTo(_lnglat, speed * this.speed * 3)
     }
@@ -450,11 +450,12 @@ export default class MapHome extends Mixins(
 
   @Watch('showInfo')
   public watchShowInfo(val: boolean) {
-    !val &&
+    if (!val) {
       !this.getIsPlay &&
-      !this.showDrawer &&
-      this.marker &&
-      this.markerCluster.addMarkers(this.markerRefs)
+        !this.showDrawer &&
+        this.marker &&
+        this.markerCluster.addMarkers(this.markerRefs)
+    }
   }
   // 监听 - 轨迹
   @Watch('carDetail', { deep: true })
