@@ -7,7 +7,7 @@
       @view="viewData"
       title="异常统计"
     >
-      <form-search v-model="params" @search="data = {}" />
+      <form-search v-model="params" @search="search" />
     </table-abnormal>
   </div>
 </template>
@@ -16,12 +16,19 @@
 import TableAbnormal from './modules/Table/Abnormal.vue'
 import FormSearch from './modules/Form/Abnormal.vue'
 import { Component, Vue, Watch } from 'vue-property-decorator'
-
+import { Getter, Mutation } from 'vuex-class'
+const QUERY = 'abnormal_query'
 @Component({
   name: 'AbnormalComponent',
   components: {
     TableAbnormal,
     FormSearch
+  },
+  beforeRouteEnter(to, from, next) {
+    if (!from.path.includes('map')) {
+      sessionStorage.removeItem(QUERY)
+    }
+    next()
   }
 })
 export default class BaseInfoComponent extends Vue {
@@ -41,13 +48,19 @@ export default class BaseInfoComponent extends Vue {
   }
 
   created() {
-    const { type } = this.$route.query
-    this.params = Object.assign({}, this.params, {
-      pageNum: 0,
-      type: type
+    let _query = {}
+    if (sessionStorage[QUERY]) {
+      _query = JSON.parse(sessionStorage[QUERY])
+    }
+
+    this.params = Object.assign({}, this.params, _query, {
+      pageNum: 0
     })
   }
-
+  search(data) {
+    this.data = {}
+    sessionStorage[QUERY] = JSON.stringify(data)
+  }
   // 请求数据
   async handleFetchData() {
     this.loading = true

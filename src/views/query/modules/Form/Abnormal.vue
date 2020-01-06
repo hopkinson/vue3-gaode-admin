@@ -72,16 +72,21 @@ export default class FormSearch extends Vue {
     }
   }
 
+  mounted() {
+    this.form = Object.assign({}, this.form, this.value)
+  }
+
   // v-model
   @Model('input', { type: Object, default: () => ({}) })
   public readonly value!: object
 
   @Emit('input')
   handleSearch() {
-    this.$emit('search')
-    return Object.assign({}, this.value, this.form, {
+    const data = Object.assign({}, this.value, this.form, {
       pageNum: 1
     })
+    this.$emit('search', data)
+    return data
   }
 }
 </script>
