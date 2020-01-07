@@ -26,7 +26,6 @@ export default class Table extends Vue {
   // 聚合坐标
   renderCluserMarker(context) {
     const count = this.markers.length
-    let size = Math.round(30 + Math.pow(context.count / count, 1 / 5) * 20)
     const result = `
             <div class="project__map-cluserMarker">
               <i class="sprite_ico sprite_ico_focus_car">
@@ -34,7 +33,7 @@ export default class Table extends Vue {
                 <span>${context.count}</span>
               </i>
             </div>`
-    context.marker.setOffset(new AMap.Pixel(-size / 2, -size / 2))
+    context.marker.setOffset(new AMap.Pixel(-70, -100))
     context.marker.setContent(result)
   }
 }

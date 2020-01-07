@@ -12,8 +12,12 @@
     <div class="track">
       <!-- 关闭 -->
       <i class="track__icon is-close el-icon-close" @click="close"></i>
-      <span class="track__icon is-back">
-        <i class="el-icon-back" @click="$router.back()"></i>
+      <span
+        class="track__icon is-back"
+        v-show="isShowBack"
+        @click="$router.back()"
+      >
+        <i class="el-icon-back"></i>
         <span>返回上一页</span>
       </span>
       <!-- 表单 -->
@@ -37,6 +41,7 @@ import { Component, Vue, Model, Watch, PropSync } from 'vue-property-decorator'
 import FormTrack from '../Form/Track.vue'
 import SliderTrack from '../Slider/Track.vue'
 import { CarIdBody } from '@/services'
+const QUERY = 'abnormal_query'
 @Component({
   name: 'DrawerTrack',
   components: {
@@ -51,10 +56,23 @@ export default class DrawerTrack extends Vue {
 
   // 是否播放中
   visible = false
+
+  isShowBack = false
+
+  created() {
+    this.isShowBack = !!sessionStorage['ALARMID']
+  }
+
+  beforeDestroy() {
+    this.isShowBack = false
+  }
+
   // 关闭
   close() {
     this.visible = false
+    this.isShowBack = false
   }
+
   // 监听 - params
   @Watch('isShow', {})
   public watchValue(val: boolean) {
@@ -87,7 +105,7 @@ export default class DrawerTrack extends Vue {
       right: 45px;
     }
     &.is-back {
-      right: 205px;
+      right: 100px;
       display: inline-flex;
       align-items: center;
       span {
