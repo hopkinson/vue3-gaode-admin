@@ -348,7 +348,6 @@ export default class MapHome extends Mixins(
       this.realTimeDetail = this.getTrackMarkers[this.countPassed]
       this.$nextTick(() => {
         this.center = _location
-        // this.map.$$getInstance().setFitView()
       })
       this.marker.$$getInstance().moveTo(_lnglat, speed * this.speed * 3)
     }

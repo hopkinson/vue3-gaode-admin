@@ -28,8 +28,14 @@ export default class BreadcrumbRoutes extends Vue {
   }
 }
 </script>
-<style scoped>
+<style lang="less" scoped>
 .breadcrumb {
-  font-size: 16px;
+  font-size: 14px;
+  & /deep/ .el-breadcrumb__item:last-child .el-breadcrumb__inner {
+    font-weight: bold;
+  }
+  & /deep/ .el-breadcrumb__inner.is-link {
+    font-weight: normal;
+  }
 }
 </style>

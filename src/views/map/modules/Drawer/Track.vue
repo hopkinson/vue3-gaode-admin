@@ -11,7 +11,15 @@
   >
     <div class="track">
       <!-- 关闭 -->
-      <i class="track__close el-icon-close" @click="close"></i>
+      <i class="track__icon is-close el-icon-close" @click="close"></i>
+      <span
+        class="track__icon is-back"
+        v-show="isShowBack"
+        @click="$router.back()"
+      >
+        <i class="el-icon-back"></i>
+        <span>返回上一页</span>
+      </span>
       <!-- 表单 -->
       <div class="track__item is-form">
         <form-track v-bind="$attrs" v-on="$listeners"></form-track>
@@ -33,6 +41,7 @@ import { Component, Vue, Model, Watch, PropSync } from 'vue-property-decorator'
 import FormTrack from '../Form/Track.vue'
 import SliderTrack from '../Slider/Track.vue'
 import { CarIdBody } from '@/services'
+const QUERY = 'abnormal_query'
 @Component({
   name: 'DrawerTrack',
   components: {
@@ -47,10 +56,23 @@ export default class DrawerTrack extends Vue {
 
   // 是否播放中
   visible = false
+
+  isShowBack = false
+
+  created() {
+    this.isShowBack = !!sessionStorage['ALARMID']
+  }
+
+  beforeDestroy() {
+    this.isShowBack = false
+  }
+
   // 关闭
   close() {
     this.visible = false
+    this.isShowBack = false
   }
+
   // 监听 - params
   @Watch('isShow', {})
   public watchValue(val: boolean) {
@@ -68,14 +90,28 @@ export default class DrawerTrack extends Vue {
 .track {
   background: #000;
   position: relative;
-  &__close {
-    position: absolute;
-    top: 20px;
-    right: 45px;
-    color: #fff;
-    font-size: 20px;
-    cursor: pointer;
-    z-index: 1;
+  &__icon {
+    &.is-close,
+    &.is-back {
+      position: absolute;
+      top: 20px;
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 1;
+      line-height: 1;
+    }
+    &.is-close {
+      right: 45px;
+    }
+    &.is-back {
+      right: 100px;
+      display: inline-flex;
+      align-items: center;
+      span {
+        font-size: 14px;
+      }
+    }
   }
   &__inner {
     & /deep/ .el-drawer__header {

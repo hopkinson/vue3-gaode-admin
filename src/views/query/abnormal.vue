@@ -5,7 +5,7 @@
       v-model="params"
       @fetch="handleFetchData"
       @view="viewData"
-      title="异常统计"
+      title="警告信息"
     >
       <form-search v-model="params" @search="search" />
     </table-abnormal>
@@ -88,12 +88,9 @@ export default class BaseInfoComponent extends Vue {
     }
     setTimeout(() => {
       this.loading = false
+      sessionStorage['ALARMID'] = item.id
       this.$router.push({
-        path: '/map',
-        query: {
-          alarmId: item.id,
-          type: item.type
-        }
+        path: '/map'
       })
     }, 500)
   }

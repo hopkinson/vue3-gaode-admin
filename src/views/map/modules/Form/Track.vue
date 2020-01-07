@@ -6,6 +6,7 @@
         class="form__date"
         v-model="form.beginTime"
         type="datetime"
+        time-arrow-control
         value-format="yyyy-MM-ddTHH:mm:ss"
         :picker-options="pickerOptions"
       ></el-date-picker>
@@ -15,6 +16,7 @@
         class="form__date"
         v-model="form.endTime"
         type="datetime"
+        time-arrow-control
         value-format="yyyy-MM-ddTHH:mm:ss"
         :picker-options="pickerOptions"
       ></el-date-picker>

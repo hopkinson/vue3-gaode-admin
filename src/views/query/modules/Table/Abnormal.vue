@@ -1,5 +1,9 @@
 <template>
-  <table-query v-bind="$attrs" v-on="$listeners">
+  <table-query
+    v-bind="$attrs"
+    v-on="$listeners"
+    :headerCellStyle="headerCellStyle"
+  >
     <!-- 条件查询 -->
     <template slot="query">
       <slot></slot>
@@ -62,5 +66,9 @@ import { WARNGING } from '@/config/dict'
 export default class TableList extends Mixins(MixinsTable) {
   // 字典 - 类型
   dict = WARNGING.status
+  headerCellStyle = {
+    background: '#e7e7e7',
+    color: '#999999'
+  }
 }
 </script>

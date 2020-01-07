@@ -31,13 +31,14 @@ export default class Table extends Vue {
       const result = Number(body)
       this.abnormalNum = result
     })
-    const { alarmId } = this.$route.query
-    if (alarmId) {
+    const _alarmId = sessionStorage.getItem('ALARMID')
+    if (_alarmId) {
       const detail = await this.$ajax.ajax({
         method: 'GET',
-        url: `v1/alarms/${alarmId}`
+        url: `v1/alarms/${_alarmId}`
       })
       this.showAbnormalDetail(detail)
+      sessionStorage.removeItem('ALARMID')
     }
     this.abnormalNum = await this.$ajax.ajax({
       method: 'GET',
