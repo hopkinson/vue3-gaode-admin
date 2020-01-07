@@ -6,14 +6,14 @@
     :modal="false"
     :with-header="false"
     size="414px"
-    title="异常信息"
+    title="当天警告信息"
     class="abnormal__inner"
   >
-    <!-- 异常信息列表 -->
+    <!-- 警告信息列表 -->
     <div class="abnormal">
       <!-- 标题 -->
       <div class="abnormal__title">
-        <div class="abnormal__title--inner">异常信息</div>
+        <div class="abnormal__title--inner">当天警告信息</div>
         <div class="abnormal__title--more" @click="$emit('more')" slot="title">
           更多
           <i class="el-icon-d-arrow-right"></i>

@@ -5,7 +5,7 @@
       v-model="params"
       @fetch="handleFetchData"
       @view="viewData"
-      title="异常信息"
+      title="警告信息"
     >
       <form-search v-model="params" @search="search" />
     </table-abnormal>

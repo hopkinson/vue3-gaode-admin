@@ -2,7 +2,7 @@
   <div class="abnormal">
     <!-- 警告 - 图标 -->
     <div class="abnormal__icon" @click="$emit('click')">
-      <!-- 有异常信息 -->
+      <!-- 有警告信息 -->
       <i
         class="sprite_ico sprite_ico_bar_notice_abnormal abnormal__icon is-abnormal"
         v-if="!!num"
