@@ -67,7 +67,7 @@ export default class BaseInfoComponent extends Vue {
     // 告警列表
     this.data = await this.$ajax.ajax({
       method: 'POST',
-      url: 'v1/alarms/page-today',
+      url: 'v1/alarms/page',
       data: this.params,
       query: this.params
     })
