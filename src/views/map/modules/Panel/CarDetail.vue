@@ -53,7 +53,7 @@ export default class CarDetail extends Vue {
 
   address = '' // 地址
 
-  // 是否显示警告信息
+  // 是否显示告警信息
   get isAbnormal() {
     return Object.keys(this.abnormalData).length
   }

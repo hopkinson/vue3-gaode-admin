@@ -1,5 +1,5 @@
 <template>
-  <!-- 警告警告 -->
+  <!-- 告警告警 -->
   <div ref="chart" class="project__echarts"></div>
 </template>
 

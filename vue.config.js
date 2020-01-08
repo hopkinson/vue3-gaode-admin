@@ -182,7 +182,7 @@ module.exports = {
   },
   devServer: {
     overlay: {
-      // 让浏览器 overlay 同时显示警告和错误
+      // 让浏览器 overlay 同时显示告警和错误
       warnings: true,
       errors: true
     },

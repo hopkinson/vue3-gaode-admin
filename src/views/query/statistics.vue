@@ -50,7 +50,7 @@ export default class StatisticsComponent extends Vue {
   // 请求数据
   async handleFetchData() {
     this.loading = true
-    // 警告列表
+    // 告警列表
     this.data = await this.$ajax.ajax({
       method: 'GET',
       url: 'v1/alarms/statistics',

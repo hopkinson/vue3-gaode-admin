@@ -129,7 +129,7 @@ export default class Table extends Vue {
     // 异常列表
     this.abnormalBody = await this.$ajax.ajax({
       method: 'POST',
-      url: 'v1/alarms/page',
+      url: 'v1/alarms/page-today',
       query: val,
       data: val
     })
