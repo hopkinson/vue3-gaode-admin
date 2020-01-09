@@ -23,7 +23,6 @@
       <!-- 3. 左侧 -->
       <div class="map__chart--left" v-if="!isFullScreen" v-show="showCharts">
         <!-- 3.1 左侧-图表 -->
-
         <panel-chart
           title="告警统计"
           unit="单位（次）"
@@ -235,6 +234,7 @@ export default class MapIndex extends Mixins(
 
   // 返回实际轨迹
   async handleSearchTrack(data) {
+    this.isEnd = true
     const _tracks = await this.$ajax.ajax({
       method: 'POST',
       url: 'v1/car/track',

@@ -7,7 +7,7 @@
         class="sprite_ico sprite_ico_bar_notice_abnormal abnormal__icon is-abnormal"
         v-if="!!num"
       >
-        <span class="abnormal__icon--text">{{ num }}条告警信息</span>
+        <span class="abnormal__icon--text">{{ num }}条未读告警信息</span>
       </i>
       <!-- 无异常 -->
       <i
@@ -53,8 +53,10 @@ export default class ButtonAbnormal extends Vue {
       color: #ff0000;
     }
     &--text {
-      padding-left: 34px;
+      padding-left: 25px;
       line-height: 32px;
+      transform: scale(0.9);
+      display: inline-block;
     }
   }
 }
