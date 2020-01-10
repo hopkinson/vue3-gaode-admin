@@ -26,6 +26,7 @@ export default class ChartWarning extends Vue {
       data: [],
       right: 30,
       top: '2%',
+      selectedMode: 'multiple',
       textStyle: {
         color: '#fff'
       },
@@ -140,6 +141,7 @@ export default class ChartWarning extends Vue {
     const barBackgound = Object.keys(sortedData).map((item, index) => {
       return {
         type: 'bar',
+        name: WARNGING.status[item.toString()].label,
         barGap: '50%',
         barWidth: 6,
         animation: false,
@@ -153,7 +155,7 @@ export default class ChartWarning extends Vue {
     })
     this.option.xAxis[0].data = [...new Set(_alertTime)] // 图表 - x轴
     this.option.xAxis[1].data = [...new Set(_alertTime)] // 图表 - x轴
-    this.option.series = [...barBackgound, ...barData] // 柱子的数据 和 背景
+    this.option.series = [...barData, ...barBackgound] // 柱子的数据 和 背景
     this.option.legend.data = Object.values(WARNGING.status).map(
       item => item.label
     ) // 图例

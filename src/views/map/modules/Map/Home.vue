@@ -336,18 +336,28 @@ export default class MapHome extends Mixins(
   moveToTracker() {
     const _nextPoint = this.getTrackMarkers[this.countPassed + 1]
     if (_nextPoint) {
-      const { location } = _nextPoint
-      const { speed } = this.getTrackMarkers[this.countPassed]
-      const _location: Array<number | string> = location.split(',')
-      const _lnglat = new AMap.LngLat(
-        Number(_location[0]),
-        Number(_location[1])
+      const { speed, location } = this.getTrackMarkers[this.countPassed]
+      // 下一个坐标的经curr纬度
+      const [currLng, currLat] = location.split(',')
+      // 下一个坐标的经纬度
+      let [nextLng, nextLat] = _nextPoint.location.split(',')
+      let _lnglat = new AMap.LngLat(Number(nextLng), Number(nextLat))
+      var dis = (AMap as any).GeometryUtil.distance(
+        [currLng, currLat],
+        [nextLng, nextLat]
       )
+      if (!dis) {
+        _lnglat = new AMap.LngLat(
+          Number(Number(nextLng).toFixed(6)) + 0.000001,
+          Number(Number(nextLat).toFixed(6)) + 0.000001
+        )
+      }
+      // 计数加1
       this.countPassed++
       this.$emit('update:passedLength', this.countPassed) // 每移动一格加一
       this.realTimeDetail = this.getTrackMarkers[this.countPassed]
       this.$nextTick(() => {
-        this.center = _location
+        this.center = [nextLng, nextLat]
       })
       this.marker.$$getInstance().moveTo(_lnglat, speed * this.speed * 3)
     }

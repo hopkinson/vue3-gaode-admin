@@ -96,7 +96,7 @@ export default class Layout extends Vue {
   @Prop({ type: String, default: '#eff4f7' }) readonly background!: string
 
   // 背景颜色
-  @Prop({ type: String, default: '22px' }) readonly gap!: string
+  @Prop({ type: Number, default: 22 }) readonly gap!: number
 
   title: string = process.env.VUE_APP_TITLE
   copyright: string = process.env.VUE_APP_COPYRIGHT

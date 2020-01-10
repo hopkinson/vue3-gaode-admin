@@ -69,6 +69,13 @@ export default class TrackComponent extends Vue {
   }
 
   onSubmit() {
+    console.log(111111)
+    this.overTwoHour(() => {
+      this.$message({
+        message: '开始时间和结束时间不能超过2小时',
+        type: 'warning'
+      })
+    })
     this.$emit('search-track', this.form)
   }
 
@@ -97,21 +104,7 @@ export default class TrackComponent extends Vue {
       })
     }
   }
-  // 监听 - 倍速
-  @Watch('form', { deep: true, immediate: true })
-  public async waform(val: any) {
-    if (val) {
-      this.$nextTick(() => {
-        this.overTwoHour(() => {
-          this.$message({
-            message: '开始时间和结束时间不能超过2小时',
-            type: 'info'
-          })
-        })
-        // this.form = Object.assign({}, this.form, val)
-      })
-    }
-  }
+
   // 监听 - 详情
   @Watch('carDetail', { deep: true, immediate: true })
   public async watchCardDetail(val: CarIdBody) {

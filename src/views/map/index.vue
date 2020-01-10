@@ -1,6 +1,12 @@
 <template>
   <layout :footer="false" :breadcrumb="false" :gap="0">
-    <div class="map">
+    <div
+      class="map"
+      v-loading="loading"
+      element-loading-text="轨迹加载中"
+      element-loading-spinner="el-icon-loading"
+      element-loading-background="rgba(0, 0, 0, 0.3)"
+    >
       <!-- 1. 告警信息-->
       <alert-abnormal
         :num="abnormalNum"
@@ -201,7 +207,7 @@ export default class MapIndex extends Mixins(
   @Getter('app/isFullScreen') isFullScreen
   // 是否在播放轨迹回放
   isPlaying: boolean = false
-
+  loading = false // 加载动画
   isEnd: boolean = true // 是否停止播放的状态
   showTrackDrawer: boolean = false // 是否显示底部抽屉（轨迹）
 
@@ -235,12 +241,15 @@ export default class MapIndex extends Mixins(
   // 返回实际轨迹
   async handleSearchTrack(data) {
     this.isEnd = true
+    this.loading = true
+    console.log(1111)
     const _tracks = await this.$ajax.ajax({
       method: 'POST',
       url: 'v1/car/track',
       data
     })
     if (!_tracks.length) {
+      this.loading = false
       setTimeout(() => {
         this.$message({
           message: '没有任何轨迹',
@@ -256,6 +265,7 @@ export default class MapIndex extends Mixins(
         data: data
       })
       if (_abnormalTrack) {
+        this.loading = false
         this.abnormalTracks = _abnormalTrack
       }
     }

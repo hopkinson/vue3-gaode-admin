@@ -68,7 +68,7 @@ setTimeout(() => {
       'AMap.OverView',
       'AMap.MouseTool'
     ],
-    v: '1.4.11'
+    v: '1.4.15'
   })
 }, 0)
 // websocket
