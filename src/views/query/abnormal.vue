@@ -5,7 +5,7 @@
       v-model="params"
       @fetch="handleFetchData"
       @view="viewData"
-      title="警告信息"
+      title="告警信息"
     >
       <form-search v-model="params" @search="search" />
     </table-abnormal>
@@ -64,7 +64,7 @@ export default class BaseInfoComponent extends Vue {
   // 请求数据
   async handleFetchData() {
     this.loading = true
-    // 警告列表
+    // 告警列表
     this.data = await this.$ajax.ajax({
       method: 'POST',
       url: 'v1/alarms/page',

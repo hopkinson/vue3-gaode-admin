@@ -56,7 +56,7 @@ export default class DrawerTrackComponent extends Vue {
     return this.trackMarkersLength ? this.trackMarkersLength - 1 : 0
   }
 
-  @Throttle(1000)
+  @Throttle(400)
   @Bind()
   addSpeed() {
     if (this.isplay) {
@@ -65,7 +65,7 @@ export default class DrawerTrackComponent extends Vue {
   }
 
   // 减速
-  @Throttle(1000)
+  @Throttle(400)
   @Bind()
   minusSpeed() {
     if (this.isplay) {

@@ -4,7 +4,7 @@
     :router="false"
     :footer="false"
     :logout="false"
-    gap="0"
+    :gap="0"
   >
     <div class="login">
       <div class="login--inner">

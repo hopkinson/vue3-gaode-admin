@@ -1,7 +1,7 @@
 <template>
-  <layout :footer="false" :breadcrumb="false" gap="0">
+  <layout :footer="false" :breadcrumb="false" :gap="0">
     <div class="map">
-      <!-- 1. 警告信息-->
+      <!-- 1. 告警信息-->
       <alert-abnormal
         :num="abnormalNum"
         @click="showAbnormalList"
@@ -23,7 +23,6 @@
       <!-- 3. 左侧 -->
       <div class="map__chart--left" v-if="!isFullScreen" v-show="showCharts">
         <!-- 3.1 左侧-图表 -->
-
         <panel-chart
           title="告警统计"
           unit="单位（次）"
@@ -235,18 +234,21 @@ export default class MapIndex extends Mixins(
 
   // 返回实际轨迹
   async handleSearchTrack(data) {
-    const tracks = await this.$ajax.ajax({
+    this.isEnd = true
+    const _tracks = await this.$ajax.ajax({
       method: 'POST',
       url: 'v1/car/track',
-      data: data
+      data
     })
-    this.trackMarkers = tracks || []
-    if (!this.trackMarkers.length) {
-      this.$message({
-        message: '没有任何轨迹',
-        type: 'warning'
-      })
+    if (!_tracks.length) {
+      setTimeout(() => {
+        this.$message({
+          message: '没有任何轨迹',
+          type: 'warning'
+        })
+      }, 350)
     } else {
+      this.trackMarkers = _tracks
       // 返回异常部分
       const _abnormalTrack = await this.$ajax.ajax({
         method: 'POST',

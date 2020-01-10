@@ -12,7 +12,7 @@
         <nav-menu :data="addRouters" v-if="navMenu"></nav-menu>
       </nav-header>
     </el-header>
-    <el-container>
+    <el-container class="index__container--inner">
       <el-aside width="270px" v-if="aside">
         <!-- <slot name="aside"></slot> -->
         <el-menu
@@ -44,7 +44,10 @@
           v-if="breadcrumb"
         ></breadcrumb-route>
         <!-- 2.2 业务页面 -->
-        <div class="index__main--container" :style="{ padding: gap }">
+        <div
+          class="index__main--container"
+          :style="{ padding: `${gap}px`, height: !gap ? '100%' : 'auto' }"
+        >
           <router-view v-if="router"></router-view>
           <slot v-else></slot>
         </div>
@@ -145,6 +148,10 @@ export default class Layout extends Vue {
 .index {
   &__container {
     height: 100%;
+    &--inner {
+      height: 100%;
+      overflow: auto;
+    }
   }
   &__aside {
     padding-top: 85px;
@@ -166,8 +173,8 @@ export default class Layout extends Vue {
   }
   &__main {
     padding: 0;
+    height: 100%;
     &--container {
-      height: 100%;
       padding: 24px;
     }
     &--breadcrumb {

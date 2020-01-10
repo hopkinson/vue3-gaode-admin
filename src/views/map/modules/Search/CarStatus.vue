@@ -133,7 +133,7 @@ export default class SearchCarStatus extends Vue {
     }
   }
   &__table {
-    min-height: 400px;
+    min-height: 450px;
   }
   &__button {
     &--text {
