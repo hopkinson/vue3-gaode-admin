@@ -421,11 +421,14 @@ export default class MapHome extends Mixins(
       this.center = location.split(',')
       this.position = this.center
     }, 0)
-    this.getIsPlay &&
+    if (this.getIsPlay) {
       setTimeout(() => {
         this.moveToTracker()
         this.movingTracker()
-      }, 600)
+      }, 350)
+    } else {
+      this.realTimeDetail = this.getTrackMarkers[this.countPassed]
+    }
   }
 
   // 监听 - 是否显示抽屉
