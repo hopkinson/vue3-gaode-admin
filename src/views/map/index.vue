@@ -1,5 +1,5 @@
 <template>
-  <layout :footer="false" :breadcrumb="false" gap="0">
+  <layout :footer="false" :breadcrumb="false" :gap="0">
     <div class="map">
       <!-- 1. 告警信息-->
       <alert-abnormal

@@ -53,10 +53,8 @@ export default class ButtonAbnormal extends Vue {
       color: #ff0000;
     }
     &--text {
-      padding-left: 25px;
+      padding-left: 35px;
       line-height: 32px;
-      transform: scale(0.9);
-      display: inline-block;
     }
   }
 }
