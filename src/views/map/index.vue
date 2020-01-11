@@ -100,16 +100,10 @@
 
       <!-- 地图 :loadPreTrack="loadPreMarkers" @on-passed-line="recordPassedLength" -->
       <map-home
-        :track-markers.sync="trackMarkers"
         :abnormal-tracks="abnormalTracks"
         :slider-val="sliderTrack"
-        :speed="trackSpeed"
         :markers="carList"
         :car-detail="carDetail"
-        :isPlay.sync="isPlaying"
-        :showDrawer="showTrackDrawer"
-        :isEnd.sync="isEnd"
-        :passedLength.sync="passedLength"
         :fenceList="fenceList"
         @stop-move="stopMoveTracker"
         @add-fence="createFence"
@@ -121,14 +115,8 @@
       <!-- 底部 - 抽屉 -->
       <drawer-track
         class="map__drawer--track"
-        :show.sync="showTrackDrawer"
-        :speed.sync="trackSpeed"
         :track-form="trackForm"
-        v-model="passedLength"
-        :trackMarkersLength="trackMarkers.length"
         ref="drawer"
-        :isEnd="isEnd"
-        :isPlaying.sync="isPlaying"
         :car-detail="carDetail"
         @play="handleControlTrack"
         @stop="stopTrack"
@@ -163,7 +151,7 @@ import ButtonFence from './modules/Button/Fence.vue'
 import MapHome from './modules/Map/Home.vue'
 import { TRAFFIC_LEGEND } from '@/config/dict'
 import SearchCarStatus from './modules/Search/CarStatus.vue'
-import { Getter } from 'vuex-class'
+import { Getter, Mutation } from 'vuex-class'
 import MixinsAbnormalList from './mixins/AbnormalList'
 import MixinsFence from './mixins/Fence'
 import MixinsChart from './mixins/Chart'
@@ -204,21 +192,28 @@ export default class MapIndex extends Mixins(
   @Ref('drawer') drawer: any
   @Ref('map') map: any
 
-  @Getter('app/isFullScreen') isFullScreen
-  // 是否在播放轨迹回放
-  isPlaying: boolean = false
+  @Getter('app/isFullScreen') isFullScreen // 是否全屏
+  @Getter('map/isEnd') isEnd!: boolean // 是否结束
+  @Getter('map/isPlaying') isPlaying!: boolean // 是否在播放轨迹回放
+  @Getter('map/speed') trackSpeed!: number // 播放速度
+  @Getter('map/trackMarkers') trackMarkers!: Array<CarLocationBody> // 标记点 - 轨迹回放
+  @Getter('map/showDrawer') showTrackDrawer!: boolean // 是否显示底部抽屉（轨迹）
+  @Getter('map/passedLength') passedLength!: number // 已经路过的长度
+
+  @Mutation('map/SET_TRACK_STATUS') setTrackStatus // 方法 - 是否结束
+  @Mutation('map/SET_PLAY_STATUS') setPlayStatus // 方法 - 设置播放状态
+  @Mutation('map/SET_TRACK_SPEED') setTrackSpeed // 方法 - 设置播放速度
+  @Mutation('map/SET_TRACK_MARKERS') setTrackMarkers // 方法 - 设置轨迹
+  @Mutation('map/IS_SHOW_DRAWER') isShowDrawer // 方法 - 显示抽屉的状态
+  @Mutation('map/SET_TRACK_PASSED_LENGTH') setTrackPassedLength // 方法 - 设置路过的长度
+
   loading = false // 加载动画
-  isEnd: boolean = true // 是否停止播放的状态
-  showTrackDrawer: boolean = false // 是否显示底部抽屉（轨迹）
 
   legends = TRAFFIC_LEGEND // 图例 - 交通状态
-  passedLength = 0 // 已经路过的长度
-  trackSpeed: number = 1 // 初始化速度
   sliderTrack: number = 0 // 滑块的值
 
   carDetail: any = {} // 汽车详情
 
-  trackMarkers: Array<Array<number>> = [] // 标记点 - 轨迹回放
   abnormalTracks: Array<Array<Array<number>>> = [] // 异常的坐标
 
   // 显示图表的条件
@@ -229,20 +224,18 @@ export default class MapIndex extends Mixins(
   // 控制轨迹的播放
   handleControlTrack(isPlaying) {
     this.isPlaying ? this.map.pauseTracker() : this.map.moveTracker()
-    this.isPlaying = !this.isPlaying
-    this.isEnd = false
+    this.setTrackStatus(false)
   }
 
   // 停止轨迹的播放
   stopTrack() {
-    this.isEnd = true
+    this.setTrackStatus(true)
   }
 
   // 返回实际轨迹
   async handleSearchTrack(data) {
-    this.isEnd = true
+    this.setTrackStatus(true)
     this.loading = true
-    console.log(1111)
     const _tracks = await this.$ajax.ajax({
       method: 'POST',
       url: 'v1/car/track',
@@ -253,11 +246,11 @@ export default class MapIndex extends Mixins(
       setTimeout(() => {
         this.$message({
           message: '没有任何轨迹',
-          type: 'warning'
+          type: 'error'
         })
       }, 350)
     } else {
-      this.trackMarkers = _tracks
+      this.setTrackMarkers(_tracks)
       // 返回异常部分
       const _abnormalTrack = await this.$ajax.ajax({
         method: 'POST',
@@ -271,21 +264,21 @@ export default class MapIndex extends Mixins(
     }
   }
   closeInfoWindow() {
-    this.showTrackDrawer = false
+    this.isShowDrawer(false)
   }
   // 滑块发生改变时
   handleChangeSlider(val) {
     this.sliderTrack = val
-    this.passedLength = val
+    this.setTrackPassedLength(val)
   }
   // 停止移动轨迹
   stopMoveTracker() {
-    this.isPlaying = false
-    this.trackSpeed = 1
+    this.setPlayStatus(false)
+    this.setTrackSpeed(1)
   }
   // 点击窗体的轨迹回放 - 显示底部抽屉
   handleShowTrack({ realTime }) {
-    this.showTrackDrawer = true
+    this.isShowDrawer(true)
   }
 
   // 点击车辆 => 根据实时车辆信息过滤
@@ -304,12 +297,12 @@ export default class MapIndex extends Mixins(
   // 加载汽车详情
   async loadCarDetail(item) {
     const { runState, location } = item
-    this.trackMarkers = []
-    this.isPlaying = false
+    this.setTrackMarkers([])
+    this.setPlayStatus(false)
     this.carDetail = item
   }
 
-  @Watch('showTrackDrawer', {})
+  @Watch('showTrackDrawer')
   public watchShowTrackDrawer(val) {
     if (!val) {
       // 汽车详情清空

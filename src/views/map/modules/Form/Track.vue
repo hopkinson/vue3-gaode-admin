@@ -69,7 +69,6 @@ export default class TrackComponent extends Vue {
   }
 
   onSubmit() {
-    console.log(111111)
     this.overTwoHour(() => {
       this.$message({
         message: '开始时间和结束时间不能超过2小时',

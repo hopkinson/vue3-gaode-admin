@@ -1,5 +1,7 @@
 // Store仓库
 import { Route } from 'vue-router'
+import { CarLocationBody } from '@/services'
+
 export declare namespace Store {
   export interface Root {
     version: string
@@ -23,5 +25,15 @@ export declare namespace Store {
   }
   export interface App {
     isFullScreen: boolean
+  }
+
+  export interface Map {
+    isDragging: boolean
+    isEnd: boolean
+    isPlaying: boolean
+    speed: number
+    showDrawer: boolean
+    passedLength: number
+    trackMarkers: Array<CarLocationBody>
   }
 }

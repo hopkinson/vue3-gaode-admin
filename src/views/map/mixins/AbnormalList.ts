@@ -1,9 +1,17 @@
 // 异常列表
 import { Component, Vue, Watch } from 'vue-property-decorator'
-// import { AlarmsPageBodyRecords } from '@/services'
+import { Getter, Mutation } from 'vuex-class'
+import { CarLocationBody } from '@/services'
+
 import Websocket from '@/plugins/websocket'
 @Component
 export default class Table extends Vue {
+  @Getter('map/showDrawer') showTrackDrawer!: boolean // 是否显示底部抽屉（轨迹）
+  @Getter('map/trackMarkers') trackMarkers!: Array<CarLocationBody> // 坐标数组
+
+  @Mutation('map/IS_SHOW_DRAWER') isShowDrawer // 方法 - 显示抽屉的状态
+  @Mutation('map/SET_TRACK_MARKERS') setTrackMarkers // 方法 - 设置轨迹
+
   showAbnormalDrawer: boolean = false // 是否显示右侧抽屉（异常）
   abnormalBody = {} // 异常列表
   carDetail = {}
@@ -20,8 +28,6 @@ export default class Table extends Vue {
   }
   abnormalNum = 0 // 警告信息数量
   websocket: any = null // websocket连接
-  showTrackDrawer: boolean = false // 是否显示底部抽屉（轨迹）
-  trackMarkers: Array<Array<number>> = [] // 标记点 - 轨迹回放
   async created() {
     //订阅websocket消息
     this.websocket = new Websocket({
@@ -91,7 +97,7 @@ export default class Table extends Vue {
       id: detail.carId
     }
     // 3. 显示抽屉
-    this.showTrackDrawer = true
+    this.isShowDrawer(true)
     // 4. 设置抽屉时间
     this.trackForm = {
       carId: detail.carId,
@@ -115,11 +121,11 @@ export default class Table extends Vue {
       url: 'v1/car/track',
       data: data
     })
-    this.trackMarkers = tracks
+    this.setTrackMarkers(tracks)
     if (!this.trackMarkers.length) {
       this.$message({
         message: '没有任何轨迹',
-        type: 'warning'
+        type: 'error'
       })
     }
   }

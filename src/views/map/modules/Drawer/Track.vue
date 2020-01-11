@@ -41,6 +41,8 @@ import { Component, Vue, Model, Watch, PropSync } from 'vue-property-decorator'
 import FormTrack from '../Form/Track.vue'
 import SliderTrack from '../Slider/Track.vue'
 import { CarIdBody } from '@/services'
+import { Getter, Mutation } from 'vuex-class'
+
 const QUERY = 'abnormal_query'
 @Component({
   name: 'DrawerTrack',
@@ -50,9 +52,9 @@ const QUERY = 'abnormal_query'
   }
 })
 export default class DrawerTrack extends Vue {
-  // 是否正在播放 .sync
-  @PropSync('show', { type: Boolean, default: false })
-  isShow!: boolean
+  @Mutation('map/IS_SHOW_DRAWER') isShowDrawer // 方法 - 显示抽屉的状态
+
+  @Getter('map/showDrawer') showDrawer!: boolean // 是否显示底部抽屉（轨迹）
 
   // 是否播放中
   visible = false
@@ -74,14 +76,15 @@ export default class DrawerTrack extends Vue {
   }
 
   // 监听 - params
-  @Watch('isShow', {})
+  @Watch('showDrawer', {})
   public watchValue(val: boolean) {
     this.visible = val
   }
+
   // 监听 - params
   @Watch('visible', {})
   public watchVisible(val: boolean) {
-    this.$emit('update:show', val)
+    this.isShowDrawer(val)
   }
 }
 </script>

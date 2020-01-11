@@ -5,7 +5,7 @@
     <!-- 播放/停止  -->
     <i
       class="sprite_ico"
-      :class="`sprite_ico_track_${isplay && !end ? 'pause' : 'play'}`"
+      :class="`sprite_ico_track_${isPlaying && !end ? 'pause' : 'play'}`"
       @click="playPause"
     ></i>
     <i class="sprite_ico sprite_ico_stop track__stop" @click="stop"></i>
@@ -13,11 +13,13 @@
     <i class="sprite_ico sprite_ico_track_forward" @click="addSpeed"></i>
     <!-- TODO -->
     <el-slider
+      @mouseup.native="dragEnd"
+      @mousedown.native="dragStart"
       class="track__slider"
       :show-tooltip="false"
       :max="trackLength"
-      :value="value"
-      :disabled="!trackMarkersLength"
+      :value="passedLength"
+      :disabled="!trackMarkers.length"
       @input="input"
       @change="change"
     ></el-slider>
@@ -25,8 +27,9 @@
 </template>
 
 <script lang="ts">
+import { Mutation, Getter } from 'vuex-class'
 import { Component, Vue, PropSync, Prop, Watch } from 'vue-property-decorator'
-import { CarIdBody } from '@/services'
+import { CarLocationBody } from '@/services'
 import { Throttle, Bind } from 'lodash-decorators'
 const SPEED = 200
 @Component({
@@ -34,33 +37,35 @@ const SPEED = 200
   inheritAttrs: false
 })
 export default class DrawerTrackComponent extends Vue {
-  // 折线&点 - 坐标（用于轨迹回放）
-  @Prop({ type: Number, default: 0 })
-  public readonly trackMarkersLength!: number
-
-  // 搜索参数 .sync
-  @PropSync('speed', { type: Number, default: 0 }) speeds!: number
-
-  // value slider的值
-  @Prop({ type: Number, default: 0 }) value!: number
-
-  // 搜索参数 .sync
-  @PropSync('isPlaying', { type: Boolean, default: false }) isplay!: boolean
-
-  // 是否结束 .sync
-  @PropSync('isEnd', { type: Boolean, default: false }) end!: boolean
-
-  slider: number = 0 // 获取已经经过点的长度(操作slider)
   // 加速
   get trackLength() {
-    return this.trackMarkersLength ? this.trackMarkersLength - 1 : 0
+    return this.trackMarkers.length ? this.trackMarkers.length - 1 : 0
+  }
+
+  @Mutation('map/SET_DRAGGING_STATUS') setDraggingStatus // 方法-是否拖拽
+  @Mutation('map/SET_TRACK_SPEED') setTrackSpeed // 方法 - 设置播放速度
+  @Mutation('map/SET_PLAY_STATUS') setPlayStatus // 方法 - 设置播放状态
+  @Mutation('map/SET_TRACK_PASSED_LENGTH') setTrackPassedLength // 方法 - 设置路过的长度
+
+  @Getter('map/isEnd') end!: boolean // 是否结束
+  @Getter('map/speed') speed!: number // 播放速度
+  @Getter('map/isPlaying') isPlaying!: boolean // 是否在播放轨迹回放
+  @Getter('map/trackMarkers') trackMarkers!: Array<CarLocationBody> // 坐标数组
+  @Getter('map/passedLength') passedLength!: number // 已经路过的长度
+
+  dragStart() {
+    this.setDraggingStatus(true)
+  }
+
+  dragEnd() {
+    this.setDraggingStatus(false)
   }
 
   @Throttle(400)
   @Bind()
   addSpeed() {
-    if (this.isplay) {
-      this.$emit('update:speed', this.speeds === 5 ? 5 : this.speeds + 1)
+    if (this.isPlaying) {
+      this.setTrackSpeed(this.speed === 5 ? 5 : this.speed + 1)
     }
   }
 
@@ -68,16 +73,15 @@ export default class DrawerTrackComponent extends Vue {
   @Throttle(400)
   @Bind()
   minusSpeed() {
-    if (this.isplay) {
-      this.$emit('update:speed', this.speeds === 1 ? 1 : this.speeds - 1)
+    if (this.isPlaying) {
+      this.setTrackSpeed(this.speed === 1 ? 1 : this.speed - 1)
     }
   }
   // 播放/暂停
   playPause() {
-    if (this.trackMarkersLength) {
-      this.isplay = !this.isplay
-      this.$emit('update:isPlaying', this.isplay)
-      this.$emit('play', this.isplay)
+    if (this.trackMarkers.length) {
+      this.$emit('play', !this.isPlaying)
+      this.setPlayStatus(!this.isPlaying)
     } else {
       this.$message({
         message: '没有轨迹点可以播放',
@@ -86,23 +90,17 @@ export default class DrawerTrackComponent extends Vue {
     }
   }
   stop() {
-    this.isplay = false
-    this.$emit('update:isPlaying', this.isplay)
     this.$emit('stop')
+    this.setPlayStatus(false)
   }
   input(val) {
-    this.$emit('input', val)
+    this.setTrackPassedLength(val)
   }
+
   change(val) {
+    this.setDraggingStatus(false)
     this.$emit('change-slider', val)
   }
-  // 监听 - 倍速
-  // @Watch('isplay', {})
-  // public watchRealTime(val: boolean) {
-  //   if (!val) {
-  //     this.$emit('update:speed', 200)
-  //   }
-  // }
 }
 </script>
 
@@ -124,6 +122,9 @@ export default class DrawerTrackComponent extends Vue {
   }
   &__slider {
     width: 100%;
+    & /deep/ .el-slider__runway {
+      margin: 0;
+    }
   }
   &__time {
     color: #fff;
