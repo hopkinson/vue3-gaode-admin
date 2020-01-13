@@ -91,11 +91,11 @@
         </panel-chart>
 
         <!-- 4.2右侧-围栏按钮 -->
-        <button-fence
+        <!-- <button-fence
           @add="addFence"
           @close="closeFence"
           :fence.sync="fenceList"
-        ></button-fence>
+        ></button-fence> -->
       </div>
 
       <!-- 地图 :loadPreTrack="loadPreMarkers" @on-passed-line="recordPassedLength" -->
